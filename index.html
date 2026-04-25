@@ -1,1 +1,3411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>순창초 지역연계 저녁늘봄 안내</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0984e3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="늘봄안내">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">  <style>
+    html{background:var(--bg);min-height:100%;}
+    :root {
+      --bg: #f5f6fa; --surface: #ffffff; --text: #2d3436; --text-sub: #636e72;
+      --border: #e9ecef; --input-bg: #f8f9fa; --input-border: #dee2e6;
+      --blue: #74b9ff; --blue-deep: #0984e3;
+      --green: #55efc4; --green-deep: #00b894;
+      --purple: #a29bfe; --purple-deep: #6c5ce7;
+      --orange-deep: #e17055;
+      --red: #ff7675; --red-deep: #d63031;
+      --teal: #81ecec; --teal-deep: #00cec9;
+      --yellow-deep: #fdcb6e;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 14px; --radius-sm: 10px; --radius-xs: 6px;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a2e; --surface: #16213e; --text: #e0e0e0; --text-sub: #a0a0a0;
+      --border: #2a2a4a; --input-bg: #1a1a2e; --input-border: #3a3a5a;
+      --shadow: 0 2px 12px rgba(0,0,0,0.3); --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;line-height:1.5;}
+    .container{width:100%;max-width:520px;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;position:relative;}
+    .header{padding:14px 20px;text-align:center;font-size:1rem;font-weight:700;color:white;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#0984e3,#00cec9);position:sticky;top:0;z-index:50;}
+    .header .title-text{flex-grow:1;text-align:center;cursor:pointer;letter-spacing:-0.3px;}
+    .btn-theme{background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.1rem;cursor:pointer;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+    .view{display:none;flex-direction:column;flex-grow:1;}
+    .view-content{padding:0;flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+
+    /* 지도 필터 - 활성 색상 변형 */
+    .btn-map-filter.active.green {
+      background: var(--green-deep);
+      color: white;
+      border-color: var(--green-deep);
+    }
+    .btn-map-filter.active.orange {
+      background: var(--orange-deep);
+      color: white;
+      border-color: var(--orange-deep);
+    }
+    /* 지도 필터 2행 간격 */
+    #map-filter {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+/* 포털 */
+.portal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+.portal-logo { font-size: 3.5rem; margin-bottom: 4px; }
+
+.portal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.portal-sub {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* 학부모 버튼 - 주요 버튼 강조 */
+.btn-portal {
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.btn-portal:active { transform: scale(0.97); }
+.btn-portal:hover  { filter: brightness(1.06); transform: scale(0.98); }
+
+.btn-portal.parent {
+  background: linear-gradient(135deg, #0984e3, #00cec9);
+  padding: 22px 20px;        /* ← 학부모 버튼만 더 크게 */
+  font-size: 1.08rem;
+  box-shadow: 0 6px 24px rgba(9, 132, 227, 0.35);  /* ← 그림자 강조 */
+}
+
+.btn-portal.org {
+  background: linear-gradient(135deg, #00b894, #55efc4);
+  opacity: 0.9;              /* ← 상대적으로 덜 강조 */
+  font-size: 0.95rem;
+  padding: 14px 20px;        /* ← 기관/관리자 버튼 작게 */
+}
+
+.btn-portal.admin {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  opacity: 0.9;
+  font-size: 0.95rem;
+  padding: 14px 20px;
+}
+
+/* 기관/관리자 버튼 묶음 구분선 */
+.portal-staff-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+.portal-staff-divider::before,
+.portal-staff-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.portal-staff-divider-text {
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.portal-version {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-top: 8px;
+}
+
+    /* 히어로 */
+    .hero{background:linear-gradient(135deg,#0984e3,#00cec9);color:white;padding:24px 24px 20px;text-align:center;border-radius:0 0 24px 24px;margin-bottom:16px;}
+    .hero-title{font-size:1.1rem;font-weight:800;margin-bottom:6px;}
+    .hero-sub{font-size:0.84rem;opacity:0.9;line-height:1.6;margin-bottom:16px;}
+    .hero-buttons{display:flex;gap:10px;}
+    .btn-hero{flex:1;padding:14px 8px;border-radius:var(--radius-sm);border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:white;font-weight:700;font-size:0.88rem;cursor:pointer;text-align:center;transition:0.15s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .btn-hero:active{background:rgba(255,255,255,0.3);}
+    .btn-hero-icon{font-size:1.5rem;}
+
+    /* 카테고리 */
+    .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 20px;margin-bottom:16px;}
+    .cat-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:10px 4px;border-radius:var(--radius-sm);transition:0.15s;background:var(--surface);border:2px solid transparent;box-shadow:var(--shadow);}
+    .cat-item:active{transform:scale(0.95);}
+    .cat-item.active{border-color:var(--teal-deep);background:rgba(0,206,201,0.08);}
+    .cat-icon{font-size:1.5rem;}
+    .cat-label{font-size:0.7rem;font-weight:700;color:var(--text-sub);text-align:center;line-height:1.3;}
+    .cat-item.active .cat-label{color:var(--teal-deep);}
+    .cat-count{font-size:0.65rem;color:var(--teal-deep);font-weight:700;}
+
+    /* 모집 요약 */
+    .open-summary{margin:0 20px 14px;padding:12px 16px;background:rgba(0,184,148,0.08);border-radius:var(--radius-sm);border-left:4px solid var(--green-deep);font-size:0.88rem;font-weight:700;color:var(--green-deep);}
+
+    /* 섹션 */
+    .sec-header{display:flex;justify-content:space-between;align-items:center;padding:0 20px;margin-bottom:10px;margin-top:4px;}
+    .sec-title{font-size:0.92rem;font-weight:800;display:flex;align-items:center;gap:6px;}
+    .sec-toggle{font-size:0.82rem;color:var(--teal-deep);font-weight:700;cursor:pointer;border:none;background:none;padding:4px 8px;}
+
+/* 프로그램 카드 */
+.prog-list { padding: 0 20px; margin-bottom: 20px; }
+
+.p-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+}
+.p-card:active { transform: scale(0.98); }
+.p-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 상단 상태 바 (색상 라인 → 상태 뱃지 영역으로 변경) */
+.p-card-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 0;
+}
+
+/* 모집 상태 강조 뱃지 */
+.p-card-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.p-card-status-badge.open {
+  background: rgba(0, 184, 148, 0.12);
+  color: var(--green-deep);
+}
+.p-card-status-badge.closed {
+  background: rgba(214, 48, 49, 0.08);
+  color: var(--red-deep);
+}
+.p-card-status-badge.wait {
+  background: rgba(253, 203, 110, 0.2);
+  color: #c0823a;
+}
+.p-card-status-badge.preparing {
+  background: rgba(99, 110, 114, 0.1);
+  color: var(--text-sub);
+}
+
+/* 잔여 인원 강조 */
+.p-card-remain {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  background: rgba(0, 184, 148, 0.08);
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+.p-card-remain.none {
+  color: var(--text-sub);
+  background: transparent;
+}
+
+/* 프로그램명 + 기관명 */
+.p-card-main { padding: 8px 16px 0; }
+
+.p-card-name {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 3px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.p-card-org {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 핵심 정보 한 줄 요약 */
+.p-card-summary {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.p-card-time {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.p-card-time-icon {
+  font-size: 0.85rem;
+}
+
+.p-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.p-card-meta-item {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.p-card-meta-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* 통학 뱃지 */
+.p-card-tags { display: flex; gap: 5px; flex-wrap: wrap; padding: 0 16px 12px; }
+    .status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:2px;}
+    .status-dot.open{background:#00b894;} .status-dot.closed{background:#d63031;} .status-dot.wait{background:#fdcb6e;} .status-dot.preparing{background:#b2bec3;}
+
+    /* 뱃지 */
+    .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.72rem;font-weight:700;}
+    .badge-blue{background:rgba(9,132,227,0.1);color:var(--blue-deep);}
+    .badge-green{background:rgba(0,184,148,0.1);color:var(--green-deep);}
+    .badge-purple{background:rgba(108,92,231,0.1);color:var(--purple-deep);}
+    .badge-orange{background:rgba(225,112,85,0.1);color:var(--orange-deep);}
+    .badge-red{background:rgba(214,48,49,0.1);color:var(--red-deep);}
+    .badge-teal{background:rgba(0,206,201,0.1);color:var(--teal-deep);}
+    .badge-yellow{background:rgba(253,203,110,0.2);color:#e17055;}
+    .badge-gray{background:rgba(99,110,114,0.1);color:var(--text-sub);}
+
+    /* 기관 상세 */
+    .detail-section{margin-bottom:20px;}
+    .detail-section-title{font-size:0.88rem;font-weight:800;padding:10px 0;margin-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:6px;}
+    .detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+    .detail-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:0.88rem;line-height:1.8;}
+    .detail-label{color:var(--text-sub);font-weight:600;white-space:nowrap;}
+    .detail-value{color:var(--text);}
+    .detail-value.pending{color:var(--orange-deep);font-style:italic;}
+    .detail-value a{color:var(--blue-deep);text-decoration:none;}
+    .contact-buttons{display:flex;gap:10px;margin-top:12px;}
+    .btn-contact{flex:1;padding:13px;border:none;border-radius:var(--radius-sm);font-size:0.92rem;font-weight:700;cursor:pointer;text-align:center;}
+    .btn-contact:active{opacity:0.8;}
+    .btn-contact.call{background:linear-gradient(135deg,#0984e3,#74b9ff);color:white;}
+    .btn-contact.sms{background:var(--input-bg);color:var(--text);border:1px solid var(--border);}
+    .transport-box{padding:14px;border-radius:var(--radius-sm);font-size:0.88rem;line-height:1.6;}
+    .transport-box.yes{background:rgba(0,184,148,0.08);border:1px solid rgba(0,184,148,0.2);color:var(--green-deep);}
+    .transport-box.no{background:var(--input-bg);border:1px solid var(--border);color:var(--text-sub);}
+    .prog-detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+    .prog-detail-top{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
+    .prog-detail-name{font-weight:800;font-size:0.92rem;display:flex;align-items:center;gap:6px;}
+    .prog-detail-body{padding:0 16px 14px;}
+    .prog-status-msg{font-size:0.78rem;padding:8px 16px;font-weight:600;}
+    .prog-status-msg.open{background:rgba(0,184,148,0.08);color:var(--green-deep);}
+    .prog-status-msg.closed{background:rgba(214,48,49,0.06);color:var(--red-deep);}
+    .prog-status-msg.wait{background:rgba(253,203,110,0.15);color:#e17055;}
+    .prog-status-msg.preparing{background:var(--input-bg);color:var(--text-sub);}
+
+    /* 기관 상세 아코디언 */
+    .detail-acc{margin-bottom:14px;}
+    .detail-acc-head{width:100%;border:none;background:transparent;padding:12px 0;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:0.92rem;font-weight:800;color:var(--text);text-align:left;}
+    .detail-acc-title{display:flex;align-items:center;gap:6px;}
+    .detail-acc-arrow{font-size:0.9rem;color:var(--text-sub);transition:transform 0.15s;}
+    .detail-acc-body{display:none;padding-top:10px;}
+    .detail-acc.open .detail-acc-body{display:block;}
+    .detail-acc.open .detail-acc-arrow{transform:rotate(180deg);}
+    .notice-empty{text-align:center;padding:12px;font-size:0.85rem;color:var(--text-sub);}
+    .detail-summary-badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 18px;}
+.detail-top-card { margin-bottom: 18px; }
+
+/* 기관 상세 - 상단 고정 전화버튼 영역 */
+.detail-contact-fixed {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--teal-deep);
+  box-shadow: 0 2px 12px rgba(0, 206, 201, 0.12);
+  margin-bottom: 16px;
+}
+
+.detail-contact-fixed .btn-contact {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+.detail-contact-fixed .btn-contact.call {
+  background: linear-gradient(135deg, #0984e3, #74b9ff);
+  color: white;
+}
+
+.detail-contact-fixed .btn-contact.sms {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* 기관명 + 뱃지 헤더 영역 */
+.detail-org-header {
+  margin-bottom: 14px;
+}
+
+.detail-org-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.detail-org-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+/* 연락처 없을 때 안내 */
+.detail-no-contact {
+  padding: 12px 16px;
+  background: var(--input-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 16px;
+}
+    /* 추천 플로우 */
+    .rec-flow{padding:24px 20px;display:flex;flex-direction:column;align-items:center;}
+    .rec-step{width:100%;margin-bottom:24px;}
+    .rec-q{font-size:1rem;font-weight:800;margin-bottom:12px;text-align:center;}
+    .rec-q-sub{font-size:0.82rem;color:var(--text-sub);text-align:center;margin-bottom:14px;}
+    .rec-options{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+    .btn-rec{padding:14px 18px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:0.88rem;cursor:pointer;transition:0.15s;min-width:80px;text-align:center;}
+    .btn-rec:active{transform:scale(0.95);}
+    .btn-rec.selected{border-color:var(--teal-deep);background:rgba(0,206,201,0.1);color:var(--teal-deep);}
+    .rec-progress{display:flex;gap:6px;margin-bottom:20px;justify-content:center;}
+    .rec-dot{width:10px;height:10px;border-radius:50%;background:var(--border);}
+    .rec-dot.active{background:var(--teal-deep);}
+    .rec-dot.done{background:var(--green-deep);}
+
+    .rec-result-card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border-left:5px solid var(--teal-deep);}
+    .rec-rank{font-size:1.2rem;font-weight:800;color:var(--teal-deep);margin-bottom:4px;}
+    .rec-org-name{font-size:1rem;font-weight:800;margin-bottom:8px;}
+    .rec-checks{font-size:0.85rem;line-height:1.8;}
+    .rec-progs{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+    .rec-prog-item{font-size:0.82rem;color:var(--text-sub);line-height:1.7;}
+    .btn-detail-link{display:block;text-align:center;padding:10px;margin-top:10px;background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.2);border-radius:var(--radius-sm);color:var(--teal-deep);font-weight:700;font-size:0.88rem;cursor:pointer;}
+    .rec-empty{text-align:center;padding:32px 20px;color:var(--text-sub);}
+    .rec-empty-icon{font-size:2.5rem;margin-bottom:8px;}
+
+    /* 지도 */
+    .map-container{width:100%;height:400px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:16px;}
+    .map-filter{display:flex;gap:6px;margin-bottom:12px;justify-content:center;}
+    .btn-map-filter{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-sub);font-weight:700;font-size:0.82rem;cursor:pointer;}
+    .btn-map-filter.active{background:var(--teal-deep);color:white;border-color:var(--teal-deep);}
+    .map-org-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow);}
+    .map-org-card:active{transform:scale(0.98);}
+
+    /* 공통 UI */
+    .nav-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;}
+    .btn-back{background:var(--input-bg);color:var(--text);border:1px solid var(--border);padding:8px 14px;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;font-size:0.85rem;}
+    .section-title{font-size:1rem;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;}
+    select,input[type="text"],input[type="password"],input[type="date"],input[type="number"],input[type="time"]{width:100%;padding:11px 14px;font-size:0.95rem;border:1px solid var(--input-border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);outline:none;max-width:100%;}
+    select:focus,input:focus{border-color:var(--teal-deep);}
+    textarea{width:100%;padding:11px 14px;font-size:0.95rem;border:1px solid var(--input-border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);resize:vertical;min-height:60px;font-family:inherit;}
+    .btn-action{width:100%;color:white;border:none;padding:13px;font-size:0.95rem;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;margin-top:10px;transition:opacity 0.2s;}
+    .btn-action:active{opacity:0.8;}
+    .btn-action.teal{background:linear-gradient(135deg,#00cec9,#81ecec);}
+    .btn-action.purple{background:linear-gradient(135deg,#6c5ce7,#a29bfe);}
+    .btn-action.gray{background:#636e72;}
+    .btn-action.danger{background:linear-gradient(135deg,#d63031,#ff7675);}
+    .btn-action.sm{width:auto;padding:8px 16px;font-size:0.82rem;margin:0;}
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:0.82rem;font-weight:700;color:var(--text-sub);margin-bottom:6px;display:block;}
+    .form-row{display:flex;gap:10px;}
+    .form-row>*{flex:1;}
+
+    .welcome-box{background:linear-gradient(135deg,rgba(0,206,201,0.08),rgba(9,132,227,0.08));border:1px solid rgba(0,206,201,0.2);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center;}
+    .welcome-title{font-size:1rem;font-weight:800;color:var(--teal-deep);margin-bottom:6px;}
+    .welcome-sub{font-size:0.85rem;color:var(--text-sub);line-height:1.6;}
+    .missing-list{margin-top:10px;text-align:left;font-size:0.82rem;color:var(--orange-deep);line-height:1.8;}
+    .comp-bar-wrap{background:var(--border);border-radius:10px;height:8px;overflow:hidden;margin-top:6px;}
+    .comp-bar{height:100%;border-radius:10px;transition:width 0.3s;}
+    .comp-bar.high{background:var(--green-deep);} .comp-bar.mid{background:var(--yellow-deep);} .comp-bar.low{background:var(--red-deep);}
+
+    .tabs{display:flex;gap:4px;margin-bottom:16px;}
+    .btn-tab{flex:1;padding:10px 4px;font-weight:700;font-size:0.82rem;border:1px solid var(--teal);border-radius:var(--radius-sm);background:transparent;color:var(--teal-deep);cursor:pointer;text-align:center;transition:0.15s;}
+    .btn-tab.active{background:var(--teal-deep);color:white;border-color:var(--teal-deep);}
+    .btn-tab.purple{border-color:var(--purple);color:var(--purple-deep);}
+    .btn-tab.purple.active{background:var(--purple-deep);color:white;border-color:var(--purple-deep);}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+    .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 6px;text-align:center;}
+    .stat-num{font-size:1.3rem;font-weight:800;}
+    .stat-label{font-size:0.72rem;color:var(--text-sub);margin-top:2px;}
+    .prog-card-manage{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;}
+    .prog-manage-title{font-weight:700;font-size:0.92rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+    .prog-manage-detail{font-size:0.82rem;color:var(--text-sub);line-height:1.7;}
+    .prog-actions{display:flex;gap:6px;margin-top:8px;}
+    .notice-card{background:var(--input-bg);border-left:3px solid var(--yellow-deep);padding:12px;border-radius:var(--radius-sm);margin-bottom:10px;}
+    .notice-title{font-weight:700;font-size:0.88rem;margin-bottom:4px;}
+    .notice-date{font-size:0.78rem;color:var(--text-sub);}
+    .notice-content{font-size:0.85rem;margin-top:6px;line-height:1.6;}
+    .student-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;background:var(--surface);}
+    .student-info{font-size:0.88rem;line-height:1.5;}
+    .student-info strong{color:var(--text);}
+    .student-actions{display:flex;gap:6px;}
+    .btn-sm{padding:6px 12px;font-size:0.78rem;font-weight:700;border-radius:var(--radius-xs);border:1px solid var(--border);background:var(--input-bg);color:var(--text);cursor:pointer;min-height:36px;}
+    .btn-sm.danger{background:rgba(214,48,49,0.08);color:var(--red-deep);border-color:var(--red);}
+    .admin-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .admin-table th,.admin-table td{border:1px solid var(--border);padding:8px 6px;text-align:center;}
+    .admin-table th{background:var(--input-bg);font-weight:700;font-size:0.78rem;}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text-sub);}
+    .empty-icon{font-size:2.5rem;margin-bottom:8px;}
+    .bottom-links{text-align:center;padding:16px 20px;margin-top:8px;}
+    .update-time{font-size:0.75rem;color:var(--text-sub);margin-top:8px;}
+
+    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;padding:20px;}
+    .modal-content{background:var(--surface);width:100%;max-width:440px;border-radius:16px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border);}
+    #loading{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--surface);opacity:0.95;z-index:999;justify-content:center;align-items:center;flex-direction:column;gap:12px;}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top:3px solid var(--teal-deep);border-radius:50%;animation:spin 0.8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .load-text{font-size:0.9rem;font-weight:600;color:var(--text-sub);}
+    #toast{visibility:hidden;background:var(--text);color:var(--surface);text-align:center;border-radius:var(--radius-sm);padding:12px 20px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);font-weight:600;font-size:0.88rem;opacity:0;transition:0.3s;max-width:90%;}
+#toast.show{visibility:visible;opacity:1;bottom:50px;}
+
+/* ========== 지도 검색 ========== */
+.map-search-wrap {
+  margin-bottom: 10px;
+}
+.map-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+.map-search-box:focus-within {
+  border-color: var(--teal-deep);
+}
+.map-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  padding: 0;
+}
+.map-search-input::placeholder {
+  color: var(--text-sub);
+}
+.map-search-clear {
+  background: var(--border);
+  border: none;
+  color: var(--text-sub);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.map-search-clear:hover {
+  background: var(--teal-deep);
+  color: white;
+}
+.map-search-clear.show {
+  display: flex;
+}
+.map-search-result {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+  margin-top: -4px;
+}
+.map-search-result span {
+  color: var(--teal-deep);
+  font-weight: 700;
+}        /* ========== 추가: 시간표 ========== */
+    .tt-tabs{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap;}
+    .tt-tab{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-sub);font-weight:700;font-size:0.85rem;cursor:pointer;transition:0.15s;}
+    .tt-tab.active{background:var(--teal-deep);color:white;border-color:var(--teal-deep);}
+    .tt-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;box-shadow:var(--shadow);}
+    .tt-toolbar-left{font-size:0.82rem;color:var(--text-sub);font-weight:700;}
+    .tt-toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .tt-select{min-width:180px;padding:9px 12px;font-size:0.84rem;border:1px solid var(--input-border);border-radius:12px;background:var(--surface);color:var(--text);}
+    .tt-filter-hint{font-size:0.78rem;color:var(--text-sub);}
+    .tt-scroll{overflow-x:auto;margin-bottom:16px;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+    .tt-table{width:100%;min-width:520px;border-collapse:collapse;font-size:0.78rem;background:var(--surface);}
+    .tt-table th{background:var(--teal-deep);color:white;padding:10px 4px;text-align:center;font-weight:700;font-size:0.82rem;position:sticky;top:0;z-index:2;}
+    .tt-table th:first-child{width:56px;position:sticky;left:0;z-index:3;background:var(--teal-deep);}
+    .tt-table td{border:1px solid var(--border);padding:2px;vertical-align:top;height:auto;min-height:48px;}
+    .tt-table td:first-child{font-weight:700;text-align:center;font-size:0.75rem;color:var(--text-sub);background:var(--input-bg);position:sticky;left:0;z-index:1;width:56px;vertical-align:middle;}
+    .tt-cell{padding:7px 5px;border-radius:8px;margin:2px;cursor:pointer;font-size:0.72rem;line-height:1.45;transition:0.1s;min-height:42px;}
+    .tt-cell:active{transform:scale(0.97);}
+    .tt-cell.cat-coding{background:rgba(9,132,227,0.12);border-left:3px solid #0984e3;}
+    .tt-cell.cat-art{background:rgba(225,112,85,0.12);border-left:3px solid #e17055;}
+    .tt-cell.cat-sport{background:rgba(0,184,148,0.12);border-left:3px solid #00b894;}
+    .tt-cell.cat-lang{background:rgba(108,92,231,0.12);border-left:3px solid #6c5ce7;}
+    .tt-cell.cat-music{background:rgba(253,203,110,0.2);border-left:3px solid #fdcb6e;}
+    .tt-cell.cat-science{background:rgba(0,206,201,0.12);border-left:3px solid #00cec9;}
+    .tt-cell.cat-care{background:rgba(85,239,196,0.12);border-left:3px solid #55efc4;}
+    .tt-cell.cat-etc{background:rgba(99,110,114,0.1);border-left:3px solid #636e72;}
+    .tt-cell-name{font-weight:700;font-size:0.75rem;margin-bottom:4px;}
+    .tt-cell-org{font-size:0.67rem;color:var(--text-sub);margin-bottom:2px;}
+    .tt-org-pill{display:inline-block;padding:2px 7px;border-radius:999px;font-size:0.66rem;font-weight:700;line-height:1.2;max-width:100%;word-break:keep-all;}
+    .tt-org-pill.school{background:rgba(9,132,227,0.12);color:#0984e3;}
+    .tt-org-pill.community{background:rgba(0,184,148,0.12);color:#00b894;}
+    .tt-cell-time{font-size:0.65rem;color:var(--text-sub);}
+    .tt-cell .status-dot{width:7px;height:7px;margin-left:2px;}
+    .tt-detail{display:none;}
+    .tt-detail.show{display:block;}
+    .tt-detail-card{background:var(--surface);border:2px solid var(--teal-deep);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-md);position:relative;}
+    .tt-detail-close{position:absolute;top:10px;right:10px;background:var(--border);border:none;width:28px;height:28px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .tt-detail-name{font-size:1rem;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-right:32px;}
+    .tt-detail-org{font-size:0.85rem;color:var(--text-sub);margin-bottom:10px;}
+    .tt-detail-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:0.85rem;line-height:1.8;}
+    .tt-detail-label{color:var(--text-sub);font-weight:600;}
+    .tt-detail-value{color:var(--text);}
+    .tt-detail-value.pending{color:var(--orange-deep);font-style:italic;}
+    .tt-empty{text-align:center;padding:20px;color:var(--text-sub);font-size:0.85rem;}
+    .btn-top{position:fixed;bottom:20px;right:calc(50% - 240px);width:42px;height:42px;border-radius:50%;background:var(--teal-deep);color:white;font-size:1.1rem;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:none;z-index:40;align-items:center;justify-content:center;}
+        /* 요일 다중선택 바 */
+    .tt-day-bar{display:flex;gap:4px;margin-bottom:10px;justify-content:center;}
+    .tt-day-btn{padding:8px 0;flex:1;max-width:52px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface);color:var(--text-sub);font-weight:800;font-size:0.88rem;cursor:pointer;text-align:center;transition:0.15s;}
+    .tt-day-btn.active{border-color:var(--teal-deep);background:var(--teal-deep);color:white;}
+    .tt-day-btn .day-sub{font-size:0.6rem;font-weight:600;display:block;margin-top:1px;}
+    .tt-day-btn.active .day-sub{color:rgba(255,255,255,0.8);}
+    .tt-day-btn.all{max-width:52px;font-size:0.75rem;}
+    /* 카드형 (요일 1개) */
+    .tt-org-group{margin-bottom:18px;}
+    .tt-org-header{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:2px solid var(--border);margin-bottom:10px;}
+    .tt-org-icon{font-size:1.2rem;}
+    .tt-org-name-h{font-weight:800;font-size:0.95rem;flex:1;}
+    .tt-org-badge-h{font-size:0.72rem;}
+    .tt-prog-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;transition:transform 0.1s;position:relative;overflow:hidden;}
+    .tt-prog-card:active{transform:scale(0.98);}
+    .tt-prog-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+    .tt-prog-card.cat-coding::before{background:#0984e3;}
+    .tt-prog-card.cat-art::before{background:#e17055;}
+    .tt-prog-card.cat-sport::before{background:#00b894;}
+    .tt-prog-card.cat-lang::before{background:#6c5ce7;}
+    .tt-prog-card.cat-music::before{background:#fdcb6e;}
+    .tt-prog-card.cat-science::before{background:#00cec9;}
+    .tt-prog-card.cat-care::before{background:#55efc4;}
+    .tt-prog-card.cat-etc::before{background:#636e72;}
+    .tt-prog-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;padding-left:8px;}
+    .tt-prog-name{font-weight:800;font-size:0.92rem;display:flex;align-items:center;gap:6px;}
+    .tt-prog-info{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:0.82rem;line-height:1.7;padding-left:8px;}
+    .tt-prog-label{color:var(--text-sub);font-weight:600;}
+    .tt-prog-value{color:var(--text);}
+    .tt-prog-value.pending{color:var(--orange-deep);font-style:italic;}
+    .tt-empty-day{text-align:center;padding:30px 20px;color:var(--text-sub);}
+    .tt-empty-day-icon{font-size:2rem;margin-bottom:8px;}
+    /* ========== 검색 기능 ========== */
+.search-wrap {
+  padding: 0 20px;
+  margin-bottom: 14px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+.search-box:focus-within {
+  border-color: var(--teal-deep);
+}
+.search-icon {
+  font-size: 1.1rem;
+  color: var(--text-sub);
+  flex-shrink: 0;
+}
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--text);
+  outline: none;
+  padding: 0;
+  width: 100%;
+}
+.search-input::placeholder {
+  color: var(--text-sub);
+}
+.search-clear {
+  background: var(--border);
+  border: none;
+  color: var(--text-sub);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.search-clear:hover {
+  background: var(--teal-deep);
+  color: white;
+}
+.search-clear.show {
+  display: flex;
+}
+.search-result-count {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  padding: 0 20px;
+  margin-bottom: 6px;
+  margin-top: -6px;
+}
+.search-result-count span {
+  color: var(--teal-deep);
+  font-weight: 700;
+}
+
+/* ========== 호버 효과 ========== */
+.btn-hero {
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.btn-hero:hover {
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+.btn-portal:hover {
+  transform: scale(0.98);
+  filter: brightness(1.06);
+}
+.btn-action:hover {
+  opacity: 0.88;
+}
+.btn-tab:hover:not(.active) {
+  background: rgba(0, 206, 201, 0.08);
+}
+.btn-tab.purple:hover:not(.active) {
+  background: rgba(108, 92, 231, 0.08);
+}
+.cat-item:hover {
+  border-color: var(--teal-deep);
+  background: rgba(0, 206, 201, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.p-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+.btn-rec:hover {
+  border-color: var(--teal-deep);
+  background: rgba(0, 206, 201, 0.06);
+  transform: translateY(-1px);
+}
+.btn-back:hover {
+  background: var(--border);
+}
+.btn-sm:hover {
+  background: var(--border);
+}
+.btn-sm.danger:hover {
+  background: rgba(214, 48, 49, 0.15);
+}
+.btn-contact.call:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.btn-contact.sms:hover {
+  background: var(--border);
+}
+.map-org-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+.tt-prog-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+.btn-detail-link:hover {
+  background: rgba(0, 206, 201, 0.15);
+  transform: translateY(-1px);
+}
+.btn-map-filter:hover:not(.active) {
+  background: rgba(0, 206, 201, 0.08);
+  border-color: var(--teal-deep);
+}
+.btn-top:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header"><div style="width:34px;"></div><div class="title-text" onclick="goPortal()">🏫 순창초 지역연계 저녁늘봄</div><button class="btn-theme" onclick="toggleDark()">☀️</button></div>
+  <div id="loading"><div class="spinner"></div><div class="load-text">불러오는 중...</div></div>
+
+<!-- 🚪 포털 -->
+<div id="view-portal" class="view" style="display:flex;">
+  <div class="portal">
+
+    <div class="portal-logo">🏫</div>
+    <div class="portal-title">순창초등학교<br>지역 연계 저녁 늘봄 안내</div>
+    <div class="portal-sub">학교밖 늘봄 · 지역사회 돌봄</div>
+
+    <!-- 학부모 버튼 → 크고 강조 -->
+    <button class="btn-portal parent" onclick="openParentView()">
+      <span>👨‍👩‍👧 학부모 — 프로그램 찾기</span>
+      <span>›</span>
+    </button>
+
+    <!-- 기관/관리자 구분선 -->
+    <div class="portal-staff-divider">
+      <span class="portal-staff-divider-text">관계자 전용</span>
+    </div>
+
+    <!-- 기관/관리자 버튼 → 작고 조용하게 -->
+    <button class="btn-portal org" onclick="showView('view-org-login')">
+      <span>🏢 기관 담당자 — 정보 관리</span>
+      <span>›</span>
+    </button>
+
+    <button class="btn-portal admin" onclick="showView('view-admin-login')">
+      <span>🟣 늘봄지원실 — 전체 관리</span>
+      <span>›</span>
+    </button>
+
+    <div class="portal-version">V1.0 · 2026학년도</div>
+
+  </div>
+</div>
+
+  <!-- 👨‍👩‍👧 학부모 메인 -->
+  <div id="view-parent" class="view">
+    <div class="view-content">
+      <div class="hero">
+        <div class="hero-title">하교 후, 우리 아이 어디서 뭐 하지?</div>
+        <div class="hero-sub">순창초 주변 지역 연계 학교밖 늘봄 및<br>지역사회 돌봄 기관을 한눈에 확인하세요.</div>
+        <div class="hero-buttons">
+          <button class="btn-hero" onclick="openRecFlow()"><div class="btn-hero-icon">🎯</div>맞춤 추천</button>
+          <button class="btn-hero" onclick="openMapView()"><div class="btn-hero-icon">🗺️</div>지도에서 찾기</button>
+          <button class="btn-hero" onclick="openTimetable()"><div class="btn-hero-icon">📅</div>시간표 보기</button>
+        </div>
+      </div>
+      <div class="search-wrap" id="search-wrap" style="display:none;">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            id="main-search-input"
+            placeholder="프로그램명 또는 기관명 검색..."
+            oninput="onMainSearch()"
+          >
+          <button class="search-clear" id="main-search-clear" onclick="clearMainSearch()">✕</button>
+        </div>
+      </div>
+      <div class="search-result-count" id="search-result-count" style="display:none;"></div>
+      <div id="cat-grid-area"></div>
+      <div id="prog-content-area"></div>
+      <div class="bottom-links"><div class="update-time" id="update-time"></div></div>
+    </div>
+  </div>
+
+  <!-- 📅 시간표 -->
+  <div id="view-timetable" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top">
+        <button class="btn-back" onclick="showView('view-parent')">← 돌아가기</button>
+        <span style="font-weight:700;color:var(--teal-deep);">📅 주간 시간표</span>
+        <div style="width:60px;"></div>
+      </div>
+      <div class="tt-tabs" id="tt-tabs"></div>
+      <div class="tt-day-bar" id="tt-day-bar"></div>
+      <div class="tt-toolbar" id="tt-toolbar"></div>
+      <div id="tt-scroll-hint" style="display:none;text-align:center;font-size:0.78rem;color:var(--teal-deep);font-weight:600;margin-bottom:6px;">👉 좌우로 스크롤하세요</div>
+      <div id="tt-content"></div>
+      <div class="tt-detail" id="tt-detail"></div>
+    </div>
+  </div>
+
+  <!-- 🎯 추천 플로우 -->
+  <div id="view-rec" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="showView('view-parent')">← 돌아가기</button><span style="font-weight:700;color:var(--teal-deep);">🎯 맞춤 추천</span><div style="width:60px;"></div></div>
+      <div id="rec-flow-area"></div>
+    </div>
+  </div>
+
+  <!-- 🗺️ 지도 -->
+  <div id="view-map" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="showView('view-parent')">← 돌아가기</button><span style="font-weight:700;color:var(--teal-deep);">🗺️ 기관 지도</span><div style="width:60px;"></div></div>
+      <div class="map-filter" id="map-filter"></div>
+      <div class="map-search-wrap">
+        <div class="map-search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="map-search-input"
+            id="map-search-input"
+            placeholder="기관명 검색..."
+            oninput="onMapSearch()"
+          >
+          <button class="map-search-clear" id="map-search-clear" onclick="clearMapSearch()">✕</button>
+        </div>
+      </div>
+      <div class="map-search-result" id="map-search-result" style="display:none;"></div>
+      <div class="map-container" id="map-container" style="height:400px;"></div>
+      <div id="map-org-list"></div>
+    </div>
+  </div>
+
+  <!-- 📋 기관상세 -->
+  <div id="view-org-detail" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" id="btn-detail-back" onclick="goDetailBack()">← 돌아가기</button></div>
+      <div id="org-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- 🏢 기관 로그인 -->
+  <div id="view-org-login" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 돌아가기</button></div>
+      <div class="section-title" style="color:var(--teal-deep);">🏢 기관 담당자 로그인</div>
+      <div class="form-group"><label class="form-label">기관 선택</label><select id="org-login-select"><option value="">기관을 선택하세요</option></select></div>
+      <div class="form-group"><label class="form-label">비밀번호</label><input type="password" id="org-login-pwd" placeholder="비밀번호" maxlength="10"></div>
+      <button class="btn-action teal" onclick="orgLogin()">로그인</button>
+    </div>
+  </div>
+
+  <!-- 🏢 기관 대시보드 -->
+  <div id="view-org-dash" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 나가기</button><span id="org-dash-title" style="font-weight:700;color:var(--teal-deep);font-size:0.95rem;"></span><div style="width:60px;"></div></div>
+      <div id="org-welcome-area"></div>
+      <div class="tabs">
+        <button class="btn-tab active" id="org-tab-info" onclick="switchOrgTab('info')">ℹ️ 정보</button>
+        <button class="btn-tab" id="org-tab-prog" onclick="switchOrgTab('prog')">📋 프로그램</button>
+        <button class="btn-tab" id="org-tab-student" onclick="switchOrgTab('student')">🧑‍🎓 학생</button>
+        <button class="btn-tab" id="org-tab-notice" onclick="switchOrgTab('notice')">📢 공지</button>
+        <button class="btn-tab" id="org-tab-pwd" onclick="switchOrgTab('pwd')">🔑 비번</button>
+      </div>
+      <div id="org-area-info" class="tab-area"><div id="org-info-form"></div></div>
+      <div id="org-area-prog" class="tab-area" style="display:none;"><button class="btn-action teal sm" onclick="openProgModal()" style="margin-bottom:14px;">+ 프로그램 추가</button><div id="org-prog-list"></div></div>
+      <div id="org-area-student" class="tab-area" style="display:none;"><button class="btn-action teal sm" onclick="openStudentModal()" style="margin-bottom:14px;">+ 학생 추가</button><input type="text" id="org-student-search" placeholder="🔍 이름 검색..." onkeyup="renderOrgStudents()" style="margin-bottom:10px;"><div id="org-student-list"></div></div>
+      <div id="org-area-notice" class="tab-area" style="display:none;"><button class="btn-action teal sm" onclick="openNoticeModal()" style="margin-bottom:14px;">+ 공지 작성</button><div id="org-notice-list"></div></div>
+      <div id="org-area-pwd" class="tab-area" style="display:none;">
+        <div class="section-title" style="color:var(--teal-deep);">🔑 비밀번호 변경</div>
+        <div style="font-size:0.85rem;color:var(--text-sub);margin-bottom:14px;line-height:1.6;">현재 비밀번호를 변경할 수 있습니다.<br>변경 후 다음 로그인부터 새 비밀번호를 사용하세요.</div>
+        <div class="form-group"><label class="form-label">새 비밀번호</label><input type="text" id="org-new-pwd" placeholder="새 비밀번호 입력" maxlength="10"></div>
+        <button class="btn-action teal" onclick="saveOrgPwd()">🔑 비밀번호 변경</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🟣 관리자 로그인 -->
+  <div id="view-admin-login" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 돌아가기</button></div>
+      <div class="section-title" style="color:var(--purple-deep);">🟣 관리자 로그인</div>
+      <div class="form-group"><label class="form-label">관리자 비밀번호</label><input type="password" id="admin-login-pwd" placeholder="비밀번호" maxlength="10"></div>
+      <button class="btn-action purple" onclick="adminLogin()">로그인</button>
+    </div>
+  </div>
+
+  <!-- 🟣 관리자 대시보드 -->
+  <div id="view-admin-dash" class="view">
+    <div class="view-content" style="padding:20px;">
+      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 나가기</button><span style="font-weight:700;color:var(--purple-deep);font-size:0.95rem;">🟣 관리자</span><button class="btn-back" onclick="loadAdminData()">🔄</button></div>
+      <div class="stat-grid"><div class="stat-box"><div class="stat-num" id="adm-orgs" style="color:var(--teal-deep);">-</div><div class="stat-label">전체 기관</div></div><div class="stat-box"><div class="stat-num" id="adm-progs" style="color:var(--blue-deep);">-</div><div class="stat-label">프로그램</div></div><div class="stat-box"><div class="stat-num" id="adm-students" style="color:var(--purple-deep);">-</div><div class="stat-label">참여 학생</div></div></div>
+      <div class="tabs"><button class="btn-tab purple active" id="adm-tab-overview" onclick="switchAdminTab('overview')">📊 현황</button><button class="btn-tab purple" id="adm-tab-students" onclick="switchAdminTab('students')">🧑‍🎓 학생</button><button class="btn-tab purple" id="adm-tab-orgs" onclick="switchAdminTab('orgs')">🏢 기관</button><button class="btn-tab purple" id="adm-tab-pwd" onclick="switchAdminTab('pwd')">🔑 비번</button></div>
+      <div id="adm-area-overview" class="tab-area"><div class="section-title">🏢 기관별 현황</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-org-table"></table></div><div class="section-title" style="margin-top:20px;">📊 학년별 분포</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-grade-table"></table></div><div style="display:flex;gap:8px;margin-top:16px;"><button class="btn-action purple sm" onclick="exportClipboard()">📋 클립보드 복사</button><button class="btn-action gray sm" onclick="exportCSV()">📥 CSV 다운로드</button></div></div>
+      <div id="adm-area-students" class="tab-area" style="display:none;"><button class="btn-action purple sm" onclick="openAdmStudentModal()" style="margin-bottom:12px;">+ 학생 추가</button><div style="display:flex;gap:8px;margin-bottom:12px;"><select id="adm-student-org-filter" onchange="renderAdminStudents()" style="flex:1;"><option value="전체">전체 기관</option></select><input type="text" id="adm-student-search" placeholder="이름 검색..." onkeyup="renderAdminStudents()" style="flex:1;"></div><div id="adm-student-list"></div></div>
+      <div id="adm-area-orgs" class="tab-area" style="display:none;"><div id="adm-org-list"></div></div>
+      <div id="adm-area-pwd" class="tab-area" style="display:none;"><div class="section-title">🔑 기관 비밀번호 관리</div><div id="adm-pwd-list"></div></div>
+    </div>
+  </div>
+
+<!-- 모달: 프로그램 -->
+<div id="modal-prog" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-prog')">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-prog-title">프로그램 추가</div>
+    <div class="form-group"><label class="form-label">프로그램명</label><input type="text" id="mp-name"></div>
+
+    <div class="form-group">
+      <label class="form-label">분류</label>
+      <select id="mp-category-select" onchange="syncCombo('mp-category-select','mp-category-custom','mp-category')">
+        <option value="">선택</option>
+        <option>코딩/AI</option>
+        <option>미술/공예</option>
+        <option>체육/스포츠</option>
+        <option>어학</option>
+        <option>음악/댄스</option>
+        <option>수학/과학</option>
+        <option>돌봄</option>
+        <option value="__direct__">직접입력...</option>
+      </select>
+      <input type="text" id="mp-category-custom" placeholder="직접 입력" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-category-custom','mp-category')">
+      <input type="hidden" id="mp-category">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">대상학년</label>
+      <select id="mp-grade-select" onchange="syncCombo('mp-grade-select','mp-grade-custom','mp-grade')">
+        <option value="">선택</option>
+        <option>1학년</option>
+        <option>2학년</option>
+        <option>3학년</option>
+        <option>4학년</option>
+        <option>5학년</option>
+        <option>6학년</option>
+        <option>1~2학년</option>
+        <option>1~3학년</option>
+        <option>3~6학년</option>
+        <option>전학년</option>
+        <option value="__direct__">직접입력...</option>
+      </select>
+      <input type="text" id="mp-grade-custom" placeholder="직접 입력 예: 2~4학년" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-grade-custom','mp-grade')">
+      <input type="hidden" id="mp-grade">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">요일</label>
+      <select id="mp-day-select" onchange="syncCombo('mp-day-select','mp-day-custom','mp-day')">
+        <option value="">선택</option>
+        <option>월</option>
+        <option>화</option>
+        <option>수</option>
+        <option>목</option>
+        <option>금</option>
+        <option>토</option>
+        <option>월,수</option>
+        <option>화,목</option>
+        <option>월,수,금</option>
+        <option>화,목,토</option>
+        <option value="__direct__">직접입력...</option>
+      </select>
+      <input type="text" id="mp-day-custom" placeholder="직접 입력 예: 월,화,수" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-day-custom','mp-day')">
+      <input type="hidden" id="mp-day">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">시작시간</label><input type="time" id="mp-start"></div>
+      <div class="form-group"><label class="form-label">종료시간</label><input type="time" id="mp-end"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">정원</label><input type="number" id="mp-capacity"></div>
+      <div class="form-group"><label class="form-label">현원</label><input type="number" id="mp-current"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">상태</label>
+      <select id="mp-status">
+        <option>모집중</option>
+        <option>마감</option>
+        <option>대기접수</option>
+        <option>준비중</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">수강료</label>
+      <select id="mp-fee-select" onchange="syncCombo('mp-fee-select','mp-fee-custom','mp-fee')">
+        <option value="">선택</option>
+        <option>무료</option>
+        <option>유료</option>
+        <option value="__direct__">직접입력...</option>
+      </select>
+      <input type="text" id="mp-fee-custom" placeholder="직접 입력 예: 월 30,000원" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-fee-custom','mp-fee')">
+      <input type="hidden" id="mp-fee">
+    </div>
+
+    <div class="form-group"><label class="form-label">설명</label><textarea id="mp-desc"></textarea></div>
+    <div class="form-group"><label class="form-label">비고</label><input type="text" id="mp-note"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-prog')">취소</button>
+      <button class="btn-action teal" style="flex:2;" onclick="saveProg()">저장</button>
+    </div>
+  </div>
+</div>
+
+  <!-- 모달: 학생 -->
+  <div id="modal-student" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-student')"><div class="modal-content"><div class="modal-title" id="modal-student-title">학생 추가</div><div class="form-row"><div class="form-group"><label class="form-label">학년</label><input type="number" id="ms-grade" min="1" max="6"></div><div class="form-group"><label class="form-label">반</label><input type="number" id="ms-class" min="1" max="10"></div></div><div class="form-group"><label class="form-label">이름</label><input type="text" id="ms-name"></div><div class="form-group" id="ms-org-group" style="display:none;"><label class="form-label">기관</label><select id="ms-org"><option value="">선택</option></select></div><div class="form-group"><label class="form-label">프로그램</label><select id="ms-prog"><option value="">선택</option></select></div><div class="form-group"><label class="form-label">이용요일</label><input type="text" id="ms-day" placeholder="예: 화,목"></div><div class="form-group"><label class="form-label">보호자 연락처</label><input type="text" id="ms-contact" placeholder="010-0000-0000"></div><div class="form-row"><div class="form-group"><label class="form-label">등원방법</label><select id="ms-arrival"><option value="">선택</option><option>기관차량</option><option>스쿨버스</option><option>학부모 동행</option><option>도보(자율)</option><option>사설학원차량</option></select></div><div class="form-group"><label class="form-label">하원방법</label><select id="ms-dismissal"><option value="">선택</option><option>기관차량</option><option>스쿨버스</option><option>학부모 동행</option><option>도보(자율)</option><option>사설학원차량</option></select></div></div><div class="form-group"><label class="form-label">비고</label><input type="text" id="ms-note"></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-student')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveStudent()">저장</button></div></div></div>
+
+  <!-- 모달: 공지 -->
+  <div id="modal-notice" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-notice')"><div class="modal-content"><div class="modal-title" id="modal-notice-title">공지사항 작성</div><div class="form-group"><label class="form-label">제목</label><input type="text" id="mn-title"></div><div class="form-group"><label class="form-label">내용</label><textarea id="mn-content" style="min-height:120px;"></textarea></div><div class="form-group"><label class="form-label">상태</label><select id="mn-status"><option>게시중</option><option>종료</option></select></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-notice')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveNotice()">저장</button></div></div></div>
+
+  <!-- 모달: 비번 -->
+  <div id="modal-pwd" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-pwd')"><div class="modal-content"><div class="modal-title" id="modal-pwd-title">비밀번호 변경</div><div class="form-group"><label class="form-label">새 비밀번호</label><input type="text" id="mpw-input" maxlength="10"></div><button class="btn-action purple" onclick="savePwd()">변경</button></div></div>
+</div>
+<button class="btn-top" id="btn-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div id="toast"></div>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=292ea33281f52f28bb790bd726a77ffb&libraries=services"></script>
+<script>
+
+// ==========================================
+// 🔧 콤보박스 헬퍼 (선택 + 직접입력)
+// ==========================================
+function syncCombo(selectId, customId, hiddenId) {
+  var sel    = document.getElementById(selectId);
+  var custom = document.getElementById(customId);
+  var hidden = document.getElementById(hiddenId);
+  if (!sel || !custom || !hidden) return;
+
+  if (sel.value === '__direct__') {
+    custom.style.display = 'block';
+    custom.focus();
+    hidden.value = custom.value;
+  } else {
+    custom.style.display = 'none';
+    hidden.value = sel.value;
+  }
+}
+
+function onCustomInput(customId, hiddenId) {
+  var custom = document.getElementById(customId);
+  var hidden = document.getElementById(hiddenId);
+  if (custom && hidden) hidden.value = custom.value;
+}
+
+function restoreCombo(selectId, customId, hiddenId, value) {
+  var sel    = document.getElementById(selectId);
+  var custom = document.getElementById(customId);
+  var hidden = document.getElementById(hiddenId);
+  if (!sel || !custom || !hidden) return;
+
+  hidden.value = value || '';
+
+  // select 옵션 중 일치하는 값 탐색
+  var found = false;
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === (value || '') && sel.options[i].value !== '__direct__') {
+      sel.value = value || '';
+      found = true;
+      break;
+    }
+  }
+
+  if (!found && value) {
+    // 직접입력 모드로 복원
+    sel.value          = '__direct__';
+    custom.style.display = 'block';
+    custom.value       = value;
+  } else {
+    if (!found) sel.value = '';
+    custom.style.display = 'none';
+    custom.value = '';
+  }
+}
+
+// ==========================================
+// ⚙️ Supabase API 설정
+// ==========================================
+var SB_URL = 'https://bnnzvidomasoimorlgii.supabase.co';
+var SB_KEY = 'sb_publishable_02RdTzMFTq-cwz1QUyq5lQ_JZxkfbCf';
+
+var SB_HEADERS = {
+  'apikey':        SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY,
+  'Content-Type':  'application/json',
+  'Prefer':        'return=representation'
+};
+
+// SELECT (조회)
+function sbGet(table, query) {
+  var url = SB_URL + '/rest/v1/' + table + '?' + (query || '');
+  return fetch(url, { headers: SB_HEADERS })
+    .then(function(r) { return r.json(); });
+}
+
+// INSERT (추가)
+function sbInsert(table, data) {
+  return fetch(SB_URL + '/rest/v1/' + table, {
+    method:  'POST',
+    headers: SB_HEADERS,
+    body:    JSON.stringify(data)
+  }).then(function(r) { return r.json(); });
+}
+
+// UPDATE (수정)
+function sbUpdate(table, query, data) {
+  return fetch(SB_URL + '/rest/v1/' + table + '?' + query, {
+    method:  'PATCH',
+    headers: SB_HEADERS,
+    body:    JSON.stringify(data)
+  }).then(function(r) { return r.json(); });
+}
+
+// DELETE (삭제)
+function sbDelete(table, query) {
+  return fetch(SB_URL + '/rest/v1/' + table + '?' + query, {
+    method:  'DELETE',
+    headers: SB_HEADERS
+  }).then(function(r) {
+    if (r.status === 204) return true;
+    return r.json();
+  });
+}
+
+// RPC (함수 호출 - 맞춤추천용)
+function sbRpc(funcName, params) {
+  return fetch(SB_URL + '/rest/v1/rpc/' + funcName, {
+    method:  'POST',
+    headers: SB_HEADERS,
+    body:    JSON.stringify(params)
+  }).then(function(r) { return r.json(); });
+}
+
+// ==========================================
+// 글로벌 변수
+// ==========================================
+var allOrgs = [];
+var allProgs = [];
+var currentCat = '전체';
+var currentOrgName = '';
+var orgDashData = null;
+var adminData = null;
+var editProgRow = null;
+var editStudentRow = null;
+var editNoticeRow = null;
+var editPwdOrg = '';
+var isAdminMode = false;
+var detailBackTo = 'view-parent';
+var recConditions = {};
+var recStep = 0;
+var kakaoMap = null;
+var kakaoMarkers = [];
+var mapFilter = '전체';
+var mapSearchQuery = '';
+  // ==========================================
+// 🔍 초성 검색 헬퍼
+// ==========================================
+var CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+function getChosung(str) {
+  var result = '';
+  for (var i = 0; i < str.length; i++) {
+    var code = str.charCodeAt(i) - 44032;
+    if (code >= 0 && code <= 11171) {
+      result += CHOSUNG[Math.floor(code / 588)];
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
+}
+
+function matchSearch(text, query) {
+  if (!query) return true;
+  var t = String(text || '').toLowerCase();
+  var q = query.toLowerCase().trim();
+
+  // 일반 검색
+  if (t.indexOf(q) !== -1) return true;
+
+  // 초성 검색 (쿼리가 초성으로만 이루어진 경우)
+  var isChosung = /^[ㄱ-ㅎ]+$/.test(q);
+  if (isChosung) {
+    return getChosung(t).indexOf(q) !== -1;
+  }
+
+  return false;
+}
+
+var CAT_MAP = {
+  '전체':    { icon: '📋', label: '전체' },
+  '코딩/AI': { icon: '💻', label: '코딩·AI', cardClass: 'cat-coding', color: '#0984e3' },
+  '미술':    { icon: '🎨', label: '미술·공예', cardClass: 'cat-art', color: '#e17055' },
+  '체육':    { icon: '⚽', label: '체육·스포츠', cardClass: 'cat-sport', color: '#00b894' },
+  '어학':    { icon: '📖', label: '어학', cardClass: 'cat-lang', color: '#6c5ce7' },
+  '음악':    { icon: '🎵', label: '음악·댄스', cardClass: 'cat-music', color: '#fdcb6e' },
+  '과학':    { icon: '🔬', label: '수학·과학', cardClass: 'cat-science', color: '#00cec9' },
+  '돌봄':    { icon: '🏠', label: '돌봄', cardClass: 'cat-care', color: '#55efc4' },
+  '기타':    { icon: '📦', label: '기타', cardClass: 'cat-etc', color: '#636e72' }
+};
+
+function getCatKeys(c) {
+  if (!c) return ['기타'];
+
+  var parts = String(c).split(',').map(function(v) { return String(v).trim(); }).filter(function(v) { return !!v; });
+  var keys = [];
+
+  function addKey(key) {
+    if (keys.indexOf(key) === -1) keys.push(key);
+  }
+
+  function matchPart(part) {
+    var s = String(part || '').toLowerCase();
+    if (!s) return;
+    if (s.indexOf('코딩')!==-1||s.indexOf('ai')!==-1||s.indexOf('로봇')!==-1||s.indexOf('로블록스')!==-1||s.indexOf('드론')!==-1) addKey('코딩/AI');
+    if (s.indexOf('미술')!==-1||s.indexOf('공예')!==-1||s.indexOf('캘리')!==-1||s.indexOf('비누')!==-1) addKey('미술');
+    if (s.indexOf('체육')!==-1||s.indexOf('축구')!==-1||s.indexOf('태권')!==-1||s.indexOf('수영')!==-1||s.indexOf('스포츠')!==-1||s.indexOf('배드민턴')!==-1||s.indexOf('탁구')!==-1) addKey('체육');
+    if (s.indexOf('어학')!==-1||s.indexOf('영어')!==-1||s.indexOf('중국')!==-1) addKey('어학');
+    if (s.indexOf('음악')!==-1||s.indexOf('피아노')!==-1||s.indexOf('우쿨')!==-1||s.indexOf('오카리나')!==-1||s.indexOf('합창')!==-1||s.indexOf('난타')!==-1||s.indexOf('댄스')!==-1) addKey('음악');
+    if (s.indexOf('과학')!==-1||s.indexOf('수학')!==-1||s.indexOf('실험')!==-1) addKey('과학');
+    if (s.indexOf('돌봄')!==-1) addKey('돌봄');
+  }
+
+  if (!parts.length) parts = [String(c)];
+  parts.forEach(matchPart);
+
+  if (!keys.length) keys.push('기타');
+  return keys;
+}
+function catKey(c) { return getCatKeys(c)[0] || '기타'; }
+function hasCat(c, key) { return key === '전체' || getCatKeys(c).indexOf(key) !== -1; }
+function getCat(c) { return CAT_MAP[catKey(c)] || CAT_MAP['기타']; }
+function statusInfo(st) {
+  if (st==='모집중') return {dot:'open',text:'지금 신청 가능합니다',cls:'open'};
+  if (st==='마감') return {dot:'closed',text:'정원이 마감되었습니다',cls:'closed'};
+  if (st==='대기접수') return {dot:'wait',text:'대기 신청이 가능합니다',cls:'wait'};
+  if (st==='준비중') return {dot:'preparing',text:'곧 모집이 시작됩니다',cls:'preparing'};
+  return {dot:'',text:'',cls:''};
+}
+function vp(v) { return (v && String(v).trim()!=='') ? String(v).trim() : ''; }
+function val(v,fb) { return vp(v) ? esc(v) : '<span class="detail-value pending">'+(fb||'확인 중')+'</span>'; }
+
+// ==========================================
+// 유틸리티
+// ==========================================
+function showLoading(v){document.getElementById('loading').style.display=v?'flex':'none';}
+function showToast(m){var t=document.getElementById('toast');t.innerText=m;t.className='show';setTimeout(function(){t.className='';},3000);}
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+function showView(id){document.querySelectorAll('.view').forEach(function(el){el.style.display='none';});document.getElementById(id).style.display='flex';}
+function goPortal(){showView('view-portal');currentOrgName='';isAdminMode=false;}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function toggleDark(){var n=document.body.getAttribute('data-theme')==='dark'?'light':'dark';document.body.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.querySelector('.btn-theme').innerText=n==='dark'?'🌙':'☀️';}
+function handleContact(num,type){var c=String(num).replace(/[^0-9\-]/g,'');if(!c){showToast('연락처 정보가 없습니다.');return;}var full=c.startsWith('0')?c:'010-'+c;var digits=full.replace(/\-/g,'');var mob=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);if(type==='sms'){mob?window.location.href='sms:'+digits:(navigator.clipboard.writeText(full),showToast('📱 '+full+' 복사'));}else{mob?window.location.href='tel:'+digits:(navigator.clipboard.writeText(full),showToast('📞 '+full+' 복사'));}}
+function mapLink(addr){return addr?'https://map.naver.com/v5/search/'+encodeURIComponent(addr):'';}
+function goDetailBack(){showView(detailBackTo);}
+
+window.addEventListener('scroll',function(){var b=document.getElementById('btn-top');b.style.display=(window.scrollY>200)?'flex':'none';});
+
+// ==========================================
+// 초기 로딩
+// ==========================================
+document.addEventListener('DOMContentLoaded',function(){
+  var t=localStorage.getItem('theme')||'light';document.body.setAttribute('data-theme',t);document.querySelector('.btn-theme').innerText=t==='dark'?'🌙':'☀️';
+  loadData();
+});
+
+function loadData() {
+  showLoading(true);
+
+  // 2개 동시 요청
+  Promise.all([
+    sbGet('organizations', 'select=*&order=updated_at.desc'),
+    sbGet('programs',      'select=*&order=updated_at.desc')
+  ])
+  .then(function(results) {
+    var orgs  = results[0] || [];
+    var progs = results[1] || [];
+
+    // organizations → allOrgs 변환 (컬럼명 매핑)
+    allOrgs = orgs.map(function(o) {
+      return {
+        orgId:           o.org_id           || '',
+        name:            o.name             || '',
+        type:            o.type             || '',
+        jurisdiction:    o.jurisdiction     || '',
+        address:         o.address          || '',
+        tel:             o.tel              || '',
+        managerName:     o.manager_name     || '',
+        managerTel:      o.manager_tel      || '',
+        hours:           o.hours            || '',
+        transport:       o.transport        || '',
+        transportDetail: o.transport_detail || '',
+        routeMapUrl:     o.route_map_url    || '',
+        routeMapNote:    o.route_map_note   || '',
+        intro:           o.intro            || '',
+        homepage:        o.homepage         || '',
+        updatedAt:       o.updated_at       || '',
+        progCount:       0
+      };
+    });
+
+    // programs → allProgs 변환
+    allProgs = progs.map(function(p) {
+      return {
+        id:          p.id,
+        programId:   p.program_id   || '',
+        orgId:       p.org_id       || '',
+        orgName:     p.org_name     || '',
+        name:        p.name         || '',
+        category:    p.category     || '',
+        grade:       p.grade        || '',
+        day:         p.day          || '',
+        startTime:   p.start_time   || '',
+        endTime:     p.end_time     || '',
+        capacity:    p.capacity     || '',
+        current:     p.current      || 0,
+        status:      p.status       || '',
+        fee:         p.fee          || '',
+        description: p.description  || '',
+        updatedAt:   p.updated_at   || ''
+      };
+    });
+
+    // progCount 계산
+    allOrgs.forEach(function(o) {
+      o.progCount = allProgs.filter(function(p) {
+        return p.orgName === o.name;
+      }).length;
+    });
+
+    // 기관 로그인 select 옵션 채우기
+    var sel = document.getElementById('org-login-select');
+    sel.innerHTML = '<option value="">기관을 선택하세요</option>';
+    allOrgs.forEach(function(o) {
+      var opt = document.createElement('option');
+      opt.value = o.name;
+      opt.text  = o.name;
+      sel.appendChild(opt);
+    });
+
+    showLoading(false);
+    handleUrlHash();
+    document.getElementById('search-wrap').style.display = 'block';
+  })
+  .catch(function(e) {
+    showLoading(false);
+    showToast('❌ 데이터 로드 실패');
+    console.error(e);
+  });
+}
+function handleUrlHash() {
+  try {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#org=') === 0) {
+      var orgName = decodeURIComponent(hash.substring(5));
+      if (orgName && allOrgs.find(function(o) { return o.name === orgName; })) {
+        openParentView();
+        setTimeout(function() {
+          detailBackTo = 'view-parent';
+          openOrgDetail(orgName);
+        }, 500);
+        return;
+      }
+    }
+  } catch(e) {}
+}
+
+// ==========================================
+// 👨‍👩‍👧 학부모 메인
+// ==========================================
+function openParentView(){
+  showView('view-parent');
+  buildCatGrid();
+  renderProgList();
+  document.getElementById('update-time').innerText = '최종 업데이트: ' + new Date().toLocaleDateString('ko-KR');
+
+  // 검색창 표시 (데이터 로드 후)
+  if (allProgs.length > 0 || allOrgs.length > 0) {
+    document.getElementById('search-wrap').style.display = 'block';
+  }
+}
+
+// ==========================================
+// 🔍 메인 검색
+// ==========================================
+var mainSearchQuery = '';
+
+function onMainSearch() {
+  var input = document.getElementById('main-search-input');
+  var clear  = document.getElementById('main-search-clear');
+  mainSearchQuery = input.value.trim();
+
+  if (mainSearchQuery) {
+    clear.classList.add('show');
+  } else {
+    clear.classList.remove('show');
+  }
+
+  buildCatGrid();
+  renderProgList();
+}
+
+function clearMainSearch() {
+  document.getElementById('main-search-input').value = '';
+  mainSearchQuery = '';
+  document.getElementById('main-search-clear').classList.remove('show');
+  document.getElementById('search-result-count').style.display = 'none';
+  buildCatGrid();
+  renderProgList();
+}
+
+function buildCatGrid(){
+  var area=document.getElementById('cat-grid-area');
+  var keys=['전체','코딩/AI','미술','체육','어학','음악','과학','돌봄'];
+  var h='<div class="cat-grid">';
+  keys.forEach(function(key){
+    var info=CAT_MAP[key];
+    var count=key==='전체'?allProgs.filter(function(p){return p.status!=='마감';}).length:allProgs.filter(function(p){return hasCat(p.category,key)&&p.status!=='마감';}).length;
+    h+='<div class="cat-item'+(currentCat===key?' active':'')+'" onclick="setCat(\''+key+'\')">';
+    h+='<div class="cat-icon">'+info.icon+'</div><div class="cat-label">'+info.label+'</div>';
+    if(count>0)h+='<div class="cat-count">'+count+'개</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  area.innerHTML=h;
+}
+
+function setCat(key){currentCat=key;buildCatGrid();renderProgList();}
+
+function renderProgList(){
+  var area = document.getElementById('prog-content-area');
+  var countEl = document.getElementById('search-result-count');
+
+  // 카테고리 + 검색어 필터링
+  var filtered = allProgs.filter(function(p) {
+    if (!hasCat(p.category, currentCat)) return false;
+    if (mainSearchQuery) {
+      return matchSearch(p.name, mainSearchQuery) ||
+             matchSearch(p.orgName, mainSearchQuery);
+    }
+    return true;
+  });
+
+  // 검색 결과 수 표시
+  if (mainSearchQuery) {
+    var uniqueNames = {};
+    filtered.forEach(function(p) { uniqueNames[p.orgName + '|||' + p.name] = true; });
+    var cnt = Object.keys(uniqueNames).length;
+    countEl.innerHTML = '검색 결과: <span>' + cnt + '개</span>';
+    countEl.style.display = 'block';
+  } else {
+    countEl.style.display = 'none';
+  }
+
+  var grouped = {};
+  filtered.forEach(function(p) {
+    var key = p.orgName + '|||' + p.name;
+    if (!grouped[key]) grouped[key] = { info: p, schedules: [], ck: catKey(p.category) };
+    grouped[key].schedules.push({ day: p.day, start: p.startTime, end: p.endTime });
+  });
+  var list=Object.values(grouped);
+  var openList=list.filter(function(g){return g.info.status!=='마감';});
+  var closedList=list.filter(function(g){return g.info.status==='마감';});
+  var h='';
+  if(openList.length>0)h+='<div class="open-summary">🟢 현재 신청 가능한 프로그램 <strong>'+openList.length+'개</strong></div><div class="prog-list">';
+  openList.forEach(function(g){h+=buildPCard(g);});
+  if(openList.length>0)h+='</div>';
+  if(closedList.length>0){h+='<div class="sec-header"><div class="sec-title">🔴 마감된 프로그램 ('+closedList.length+'개)</div><button class="sec-toggle" onclick="toggleClosed()">펼치기 ▼</button></div><div class="prog-list" id="closed-list" style="display:none;">';closedList.forEach(function(g){h+=buildPCard(g);});h+='</div>';}
+  if(!openList.length&&!closedList.length)h='<div class="empty-state"><div class="empty-icon">📋</div>등록된 프로그램이 없습니다.</div>';
+  area.innerHTML=h;
+}
+
+function buildPCard(g) {
+  var p = g.info;
+  var cat = getCat(p.category);
+  var org = allOrgs.find(function(o) { return o.name === p.orgName; });
+  var orgType = org ? (org.type === '학교밖 늘봄' ? '학교밖 늘봄' : '지역사회 돌봄') : '';
+  var hasTransport = org && org.transport === '있음';
+
+  // 모집 상태 설정
+  var statusCls = '';
+  var statusLabel = '';
+  if (p.status === '모집중')    { statusCls = 'open';       statusLabel = '🟢 모집중'; }
+  else if (p.status === '마감') { statusCls = 'closed';     statusLabel = '🔴 마감'; }
+  else if (p.status === '대기접수') { statusCls = 'wait';   statusLabel = '🟡 대기접수'; }
+  else if (p.status === '준비중')   { statusCls = 'preparing'; statusLabel = '⚪ 준비중'; }
+  else { statusCls = 'preparing'; statusLabel = p.status || ''; }
+
+  // 잔여 인원 계산
+  var remainHtml = '';
+  if (p.capacity) {
+    var cap = parseInt(p.capacity) || 0;
+    var cur = parseInt(p.current) || 0;
+    var rem = cap - cur;
+    if (rem > 0) {
+      remainHtml = '<span class="p-card-remain">잔여 ' + rem + '명</span>';
+    } else {
+      remainHtml = '<span class="p-card-remain none">' + cur + '/' + cap + '명</span>';
+    }
+  }
+
+  // 요일·시간 한 줄로
+  var scheduleLines = [];
+  g.schedules.forEach(function(s) {
+    var line = esc(s.day || '');
+    if (s.start) line += '  ' + esc(s.start) + '~' + esc(s.end);
+    if (line) scheduleLines.push(line);
+  });
+  var scheduleText = scheduleLines.join(' / ');
+
+  // 카드 왼쪽 컬러 라인 (카테고리 색상 유지)
+  var cardBorder = 'border-left: 4px solid ' + (cat.color || '#636e72') + ';';
+
+  var h = '';
+  h += '<div class="p-card" style="' + cardBorder + '" onclick="openOrgDetailFrom(\'' + esc(p.orgName).replace(/'/g, "\\'") + '\')">';
+
+  // ① 상단: 모집 상태 뱃지 + 잔여 인원
+  h += '  <div class="p-card-header-bar">';
+  if (statusLabel) {
+    h += '    <span class="p-card-status-badge ' + statusCls + '">' + statusLabel + '</span>';
+  } else {
+    h += '    <span></span>';
+  }
+  h += '    ' + remainHtml;
+  h += '  </div>';
+
+  // ② 프로그램명 + 기관명
+  h += '  <div class="p-card-main">';
+  h += '    <div class="p-card-name">' + cat.icon + ' ' + esc(p.name) + '</div>';
+  h += '    <div class="p-card-org">';
+  h += '      📍 ' + esc(p.orgName);
+  if (orgType) h += ' <span style="color:var(--border);margin:0 2px;">·</span> ' + orgType;
+  h += '    </div>';
+  h += '  </div>';
+
+  // ③ 핵심 정보 요약
+  h += '  <div class="p-card-summary">';
+
+  // 요일·시간 (굵게)
+  if (scheduleText) {
+    h += '    <div class="p-card-time">';
+    h += '      <span class="p-card-time-icon">📅</span>';
+    h += '      ' + scheduleText;
+    h += '    </div>';
+  }
+
+  // 대상학년 · 수강료 한 줄
+  h += '    <div class="p-card-meta">';
+
+  if (vp(p.grade)) {
+    h += '      <span class="p-card-meta-item">🎓 ' + esc(p.grade) + '</span>';
+  }
+
+  if (vp(p.grade) && vp(p.fee)) {
+    h += '      <span class="p-card-meta-divider"></span>';
+  }
+
+  if (vp(p.fee)) {
+    h += '      <span class="p-card-meta-item">💰 ' + esc(p.fee) + '</span>';
+  }
+
+  if (hasTransport) {
+    h += '      <span class="p-card-meta-divider"></span>';
+    h += '      <span class="p-card-meta-item" style="color:var(--orange-deep);">🚌 통학</span>';
+  }
+
+  h += '    </div>';
+  h += '  </div>';
+
+  h += '</div>';
+
+  return h;
+}
+
+function toggleClosed(){var el=document.getElementById('closed-list');if(!el)return;var show=el.style.display==='none';el.style.display=show?'block':'none';el.previousElementSibling.querySelector('.sec-toggle').innerText=show?'접기 ▲':'펼치기 ▼';}
+
+function openOrgDetailFrom(orgName){detailBackTo='view-parent';openOrgDetail(orgName);}
+
+// ==========================================
+// 📋 기관 상세 (공개)
+// ==========================================
+function openOrgDetail(orgName) {
+  showLoading(true);
+
+  // 프로그램 + 공지 동시 요청
+  Promise.all([
+    sbGet('programs', 'select=*&org_name=eq.' + encodeURIComponent(orgName)),
+    sbGet('notices',  'select=*&org_name=eq.' + encodeURIComponent(orgName) + '&status=eq.게시중&order=date.desc')
+  ])
+  .then(function(results) {
+    var progs   = (results[0] || []).map(function(p) {
+      return {
+        id:          p.id,
+        programId:   p.program_id   || '',
+        orgName:     p.org_name     || '',
+        name:        p.name         || '',
+        category:    p.category     || '',
+        grade:       p.grade        || '',
+        day:         p.day          || '',
+        startTime:   p.start_time   || '',
+        endTime:     p.end_time     || '',
+        capacity:    p.capacity     || '',
+        current:     p.current      || 0,
+        status:      p.status       || '',
+        fee:         p.fee          || '',
+        description: p.description  || ''
+      };
+    });
+
+    var notices = (results[1] || []).map(function(n) {
+      return {
+        date:    n.date    || '',
+        title:   n.title   || '',
+        content: n.content || ''
+      };
+    });
+
+    showLoading(false);
+    var org = allOrgs.find(function(o) { return o.name === orgName; });
+    renderOrgDetail(org, progs, notices);
+    showView('view-org-detail');
+    window.scrollTo(0, 0);
+  })
+  .catch(function() { showLoading(false); });
+}
+
+function buildDetailAccordion(id, title, bodyHtml, isOpen) {
+  return ''
+    + '<div class="detail-acc' + (isOpen ? ' open' : '') + '" id="detail-acc-' + id + '">'
+    +   '<button type="button" class="detail-acc-head" onclick="toggleDetailAccordion(\'' + id + '\')">'
+    +     '<span class="detail-acc-title">' + title + '</span>'
+    +     '<span class="detail-acc-arrow">▼</span>'
+    +   '</button>'
+    +   '<div class="detail-acc-body">' + bodyHtml + '</div>'
+    + '</div>';
+}
+
+function toggleDetailAccordion(id) {
+  var wrap = document.getElementById('detail-acc-' + id);
+  if (!wrap) return;
+  wrap.classList.toggle('open');
+}
+
+
+function buildRouteMapBlock(url, note) {
+  if (!vp(url)) return '';
+  var h = '<div style="margin-top:10px;">';
+  h += '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" class="btn-detail-link" onclick="event.stopPropagation();">🗺️ 통학 노선도 보기</a>';
+  if (vp(note)) h += '<div style="margin-top:8px;font-size:0.82rem;color:var(--text-sub);line-height:1.6;">' + esc(note) + '</div>';
+  h += '</div>';
+  return h;
+}
+
+function groupProgramsByName(progs) {
+  var grouped = {};
+  (progs || []).forEach(function(p) {
+    var key = p.name || '이름 미정';
+    if (!grouped[key]) grouped[key] = { info: p, schedules: [] };
+    grouped[key].schedules.push({ day: p.day, start: p.startTime, end: p.endTime });
+  });
+  return grouped;
+}
+
+function renderOrgDetail(org, progs, notices) {
+  var c = document.getElementById('org-detail-content');
+  if (!org) {
+    c.innerHTML = '<div class="empty-state">기관 정보를 찾을 수 없습니다.</div>';
+    return;
+  }
+
+  var typeIcon  = org.type === '학교밖 늘봄' ? '📚' : '🏠';
+  var typeName  = org.type === '학교밖 늘봄' ? '학교밖 늘봄 기관' : '지역사회 돌봄 기관';
+  var typeBadge = org.type === '학교밖 늘봄' ? 'badge-blue' : 'badge-green';
+  var contactNum = vp(org.managerTel) || vp(org.tel);
+
+  var h = '';
+
+  // ① 기관명 + 뱃지
+  h += '<div class="detail-org-header">';
+  h += '  <div class="detail-org-name">' + typeIcon + ' ' + esc(org.name) + '</div>';
+  h += '  <div class="detail-org-badges">';
+  h += '    <span class="badge ' + typeBadge + '">' + typeName + '</span>';
+  if (org.jurisdiction) {
+    h += '    <span class="badge badge-teal">' + esc(org.jurisdiction) + '</span>';
+  }
+  if ((progs || []).some(function(p) { return p.status === '모집중'; })) {
+    h += '    <span class="badge badge-green">🟢 모집중 있음</span>';
+  }
+  if (org.transport === '있음') {
+    h += '    <span class="badge badge-orange">🚌 통학버스</span>';
+  }
+  h += '  </div>';
+  h += '</div>';
+
+  // ② 전화/문자 버튼 → 상단 고정 (연락처 있을 때만)
+  if (contactNum) {
+    h += '<div class="detail-contact-fixed">';
+    h += '  <button class="btn-contact call" onclick="event.stopPropagation();handleContact(\'' + esc(contactNum) + '\',\'call\')">📞 전화하기</button>';
+    h += '  <button class="btn-contact sms"  onclick="event.stopPropagation();handleContact(\'' + esc(contactNum) + '\',\'sms\')">📱 문자하기</button>';
+    h += '</div>';
+  } else {
+    h += '<div class="detail-no-contact">📞 연락처 정보를 준비 중입니다.</div>';
+  }
+
+  // ③ 프로그램 목록 (기본 펼침 유지)
+  var programHtml = '';
+  if (!progs || !progs.length) {
+    programHtml = '<div class="detail-card"><div class="notice-empty">등록된 프로그램이 없습니다.</div></div>';
+  } else {
+    var grouped = groupProgramsByName(progs);
+    for (var key in grouped) {
+      var g   = grouped[key];
+      var p   = g.info;
+      var cat = getCat(p.category);
+      var si  = statusInfo(p.status);
+
+      programHtml += '<div class="prog-detail-card">';
+      programHtml += '  <div style="height:4px;background:' + (cat.color || '#636e72') + ';"></div>';
+      programHtml += '  <div class="prog-detail-top">';
+      programHtml += '    <div class="prog-detail-name">' + cat.icon + ' ' + esc(key) + '</div>';
+
+      if (p.status) {
+        var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow';
+        programHtml += '    <span class="badge ' + sb + '">' + esc(p.status) + '</span>';
+      }
+
+      programHtml += '  </div>';
+
+      if (si.text) {
+        programHtml += '  <div class="prog-status-msg ' + si.cls + '">' + si.text + '</div>';
+      }
+
+      programHtml += '  <div class="prog-detail-body"><div class="detail-grid">';
+      programHtml += '    <div class="detail-label">📂 분류</div><div class="detail-value">'   + val(p.category) + '</div>';
+      programHtml += '    <div class="detail-label">🎓 대상</div><div class="detail-value">'   + val(p.grade)    + '</div>';
+
+      g.schedules.forEach(function(s) {
+        programHtml += '    <div class="detail-label">📅 일정</div>';
+        programHtml += '    <div class="detail-value">' + esc(s.day) + (s.start ? ' ' + esc(s.start) + '~' + esc(s.end) : '') + '</div>';
+      });
+
+      if (p.capacity) {
+        var cap = parseInt(p.capacity) || 0;
+        var cur = parseInt(p.current)  || 0;
+        var rem = cap - cur;
+        programHtml += '    <div class="detail-label">👥 정원</div>';
+        programHtml += '    <div class="detail-value">' + cur + '/' + cap + '명';
+        if (rem > 0) {
+          programHtml += ' <span style="color:var(--green-deep);font-weight:700;">(잔여 ' + rem + '명)</span>';
+        }
+        programHtml += '    </div>';
+      } else {
+        programHtml += '    <div class="detail-label">👥 정원</div><div class="detail-value pending">확인 중</div>';
+      }
+
+      programHtml += '    <div class="detail-label">💰 수강료</div><div class="detail-value">' + val(p.fee) + '</div>';
+      programHtml += '  </div>';
+
+      if (vp(p.description)) {
+        programHtml += '  <div style="margin-top:10px;font-size:0.85rem;line-height:1.7;">' + esc(p.description) + '</div>';
+      }
+
+      programHtml += '  </div>';
+      programHtml += '</div>';
+    }
+  }
+  h += buildDetailAccordion('program', '📋 프로그램 (' + (progs ? progs.length : 0) + '개)', programHtml, true);
+
+  // ④ 공지사항
+  var noticeHtml = '';
+  if (!notices || !notices.length) {
+    noticeHtml = '<div class="detail-card"><div class="notice-empty">등록된 공지사항이 없습니다.</div></div>';
+  } else {
+    notices.forEach(function(n) {
+      var isNew = false;
+      try {
+        var diff = Math.floor((new Date() - new Date(n.date)) / 86400000);
+        isNew = diff >= 0 && diff <= 7;
+      } catch(e) {}
+      noticeHtml += '<div class="notice-card">';
+      noticeHtml += '  <div class="notice-title">' + esc(n.title) + (isNew ? ' <span class="badge badge-green">NEW</span>' : '') + '</div>';
+      noticeHtml += '  <div class="notice-date">' + esc(n.date) + '</div>';
+      if (n.content) {
+        noticeHtml += '  <div class="notice-content">' + esc(n.content) + '</div>';
+      }
+      noticeHtml += '</div>';
+    });
+  }
+  h += buildDetailAccordion('notice', '📢 공지사항', noticeHtml, false);
+
+  // ⑤ 통학 안내
+  var transportHtml = '<div class="detail-card">';
+  if (org.transport === '있음') {
+    transportHtml += '<div class="transport-box yes">🚌 <strong>통학버스 운영</strong><br>' + (vp(org.transportDetail) || '상세 정보는 기관에 문의해주세요.') + '</div>';
+    transportHtml += buildRouteMapBlock(org.routeMapUrl, org.routeMapNote);
+  } else {
+    transportHtml += '<div class="transport-box no">🚌 통학버스 <strong>미운영</strong><br>※ 학부모 직접 등·하원이 필요합니다.</div>';
+  }
+  transportHtml += '</div>';
+  h += buildDetailAccordion('transport', '🚌 통학 안내', transportHtml, false);
+
+  // ⑥ 운영 정보
+  var hpUrl    = vp(org.homepage) || '';
+  if (hpUrl && hpUrl.indexOf('http') !== 0) hpUrl = 'http://' + hpUrl;
+
+  var infoHtml = '<div class="detail-card"><div class="detail-grid">';
+  infoHtml += '  <div class="detail-label">📞 대표연락처</div><div class="detail-value">' + val(org.tel)         + '</div>';
+  infoHtml += '  <div class="detail-label">👤 담당자</div><div class="detail-value">'     + val(org.managerName) + '</div>';
+  infoHtml += '  <div class="detail-label">📱 담당자 연락처</div><div class="detail-value">' + val(org.managerTel) + '</div>';
+  infoHtml += '  <div class="detail-label">🕐 운영시간</div><div class="detail-value">'   + val(org.hours)       + '</div>';
+  infoHtml += '  <div class="detail-label">📍 위치</div><div class="detail-value">'       + val(org.address);
+  if (vp(org.address)) {
+    infoHtml += ' <a href="' + mapLink(org.address) + '" target="_blank" style="font-size:0.78rem;" onclick="event.stopPropagation();">[🗺️ 지도]</a>';
+  }
+  infoHtml += '</div>';
+  infoHtml += '  <div class="detail-label">🔗 홈페이지</div><div class="detail-value">';
+  infoHtml += vp(org.homepage)
+    ? '<a href="' + esc(hpUrl) + '" target="_blank" onclick="event.stopPropagation();">' + esc(org.homepage) + '</a>'
+    : '<span class="detail-value pending">확인 중</span>';
+  infoHtml += '</div></div></div>';
+  h += buildDetailAccordion('info', '🕐 운영 정보', infoHtml, false);
+
+  // ⑦ 기관 소개
+  var introHtml = '<div class="detail-card"><div style="font-size:0.88rem;line-height:1.7;">'
+    + (vp(org.intro) ? esc(org.intro) : '<span class="detail-value pending">확인 중</span>')
+    + '</div></div>';
+  h += buildDetailAccordion('intro', '💬 기관 소개', introHtml, false);
+
+  c.innerHTML = h;
+}
+// ==========================================
+// 🎯 맞춤 추천 플로우
+// ==========================================
+var REC_STEPS = [
+  { id: 'purpose', question: '어떤 도움이 필요하세요?', options: [
+    { label: '📚 교육 프로그램', value: '교육' },
+    { label: '🏠 방과후 돌봄', value: '돌봄' },
+    { label: '🔄 둘 다 괜찮아요', value: '둘다' }
+  ]},
+  { id: 'dayType', question: '주중/주말 어떤 프로그램을 찾으세요?', options: [
+    { label: '📅 주중 (월~금)', value: '주중' },
+    { label: '🌈 주말 (토~일)', value: '주말' },
+    { label: '🔄 상관없음', value: '상관없음' }
+  ]},
+  { id: 'timeSlot', question: '참여 가능한 시간대는?', dynamic: true },
+  { id: 'grade', question: '아이의 학년은?', options: [
+    { label: '1학년', value: '1' }, { label: '2학년', value: '2' },
+    { label: '3학년', value: '3' }, { label: '4학년', value: '4' },
+    { label: '5학년', value: '5' }, { label: '6학년', value: '6' }
+  ]},
+  { id: 'transport', question: '통학버스가 필요하신가요?', options: [
+    { label: '🚌 네, 필요해요', value: '필요' },
+    { label: '🚶 아니요, 괜찮아요', value: '괜찮아요' }
+  ]},
+  { id: 'fee', question: '수강료는?', options: [
+    { label: '🆓 무료만', value: '무료만' },
+    { label: '💰 유료도 괜찮아요', value: '유료도' }
+  ]}
+];
+
+function getTimeOptions() {
+  if (recConditions.dayType === '주중') {
+    return [
+      { label: '🌅 오후 (16:00~18:30)', value: '오후' },
+      { label: '🌙 저녁 (18:30~20:30)', value: '저녁' },
+      { label: '🔄 상관없음', value: '상관없음' }
+    ];
+  } else if (recConditions.dayType === '주말') {
+    return [
+      { label: '☀️ 오전 (9:20~12:00)', value: '오전' },
+      { label: '🔄 상관없음', value: '상관없음' }
+    ];
+  }
+  return [];
+}
+
+function getTotalSteps() {
+  if (recConditions.dayType === '상관없음') return 5; // purpose, dayType, grade, transport, fee
+  return 6;
+}
+
+function getStepIndex(step) {
+  if (recConditions.dayType === '상관없음') {
+    // skip timeSlot: 0=purpose, 1=dayType, 2=grade, 3=transport, 4=fee
+    var skipMap = [0, 1, 3, 4, 5];
+    return skipMap[step] !== undefined ? skipMap[step] : step;
+  }
+  return step;
+}
+
+function openRecFlow() {
+  recConditions = {};
+  recStep = 0;
+  showView('view-rec');
+  renderRecStep();
+}
+
+function renderRecStep() {
+  var area = document.getElementById('rec-flow-area');
+  var totalSteps = getTotalSteps();
+
+  if (recStep >= totalSteps) {
+    showRecResults();
+    return;
+  }
+
+  var stepDef = REC_STEPS[getStepIndex(recStep)];
+  var options = stepDef.dynamic ? getTimeOptions() : stepDef.options;
+
+  // 진행률 점
+  var dots = '<div class="rec-progress">';
+  for (var i = 0; i < totalSteps; i++) {
+    var cls = i < recStep ? 'done' : i === recStep ? 'active' : '';
+    dots += '<div class="rec-dot ' + cls + '"></div>';
+  }
+  dots += '</div>';
+
+  var h = dots;
+  h += '<div class="rec-step">';
+  h += '<div class="rec-q">' + stepDef.question + '</div>';
+  h += '<div class="rec-options">';
+  options.forEach(function(opt) {
+    h += '<button class="btn-rec" onclick="selectRecOption(\'' + stepDef.id + '\',\'' + opt.value + '\')">' + opt.label + '</button>';
+  });
+  h += '</div></div>';
+
+  if (recStep > 0) {
+    h += '<button class="btn-action gray" style="margin-top:20px;max-width:200px;" onclick="recStepBack()">← 이전</button>';
+  }
+
+  area.innerHTML = h;
+}
+
+function selectRecOption(key, value) {
+  recConditions[key] = value;
+  recStep++;
+  renderRecStep();
+}
+
+function recStepBack() {
+  if (recStep > 0) {
+    recStep--;
+    // 이전 단계 조건 삭제
+    var stepDef = REC_STEPS[getStepIndex(recStep)];
+    delete recConditions[stepDef.id];
+    renderRecStep();
+  }
+}
+
+function showRecResults() {
+  var area = document.getElementById('rec-flow-area');
+  area.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div><div style="margin-top:12px;color:var(--text-sub);">맞춤 프로그램 분석 중...</div></div>';
+
+  gasPost('getMatchingOrgs', { conditions: recConditions })
+    .then(function(results) {
+      renderRecResults(results);
+    })
+    .catch(function(e) {
+      area.innerHTML = '<div class="rec-empty"><div class="rec-empty-icon">😢</div>추천 결과를 불러오지 못했습니다.<br>' + esc(e.message) + '</div>';
+    });
+}
+  
+function renderRecResults(results) {
+  var area = document.getElementById('rec-flow-area');
+
+  // 조건 요약 텍스트
+  var summary = [];
+  if (recConditions.purpose) {
+    var purposeLabel = recConditions.purpose === '교육' ? '교육 프로그램' : recConditions.purpose === '돌봄' ? '방과후 돌봄' : '교육+돌봄';
+    summary.push(purposeLabel);
+  }
+  if (recConditions.dayType && recConditions.dayType !== '상관없음') summary.push(recConditions.dayType);
+  if (recConditions.timeSlot && recConditions.timeSlot !== '상관없음') summary.push(recConditions.timeSlot);
+  if (recConditions.grade) summary.push(recConditions.grade + '학년');
+  if (recConditions.transport === '필요') summary.push('통학버스 필요');
+  if (recConditions.fee === '무료만') summary.push('무료');
+
+  var h = '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:1.1rem;font-weight:800;margin-bottom:6px;">🎯 맞춤 추천 결과</div>';
+  h += '<div style="font-size:0.85rem;color:var(--text-sub);">' + summary.join(' · ') + '</div></div>';
+
+  if (!results || results.length === 0) {
+    h += '<div class="rec-empty"><div class="rec-empty-icon">😢</div>조건에 맞는 기관이 없습니다.<br><br>조건을 변경하거나 전체 프로그램을 확인해보세요.</div>';
+    h += '<div style="display:flex;gap:8px;margin-top:16px;"><button class="btn-action gray" style="flex:1;" onclick="openRecFlow()">🔄 다시 선택</button><button class="btn-action teal" style="flex:1;" onclick="openParentView()">📋 전체 보기</button></div>';
+    area.innerHTML = h;
+    return;
+  }
+
+  var medals = ['🥇', '🥈', '🥉'];
+
+  results.forEach(function(r, idx) {
+    var medal = idx < 3 ? medals[idx] : '🏢';
+    var org = allOrgs.find(function(o) { return o.name === r.orgName; });
+    var typeLabel = r.type === '학교밖 늘봄' ? '학교밖 늘봄' : '지역사회 돌봄';
+
+    h += '<div class="rec-result-card">';
+    h += '<div class="rec-rank">' + medal + ' ' + (idx + 1) + '순위</div>';
+    h += '<div class="rec-org-name">' + esc(r.orgName) + ' <span class="badge ' + (r.type === '학교밖 늘봄' ? 'badge-blue' : 'badge-green') + '">' + typeLabel + '</span></div>';
+
+    // 체크 항목
+    h += '<div class="rec-checks">';
+    r.checks.forEach(function(ck) {
+      h += ck.icon + ' ' + esc(ck.text) + '<br>';
+    });
+    h += '</div>';
+
+    // 매칭된 프로그램
+    if (r.matchedProgs && r.matchedProgs.length > 0) {
+      h += '<div class="rec-progs">';
+      h += '<div style="font-size:0.82rem;font-weight:700;color:var(--text-sub);margin-bottom:4px;">📋 매칭된 프로그램</div>';
+      var progNames = {};
+      r.matchedProgs.forEach(function(p) {
+        if (progNames[p.name]) return;
+        progNames[p.name] = true;
+        var cat = getCat(p.category);
+        var stBadge = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow';
+        h += '<div class="rec-prog-item">' + cat.icon + ' ' + esc(p.name);
+        if (p.status) h += ' <span class="badge ' + stBadge + '">' + esc(p.status) + '</span>';
+        if (p.capacity) {
+          var rem = parseInt(p.capacity) - (parseInt(p.current) || 0);
+          if (rem > 0) h += ' <span style="color:var(--green-deep);">(잔여 ' + rem + '명)</span>';
+        }
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+
+    h += '<div class="btn-detail-link" onclick="detailBackTo=\'view-rec\';openOrgDetail(\'' + esc(r.orgName).replace(/'/g, "\\'") + '\')">상세보기 ›</div>';
+    h += '</div>';
+  });
+
+  // 하단 카테고리 안내
+  h += '<div style="margin-top:24px;padding:16px;background:var(--input-bg);border-radius:var(--radius);text-align:center;">';
+  h += '<div style="font-size:0.88rem;font-weight:700;margin-bottom:10px;">💡 관심 분야별로도 찾아보세요</div>';
+  h += '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
+  ['코딩/AI', '미술', '체육', '어학', '음악', '과학', '돌봄'].forEach(function(k) {
+    h += '<span style="cursor:pointer;font-size:1.3rem;" onclick="currentCat=\'' + k + '\';openParentView();">' + CAT_MAP[k].icon + '</span>';
+  });
+  h += '</div></div>';
+
+  h += '<button class="btn-action gray" style="margin-top:12px;" onclick="openRecFlow()">🔄 다시 선택하기</button>';
+
+  area.innerHTML = h;
+}
+
+// ==========================================
+// 🗺️ 카카오맵 지도
+// ==========================================
+function openMapView() {
+  showView('view-map');
+  renderMapFilters();
+
+  mapSearchQuery = '';
+  var searchInput = document.getElementById('map-search-input');
+  var searchClear = document.getElementById('map-search-clear');
+  var searchResult = document.getElementById('map-search-result');
+  if (searchInput) searchInput.value = '';
+  if (searchClear) searchClear.classList.remove('show');
+  if (searchResult) searchResult.style.display = 'none';
+
+  if (!kakaoMap) {
+    // allOrgs + allProgs 로 지도 데이터 구성 (이미 로드됨)
+    var mapOrgs = allOrgs.map(function(o) {
+      var orgProgs = allProgs.filter(function(p) {
+        return p.orgName === o.name;
+      });
+      var openCount = orgProgs.filter(function(p) {
+        return p.status === '모집중';
+      }).length;
+
+      return {
+        orgId:           o.orgId,
+        name:            o.name,
+        type:            o.type,
+        jurisdiction:    o.jurisdiction,
+        address:         o.address,
+        tel:             o.tel,
+        managerName:     o.managerName,
+        managerTel:      o.managerTel,
+        hours:           o.hours,
+        transport:       o.transport,
+        transportDetail: o.transportDetail,
+        routeMapUrl:     o.routeMapUrl,
+        routeMapNote:    o.routeMapNote,
+        intro:           o.intro,
+        homepage:        o.homepage,
+        progCount:       orgProgs.length,
+        openCount:       openCount,
+        programs:        orgProgs
+      };
+    });
+
+    initKakaoMap(mapOrgs);
+    renderMapOrgList(mapOrgs);
+  }
+}
+
+// ==========================================
+// 🔍 지도 검색
+// ==========================================
+function onMapSearch() {
+  var input = document.getElementById('map-search-input');
+  var clear  = document.getElementById('map-search-clear');
+  mapSearchQuery = input.value.trim();
+
+  if (mapSearchQuery) {
+    clear.classList.add('show');
+  } else {
+    clear.classList.remove('show');
+  }
+
+  applyMapSearch();
+}
+
+function clearMapSearch() {
+  document.getElementById('map-search-input').value = '';
+  mapSearchQuery = '';
+  document.getElementById('map-search-clear').classList.remove('show');
+  document.getElementById('map-search-result').style.display = 'none';
+  applyMapSearch();
+}
+
+function applyMapSearch() {
+  if (!kakaoMap) return;
+
+  var resultEl = document.getElementById('map-search-result');
+
+  // 마커 필터링
+  kakaoMarkers.forEach(function(m) {
+    var show = true;
+    if (mapSearchQuery) {
+      show = matchSearch(m.org.name, mapSearchQuery);
+    }
+    m.marker.setMap(show ? kakaoMap : null);
+  });
+
+  // 기관 카드 목록 필터링
+  var allOrgsData = kakaoMarkers.map(function(m) { return m.org; });
+  var filtered = allOrgsData.filter(function(o) {
+    if (mapFilter !== '전체' && o.type !== mapFilter) return false;
+    if (mapSearchQuery) return matchSearch(o.name, mapSearchQuery);
+    return true;
+  });
+
+  // 결과 수 표시
+  if (mapSearchQuery) {
+    resultEl.innerHTML = '검색 결과: <span>' + filtered.length + '곳</span>';
+    resultEl.style.display = 'block';
+  } else {
+    resultEl.style.display = 'none';
+  }
+
+  renderMapOrgListFiltered(filtered);
+}
+
+function renderMapOrgListFiltered(orgs) {
+  var list = document.getElementById('map-org-list');
+  var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">📍 ' + orgs.length + '곳</div>';
+  orgs.forEach(function(o) {
+    var icon = o.type === '학교밖 늘봄' ? '📚' : '🏠';
+    var openBadge = o.openCount > 0 ? '<span class="badge badge-green">모집중 ' + o.openCount + '개</span> ' : '';
+    h += '<div class="map-org-card" onclick="onOrgCardClick(\'' + esc(o.name).replace(/'/g, "\\'") + '\')">';
+    h += '<div style="font-weight:700;margin-bottom:4px;">' + icon + ' ' + esc(o.name) + '</div>';
+    h += '<div style="font-size:0.78rem;color:var(--text-sub);">';
+    h += (vp(o.address) || '주소 확인 중') + ' · 프로그램 ' + o.progCount + '개 ' + openBadge;
+    if (o.transport === '있음') h += '<span class="badge badge-orange">🚌</span>';
+    h += '</div></div>';
+  });
+  if (!orgs.length) {
+    h = '<div class="empty-state"><div class="empty-icon">🔍</div>검색 결과가 없습니다.</div>';
+  }
+  list.innerHTML = h;
+}
+  
+// ==========================================
+// 지도 필터 상태 변수 추가 (글로벌 변수 선언부에 추가)
+// ==========================================
+// var mapFilter = '전체';  ← 기존 유지
+var mapFilterOpen = false;      // 모집중 필터
+var mapFilterTransport = false; // 통학버스 필터
+
+// ==========================================
+// renderMapFilters() 함수 전체 교체
+// ==========================================
+function renderMapFilters() {
+  var h = '';
+
+  // 1행: 유형 필터
+  var typeFilters = ['전체', '학교밖 늘봄', '지역사회 돌봄'];
+  var typeLabels = {
+    '전체': '전체',
+    '학교밖 늘봄': '📚 학교밖 늘봄',
+    '지역사회 돌봄': '🏠 지역사회 돌봄'
+  };
+  typeFilters.forEach(function(f) {
+    h += '<button class="btn-map-filter' + (mapFilter === f ? ' active' : '') +
+         '" onclick="setMapFilter(\'' + f + '\')">' + typeLabels[f] + '</button>';
+  });
+
+  // 2행 래퍼 (줄바꿈)
+  h += '</div><div class="map-filter" style="margin-top:6px;">';
+
+  // 모집중 토글
+  h += '<button class="btn-map-filter' + (mapFilterOpen ? ' active green' : '') +
+       '" onclick="toggleMapFilterOpen()">🟢 모집중만</button>';
+
+  // 통학버스 토글
+  h += '<button class="btn-map-filter' + (mapFilterTransport ? ' active orange' : '') +
+       '" onclick="toggleMapFilterTransport()">🚌 통학버스</button>';
+
+  document.getElementById('map-filter').innerHTML = h;
+}
+
+// ==========================================
+// 토글 함수 추가
+// ==========================================
+function toggleMapFilterOpen() {
+  mapFilterOpen = !mapFilterOpen;
+  renderMapFilters();
+  applyAllMapFilters();
+}
+
+function toggleMapFilterTransport() {
+  mapFilterTransport = !mapFilterTransport;
+  renderMapFilters();
+  applyAllMapFilters();
+}
+
+// ==========================================
+// setMapFilter() 함수 수정
+// ==========================================
+function setMapFilter(f) {
+  mapFilter = f;
+  renderMapFilters();
+  applyAllMapFilters();
+}
+
+// ==========================================
+// applyAllMapFilters() 신규 함수 추가
+// (기존 applyMapSearch + 타입필터 + 모집중 + 통학버스 통합)
+// ==========================================
+function applyAllMapFilters() {
+  if (!kakaoMap) return;
+
+  var resultEl = document.getElementById('map-search-result');
+
+  // 마커 필터링
+  kakaoMarkers.forEach(function(m) {
+    var show = true;
+
+    // 유형 필터
+    if (mapFilter !== '전체' && m.org.type !== mapFilter) show = false;
+
+    // 검색어 필터
+    if (mapSearchQuery && !matchSearch(m.org.name, mapSearchQuery)) show = false;
+
+    // 모집중 필터: 기관의 프로그램 중 모집중이 1개라도 있으면 표시
+    if (mapFilterOpen) {
+      var hasOpen = (m.org.openCount || 0) > 0;
+      if (!hasOpen) show = false;
+    }
+
+    // 통학버스 필터
+    if (mapFilterTransport) {
+      if (m.org.transport !== '있음') show = false;
+    }
+
+    m.marker.setMap(show ? kakaoMap : null);
+  });
+
+  // 기관 카드 목록 필터링
+  var filtered = kakaoMarkers
+    .filter(function(m) { return m.marker.getMap() !== null; })
+    .map(function(m) { return m.org; });
+
+  // 검색 결과 수 표시
+  if (mapSearchQuery || mapFilterOpen || mapFilterTransport) {
+    resultEl.innerHTML = '필터 결과: <span>' + filtered.length + '곳</span>';
+    resultEl.style.display = 'block';
+  } else {
+    resultEl.style.display = 'none';
+  }
+
+  renderMapOrgListFiltered(filtered);
+}
+
+// ==========================================
+// applyMapSearch() 함수 수정 (applyAllMapFilters 호출로 통합)
+// ==========================================
+function applyMapSearch() {
+  applyAllMapFilters(); // 기존 applyMapSearch 대신 통합 필터 호출
+}
+  
+function initKakaoMap(mapOrgs) {
+  var container = document.getElementById('map-container');
+  // 순창초 좌표 (기본 중심)
+  var center = new kakao.maps.LatLng(35.3741, 127.1373);
+  var options = { center: center, level: 5 };
+
+  kakaoMap = new kakao.maps.Map(container, options);
+
+  // 순창초 마커
+  var schoolMarker = new kakao.maps.Marker({
+    position: center,
+    map: kakaoMap
+  });
+  var schoolInfo = new kakao.maps.InfoWindow({
+    content: '<div style="padding:8px 12px;font-size:0.82rem;font-weight:700;white-space:nowrap;">🏫 순창초등학교</div>'
+  });
+  kakao.maps.event.addListener(schoolMarker, 'click', function() {
+    schoolInfo.open(kakaoMap, schoolMarker);
+  });
+
+  placeOrgMarkers(mapOrgs);
+}
+
+function placeOrgMarkers(mapOrgs) {
+  // 기존 마커 제거
+  kakaoMarkers.forEach(function(m) { m.marker.setMap(null); });
+  kakaoMarkers = [];
+
+  var geocoder = new kakao.maps.services.Geocoder();
+  var filtered = mapOrgs.filter(function(o) {
+    if (mapFilter === '전체') return true;
+    return o.type === mapFilter;
+  });
+
+  filtered.forEach(function(org) {
+    if (!org.address) return;
+
+    geocoder.addressSearch(org.address, function(result, status) {
+      if (status === kakao.maps.services.Status.OK) {
+        var pos = new kakao.maps.LatLng(result[0].y, result[0].x);
+        var markerImage = null;
+
+        // 마커 색상 구분 (SVG 마커)
+        var color = org.type === '학교밖 늘봄' ? '#0984e3' : '#00b894';
+        var svgData = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.3 21.7 0 14 0z" fill="' + color + '"/><circle cx="14" cy="14" r="7" fill="white"/><text x="14" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="' + color + '">' + (org.type === '학교밖 늘봄' ? '📚' : '🏠') + '</text></svg>';
+        var imgSrc = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+        var imgSize = new kakao.maps.Size(28, 40);
+        markerImage = new kakao.maps.MarkerImage(imgSrc, imgSize);
+
+        var marker = new kakao.maps.Marker({
+          position: pos,
+          map: kakaoMap,
+          image: markerImage
+        });
+
+        var typeLabel = org.type === '학교밖 늘봄' ? '늘봄교육' : '돌봄';
+        var openBadge = org.openCount > 0 ? '<span style="color:#00b894;">모집중 ' + org.openCount + '개</span>' : '';
+        var infoContent = '<div style="padding:10px 14px;font-size:0.82rem;line-height:1.6;min-width:160px;">' +
+          '<div style="font-weight:800;margin-bottom:4px;">' + org.name + '</div>' +
+          '<div style="color:#636e72;">' + typeLabel + ' · 프로그램 ' + org.progCount + '개</div>' +
+          (openBadge ? '<div>' + openBadge + '</div>' : '') +
+          (org.transport === '있음' ? '<div>🚌 통학지원</div>' : '') +
+          '<div style="margin-top:6px;"><a href="#" onclick="event.preventDefault();detailBackTo=\'view-map\';openOrgDetail(\'' + org.name.replace(/'/g, "\\'") + '\');" style="color:#0984e3;font-weight:700;">상세보기 ›</a></div>' +
+          '</div>';
+
+        var infoWindow = new kakao.maps.InfoWindow({ content: infoContent });
+
+        kakao.maps.event.addListener(marker, 'click', function() {
+          kakaoMarkers.forEach(function(m) { m.info.close(); });
+          infoWindow.open(kakaoMap, marker);
+        });
+
+        kakaoMarkers.push({ marker: marker, info: infoWindow, org: org });
+      }
+    });
+  });
+}
+
+function updateMapMarkers(mapOrgs) {
+  if (!kakaoMap) return;
+  placeOrgMarkers(mapOrgs);
+}
+
+function renderMapOrgList(mapOrgs) {
+  var list = document.getElementById('map-org-list');
+  var filtered = mapOrgs.filter(function(o) {
+    if (mapFilter === '전체') return true;
+    return o.type === mapFilter;
+  });
+
+  var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">📍 ' + filtered.length + '곳</div>';
+  filtered.forEach(function(o) {
+    var icon = o.type === '학교밖 늘봄' ? '📚' : '🏠';
+    var openBadge = o.openCount > 0 ? '<span class="badge badge-green">모집중 ' + o.openCount + '개</span> ' : '';
+    h += '<div class="map-org-card" onclick="detailBackTo=\'view-map\';openOrgDetail(\'' + esc(o.name).replace(/'/g, "\\'") + '\')">';
+    h += '<div style="font-weight:700;margin-bottom:4px;">' + icon + ' ' + esc(o.name) + '</div>';
+    h += '<div style="font-size:0.78rem;color:var(--text-sub);">';
+    h += (vp(o.address) || '주소 확인 중') + ' · 프로그램 ' + o.progCount + '개 ' + openBadge;
+    if (o.transport === '있음') h += '<span class="badge badge-orange">🚌</span>';
+    h += '</div></div>';
+  });
+  list.innerHTML = h;
+}
+
+function onOrgCardClick(name) {
+  var found = kakaoMarkers.find(function(m) { return m.org.name === name; });
+  if (found) {
+    kakaoMap.setCenter(found.marker.getPosition());
+    kakaoMap.setLevel(3);
+    closeAllInfo();
+    found.info.open(kakaoMap, found.marker);
+    currentOpenInfo = found.info;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  showDetail(name);
+}
+
+// ==========================================
+// 🏢 기관 로그인 & 대시보드
+// ==========================================
+function orgLogin() {
+  var orgName = document.getElementById('org-login-select').value;
+  var pwd     = document.getElementById('org-login-pwd').value;
+  if (!orgName || !pwd) { showToast('기관과 비밀번호를 입력하세요.'); return; }
+
+  showLoading(true);
+
+  sbGet('organizations', 'select=password&name=eq.' + encodeURIComponent(orgName))
+    .then(function(rows) {
+      if (!rows || rows.length === 0) {
+        showLoading(false);
+        showToast('기관을 찾을 수 없습니다.');
+        return;
+      }
+      var storedPwd = String(rows[0].password || '').trim();
+      if (storedPwd === String(pwd).trim()) {
+        currentOrgName = orgName;
+        loadOrgDash();
+      } else {
+        showLoading(false);
+        showToast('비밀번호가 틀렸습니다.');
+      }
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+function loadOrgDash() {
+  showLoading(true);
+
+  Promise.all([
+    sbGet('organizations', 'select=*&name=eq.' + encodeURIComponent(currentOrgName)),
+    sbGet('programs',      'select=*&org_name=eq.' + encodeURIComponent(currentOrgName)),
+    sbGet('students',      'select=*&org_name=eq.' + encodeURIComponent(currentOrgName)),
+    sbGet('notices',       'select=*&org_name=eq.' + encodeURIComponent(currentOrgName) + '&order=date.desc')
+  ])
+  .then(function(results) {
+    var orgRow  = results[0] && results[0][0] ? results[0][0] : {};
+    var progs   = results[1] || [];
+    var students = results[2] || [];
+    var notices  = results[3] || [];
+
+    var orgInfo = {
+      orgId:           orgRow.org_id           || '',
+      name:            orgRow.name             || '',
+      type:            orgRow.type             || '',
+      jurisdiction:    orgRow.jurisdiction     || '',
+      address:         orgRow.address          || '',
+      tel:             orgRow.tel              || '',
+      managerName:     orgRow.manager_name     || '',
+      managerTel:      orgRow.manager_tel      || '',
+      hours:           orgRow.hours            || '',
+      transport:       orgRow.transport        || '',
+      transportDetail: orgRow.transport_detail || '',
+      routeMapUrl:     orgRow.route_map_url    || '',
+      routeMapNote:    orgRow.route_map_note   || '',
+      intro:           orgRow.intro            || '',
+      homepage:        orgRow.homepage         || ''
+    };
+
+    var mappedProgs = progs.map(function(p) {
+      return {
+        id:          p.id,
+        rowIndex:    p.id,
+        programId:   p.program_id   || '',
+        orgName:     p.org_name     || '',
+        name:        p.name         || '',
+        category:    p.category     || '',
+        grade:       p.grade        || '',
+        day:         p.day          || '',
+        startTime:   p.start_time   || '',
+        endTime:     p.end_time     || '',
+        capacity:    p.capacity     || '',
+        current:     p.current      || 0,
+        status:      p.status       || '',
+        fee:         p.fee          || '',
+        description: p.description  || '',
+        note:        p.note         || ''
+      };
+    });
+
+    var mappedStudents = students.map(function(s) {
+      return {
+        id:        s.id,
+        rowIndex:  s.id,
+        grade:     s.grade     || '',
+        classNum:  s.class_num || '',
+        name:      s.name      || '',
+        orgName:   s.org_name  || '',
+        progName:  s.prog_name || '',
+        day:       s.day       || '',
+        contact:   s.contact   || '',
+        arrival:   s.arrival   || '',
+        dismissal: s.dismissal || '',
+        note:      s.note      || ''
+      };
+    });
+
+    var mappedNotices = notices.map(function(n) {
+      return {
+        id:       n.id,
+        rowIndex: n.id,
+        date:     n.date    || '',
+        title:    n.title   || '',
+        content:  n.content || '',
+        status:   n.status  || '게시중'
+      };
+    });
+
+    // 완성도 계산
+    var fields = ['address','tel','managerName','managerTel','hours','transport','intro','homepage'];
+    var filled  = fields.filter(function(k) { return vp(orgInfo[k]); }).length;
+    if (mappedProgs.length > 0) filled++;
+    var total   = fields.length + 1;
+    var missing = fields.filter(function(k) { return !vp(orgInfo[k]); }).map(function(k) {
+      var labels = { address:'주소', tel:'대표연락처', managerName:'담당자명',
+                     managerTel:'담당자연락처', hours:'운영시간',
+                     transport:'통학지원', intro:'소개글', homepage:'홈페이지' };
+      return labels[k] || k;
+    });
+    if (mappedProgs.length === 0) missing.push('프로그램 등록');
+
+    orgDashData = {
+      orgInfo:      orgInfo,
+      programs:     mappedProgs,
+      students:     mappedStudents,
+      notices:      mappedNotices,
+      completeness: {
+        percent: Math.round((filled / total) * 100),
+        missing: missing,
+        filled:  filled,
+        total:   total
+      }
+    };
+
+    showLoading(false);
+    document.getElementById('org-dash-title').innerText = currentOrgName;
+    renderOrgWelcome();
+    showView('view-org-dash');
+    switchOrgTab('info');
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+function renderOrgWelcome() {
+  var area = document.getElementById('org-welcome-area');
+  var comp = orgDashData.completeness || { percent: 0, missing: [] };
+  var barCls = comp.percent >= 80 ? 'high' : comp.percent >= 50 ? 'mid' : 'low';
+  var h = '<div class="welcome-box"><div class="welcome-title">👋 ' + esc(currentOrgName) + '님 환영합니다</div>';
+  h += '<div class="welcome-sub">기관 정보와 프로그램을 관리하실 수 있습니다.<br>비어있는 정보를 채워주시면 학부모에게 더 정확한 안내가 제공됩니다.</div>';
+  h += '<div style="margin-top:12px;font-size:0.85rem;font-weight:700;">정보 완성도: ' + comp.percent + '%</div>';
+  h += '<div class="comp-bar-wrap"><div class="comp-bar ' + barCls + '" style="width:' + comp.percent + '%;"></div></div>';
+  if (comp.missing && comp.missing.length > 0) h += '<div class="missing-list">⚠️ 미입력: ' + comp.missing.join(', ') + '</div>';
+  h += '</div>';
+  area.innerHTML = h;
+}
+
+function switchOrgTab(tab) {
+  ['info', 'prog', 'student', 'notice', 'pwd'].forEach(function(t) { document.getElementById('org-tab-' + t).classList.toggle('active', t === tab); document.getElementById('org-area-' + t).style.display = t === tab ? 'block' : 'none'; });
+  if (tab === 'info') renderOrgInfoForm();
+  if (tab === 'prog') renderOrgProgs();
+  if (tab === 'student') renderOrgStudents();
+  if (tab === 'notice') renderOrgNotices();
+}
+
+function saveOrgPwd() {
+  var newPwd = document.getElementById('org-new-pwd').value.trim();
+  if (!newPwd) { showToast('새 비밀번호를 입력하세요.'); return; }
+  if (!confirm('비밀번호를 변경하시겠습니까?\n다음 로그인부터 새 비밀번호를 사용합니다.')) return;
+  showLoading(true);
+  gasPost('updateOrgPassword', { orgName: currentOrgName, newPwd: newPwd })
+    .then(function(r) {
+      showLoading(false);
+      if (r) {
+        document.getElementById('org-new-pwd').value = '';
+        showToast('✅ 비밀번호가 변경되었습니다!');
+      } else {
+        showToast('❌ 변경 실패');
+      }
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+function renderOrgInfoForm() {
+  var o = orgDashData.orgInfo || {};
+  var fields = [{ key: 'address', label: '주소', icon: '📍' }, { key: 'tel', label: '대표연락처', icon: '📞' }, { key: 'managerName', label: '담당자명', icon: '👤' }, { key: 'managerTel', label: '담당자 연락처', icon: '📱' }, { key: 'hours', label: '운영시간', icon: '🕐' }, { key: 'intro', label: '소개글', icon: '📝', ta: true }, { key: 'homepage', label: '홈페이지/SNS', icon: '🔗' }, { key: 'routeMapUrl', label: '통학노선도 링크', icon: '🗺️' }, { key: 'routeMapNote', label: '통학노선도 설명', icon: '🚌', ta: true }];
+  var h = '';
+  fields.forEach(function(f) {
+    h += '<div class="form-group"><label class="form-label">' + f.icon + ' ' + f.label + '</label>' + (f.ta ? '<textarea id="oi-' + f.key + '">' + esc(o[f.key] || '') + '</textarea>' : '<input type="text" id="oi-' + f.key + '" value="' + esc(o[f.key] || '') + '">') + '</div>';
+  });
+  h += '<div class="form-group"><label class="form-label">🚌 통학지원</label><select id="oi-transport"><option value="있음"' + (o.transport === '있음' ? ' selected' : '') + '>있음</option><option value="없음"' + (o.transport === '없음' ? ' selected' : '') + '>없음</option></select></div>';
+var tdVal = o.transportDetail || '';
+var tdPreset = ['없음','스쿨버스','자체버스'];
+var tdIsDirect = tdVal !== '' && tdPreset.indexOf(tdVal) === -1;
+h += '<div class="form-group"><label class="form-label">🚌 통학 상세</label>';
+h += '<select id="oi-transportDetail-select" onchange="syncCombo(\'oi-transportDetail-select\',\'oi-transportDetail-custom\',\'oi-transportDetail\')">';
+h += '<option value="">선택</option>';
+tdPreset.forEach(function(v) {
+  h += '<option' + (tdVal === v ? ' selected' : '') + '>' + v + '</option>';
+});
+h += '<option value="__direct__"' + (tdIsDirect ? ' selected' : '') + '>직접입력...</option>';
+h += '</select>';
+h += '<input type="text" id="oi-transportDetail-custom" placeholder="직접 입력" style="margin-top:6px;' + (tdIsDirect ? '' : 'display:none;') + '" oninput="onCustomInput(\'oi-transportDetail-custom\',\'oi-transportDetail\')" value="' + (tdIsDirect ? esc(tdVal) : '') + '">';
+h += '<input type="hidden" id="oi-transportDetail" value="' + esc(tdVal) + '">';
+h += '</div>';
+  h += '<button class="btn-action teal" onclick="saveOrgInfo()">💾 저장</button>';
+  document.getElementById('org-info-form').innerHTML = h;
+}
+
+function saveOrgInfo() {
+  var d = {};
+  ['address', 'tel', 'managerName', 'managerTel', 'hours', 'intro', 'homepage', 'transport', 'routeMapUrl', 'routeMapNote'].forEach(function(k) {
+    d[k] = document.getElementById('oi-' + k).value;
+  });
+  d['transportDetail'] = document.getElementById('oi-transportDetail').value;
+  showLoading(true);
+  gasPost('updateOrgInfo', { orgName: currentOrgName, data: d })
+    .then(function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); loadData(); })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+function renderOrgProgs() { var list = document.getElementById('org-prog-list'); var progs = orgDashData.programs || []; if (!progs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>프로그램이 없습니다.</div>'; return; } var h = ''; progs.forEach(function(p) { var cat = getCat(p.category); var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow'; h += '<div class="prog-card-manage" style="border-left:4px solid ' + (cat.color || '#636e72') + ';"><div class="prog-manage-title"><span>' + cat.icon + ' ' + esc(p.name) + '</span>'; if (p.status) h += '<span class="badge ' + sb + '">' + esc(p.status) + '</span>'; h += '</div><div class="prog-manage-detail">📅 ' + esc(p.day) + ' ' + esc(p.startTime) + '~' + esc(p.endTime); if (p.grade) h += ' | 🎓 ' + esc(p.grade); if (p.capacity) h += '<br>👥 ' + esc(p.current || 0) + '/' + esc(p.capacity) + '명'; if (p.fee) h += ' | 💰 ' + esc(p.fee); h += '</div><div class="prog-actions"><button class="btn-sm" onclick="openProgModal(' + p.rowIndex + ')">✏️ 수정</button><button class="btn-sm danger" onclick="deleteProg(' + p.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+
+function openProgModal(ri) {
+  editProgRow = ri || null;
+  document.getElementById('modal-prog-title').innerText = editProgRow ? '프로그램 수정' : '프로그램 추가';
+
+  // 일반 필드 초기화
+  ['name', 'start', 'end', 'capacity', 'current', 'desc', 'note'].forEach(function(f) {
+    var el = document.getElementById('mp-' + f);
+    if (el) el.value = '';
+  });
+  document.getElementById('mp-status').value = '모집중';
+
+  // 콤보박스 초기화
+  restoreCombo('mp-category-select', 'mp-category-custom', 'mp-category', '');
+  restoreCombo('mp-grade-select',    'mp-grade-custom',    'mp-grade',    '');
+  restoreCombo('mp-day-select',      'mp-day-custom',      'mp-day',      '');
+  restoreCombo('mp-fee-select',      'mp-fee-custom',      'mp-fee',      '');
+
+  if (editProgRow && orgDashData.programs) {
+    var p = orgDashData.programs.find(function(x) { return x.rowIndex === editProgRow; });
+    if (p) {
+      document.getElementById('mp-name').value      = p.name;
+      document.getElementById('mp-start').value     = p.startTime;
+      document.getElementById('mp-end').value       = p.endTime;
+      document.getElementById('mp-capacity').value  = p.capacity;
+      document.getElementById('mp-current').value   = p.current;
+      document.getElementById('mp-status').value    = p.status || '모집중';
+      document.getElementById('mp-desc').value      = p.description;
+      document.getElementById('mp-note').value      = p.note;
+
+      // 콤보박스 값 복원
+      restoreCombo('mp-category-select', 'mp-category-custom', 'mp-category', p.category);
+      restoreCombo('mp-grade-select',    'mp-grade-custom',    'mp-grade',    p.grade);
+      restoreCombo('mp-day-select',      'mp-day-custom',      'mp-day',      p.day);
+      restoreCombo('mp-fee-select',      'mp-fee-custom',      'mp-fee',      p.fee);
+    }
+  }
+
+  document.getElementById('modal-prog').style.display = 'flex';
+}
+
+function saveProg() {
+  var d = {};
+
+  // 일반 필드
+  var m = {
+    name:        'mp-name',
+    startTime:   'mp-start',
+    endTime:     'mp-end',
+    capacity:    'mp-capacity',
+    current:     'mp-current',
+    status:      'mp-status',
+    description: 'mp-desc',
+    note:        'mp-note'
+  };
+  for (var k in m) d[k] = document.getElementById(m[k]).value;
+
+  // 콤보박스 hidden 값으로 읽기
+  d['category'] = document.getElementById('mp-category').value;
+  d['grade']    = document.getElementById('mp-grade').value;
+  d['day']      = document.getElementById('mp-day').value;
+  d['fee']      = document.getElementById('mp-fee').value;
+
+  if (!d.name) { showToast('프로그램명을 입력하세요.'); return; }
+
+  showLoading(true);
+  closeModal('modal-prog');
+
+  var ok   = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); loadData(); };
+  var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
+
+  if (editProgRow) {
+    gasPost('updateProgram', { orgName: currentOrgName, rowIndex: editProgRow, data: d })
+      .then(ok).catch(fail);
+  } else {
+    gasPost('addProgram', { orgName: currentOrgName, data: d })
+      .then(ok).catch(fail);
+  }
+}
+
+function deleteProg(ri) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  showLoading(true);
+  gasPost('deleteProgram', { orgName: currentOrgName, rowIndex: ri })
+    .then(function() { showLoading(false); showToast('🗑️ 삭제'); loadOrgDash(); loadData(); })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+  
+// --- 학생 ---
+function renderOrgStudents() { var list = document.getElementById('org-student-list'); var students = orgDashData.students || []; var search = document.getElementById('org-student-search').value.trim(); var filtered = students.filter(function(s) { return !search || s.name.indexOf(search) !== -1; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>학생이 없습니다.</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">'; if (s.progName) h += '📋 ' + esc(s.progName) + ' | '; if (s.day) h += '📅 ' + esc(s.day) + '<br>'; if (s.contact) h += '📞 ' + esc(s.contact) + ' | '; h += '🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delOrgStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+
+function openStudentModal(ri) { editStudentRow = ri || null; isAdminMode = false; document.getElementById('modal-student-title').innerText = editStudentRow ? '학생 수정' : '학생 추가'; document.getElementById('ms-org-group').style.display = 'none'; var ps = document.getElementById('ms-prog'); ps.innerHTML = '<option value="">프로그램 선택</option>'; var pn = {}; (orgDashData.programs || []).forEach(function(p) { if (!pn[p.name]) { pn[p.name] = true; var o = document.createElement('option'); o.value = p.name; o.text = p.name; ps.appendChild(o); } }); ['grade', 'class', 'name', 'day', 'contact', 'note'].forEach(function(f) { document.getElementById('ms-' + f).value = ''; }); document.getElementById('ms-arrival').value = ''; document.getElementById('ms-dismissal').value = ''; if (editStudentRow && orgDashData.students) { var s = orgDashData.students.find(function(x) { return x.rowIndex === editStudentRow; }); if (s) { document.getElementById('ms-grade').value = s.grade; document.getElementById('ms-class').value = s.classNum; document.getElementById('ms-name').value = s.name; document.getElementById('ms-prog').value = s.progName; document.getElementById('ms-day').value = s.day; document.getElementById('ms-contact').value = s.contact; document.getElementById('ms-arrival').value = s.arrival || ''; document.getElementById('ms-dismissal').value = s.dismissal || ''; document.getElementById('ms-note').value = s.note; } } document.getElementById('modal-student').style.display = 'flex'; }
+
+function saveStudent() { var d = { grade: document.getElementById('ms-grade').value, classNum: document.getElementById('ms-class').value, name: document.getElementById('ms-name').value, progName: document.getElementById('ms-prog').value, day: document.getElementById('ms-day').value, contact: document.getElementById('ms-contact').value, arrival: document.getElementById('ms-arrival').value, dismissal: document.getElementById('ms-dismissal').value, note: document.getElementById('ms-note').value }; if (!d.grade || !d.name) { showToast('학년과 이름을 입력하세요.'); return; } showLoading(true); closeModal('modal-student'); var ok = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData(); else loadOrgDash(); }; var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); }; if (isAdminMode) {
+  d.orgName = document.getElementById('ms-org').value;
+  if (!d.orgName) { showLoading(false); showToast('기관을 선택하세요.'); return; }
+  if (editStudentRow) gasPost('updateStudent', { rowIndex: editStudentRow, data: d }).then(ok).catch(fail);
+  else gasPost('addStudent', { data: d }).then(ok).catch(fail);
+} else {
+  if (editStudentRow) gasPost('updateOrgStudent', { orgName: currentOrgName, rowIndex: editStudentRow, data: d }).then(ok).catch(fail);
+  else gasPost('addOrgStudent', { orgName: currentOrgName, data: d }).then(ok).catch(fail);
+} }
+
+function delOrgStudent(ri) {
+  if (!confirm('삭제?')) return;
+  showLoading(true);
+  gasPost('deleteOrgStudent', { orgName: currentOrgName, rowIndex: ri })
+    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+// --- 공지 ---
+function renderOrgNotices() { var list = document.getElementById('org-notice-list'); var notices = orgDashData.notices || []; if (!notices.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div>공지가 없습니다.</div>'; return; } var h = ''; notices.forEach(function(n) { var sb = n.status === '게시중' ? 'badge-green' : 'badge-red'; h += '<div class="notice-card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="notice-title">' + esc(n.title) + '</div><div class="notice-date">' + esc(n.date) + ' <span class="badge ' + sb + '">' + esc(n.status) + '</span></div></div><div style="display:flex;gap:4px;"><button class="btn-sm" onclick="openNoticeModal(' + n.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delNotice(' + n.rowIndex + ')">🗑️</button></div></div>'; if (n.content) h += '<div class="notice-content">' + esc(n.content) + '</div>'; h += '</div>'; }); list.innerHTML = h; }
+function openNoticeModal(ri) { editNoticeRow = ri || null; document.getElementById('modal-notice-title').innerText = editNoticeRow ? '공지 수정' : '공지사항 작성'; document.getElementById('mn-title').value = ''; document.getElementById('mn-content').value = ''; document.getElementById('mn-status').value = '게시중'; if (editNoticeRow && orgDashData.notices) { var n = orgDashData.notices.find(function(x) { return x.rowIndex === editNoticeRow; }); if (n) { document.getElementById('mn-title').value = n.title; document.getElementById('mn-content').value = n.content; document.getElementById('mn-status').value = n.status || '게시중'; } } document.getElementById('modal-notice').style.display = 'flex'; }
+function saveNotice() {
+  var d = { title: document.getElementById('mn-title').value, content: document.getElementById('mn-content').value, status: document.getElementById('mn-status').value };
+  if (!d.title) { showToast('제목을 입력하세요.'); return; }
+  showLoading(true);
+  closeModal('modal-notice');
+  var ok = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); };
+  var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
+  if (editNoticeRow) gasPost('updateNotice', { orgName: currentOrgName, rowIndex: editNoticeRow, data: d }).then(ok).catch(fail);
+  else gasPost('addNotice', { orgName: currentOrgName, data: d }).then(ok).catch(fail);
+}  
+function delNotice(ri) {
+  if (!confirm('삭제?')) return;
+  showLoading(true);
+  gasPost('deleteNotice', { orgName: currentOrgName, rowIndex: ri })
+    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+// ==========================================
+// 🟣 관리자
+// ==========================================
+function adminLogin() {
+  var pwd = document.getElementById('admin-login-pwd').value;
+  if (!pwd) { showToast('비밀번호를 입력하세요.'); return; }
+  showLoading(true);
+  gasPost('verifyAdminPassword', { inputPwd: pwd })
+    .then(function(v) {
+      if (v) loadAdminData();
+      else { showLoading(false); showToast('비밀번호가 틀렸습니다.'); }
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+function loadAdminData() {
+  showLoading(true);
+  gasGet('getAdminDashboard')
+    .then(function(data) {
+      showLoading(false);
+      adminData = data;
+      document.getElementById('adm-orgs').innerText = data.summary.totalOrgs + '곳';
+      document.getElementById('adm-progs').innerText = data.summary.totalProgs + '개';
+      document.getElementById('adm-students').innerText = data.summary.totalStudents + '명';
+      var of = document.getElementById('adm-student-org-filter');
+      var cv = of.value;
+      of.innerHTML = '<option value="전체">전체 기관</option>';
+      data.orgs.forEach(function(o) {
+        var opt = document.createElement('option');
+        opt.value = o.name;
+        opt.text = o.name;
+        of.appendChild(opt);
+      });
+      of.value = cv || '전체';
+      showView('view-admin-dash');
+      switchAdminTab('overview');
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+function switchAdminTab(tab) { ['overview', 'students', 'orgs', 'pwd'].forEach(function(t) { document.getElementById('adm-tab-' + t).classList.toggle('active', t === tab); document.getElementById('adm-area-' + t).style.display = t === tab ? 'block' : 'none'; }); if (tab === 'overview') renderAdmOverview(); if (tab === 'students') renderAdminStudents(); if (tab === 'orgs') renderAdmOrgs(); if (tab === 'pwd') renderAdmPwd(); }
+
+function renderAdmOverview() { if (!adminData || !adminData.stats) return; var t = document.getElementById('adm-org-table'); var h = '<tr><th>기관명</th><th>유형</th><th>프로그램</th><th>이용학생</th><th>완성도</th></tr>'; var stats = adminData.stats.orgStats || []; var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); stats.forEach(function(s) { var clr = s.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[s.name] || { percent: 0 }; var cc = cm.percent >= 80 ? 'var(--green-deep)' : cm.percent >= 50 ? 'var(--orange-deep)' : 'var(--red-deep)'; var ci = cm.percent >= 80 ? '✅' : cm.percent >= 50 ? '⚠️' : '🔴'; h += '<tr><td style="text-align:left;font-weight:600;">' + esc(s.name) + '</td><td style="color:' + clr + ';font-size:0.78rem;">' + esc(s.type) + '</td><td>' + s.progCount + '</td><td style="font-weight:700;color:var(--purple-deep);">' + s.studentCount + '</td><td style="color:' + cc + ';font-weight:700;">' + ci + ' ' + cm.percent + '%</td></tr>'; }); t.innerHTML = h; var gt = document.getElementById('adm-grade-table'); var gd = adminData.stats.gradeDistribution || {}; var gh = '<tr><th>학년</th>', gv = '<tr><td style="font-weight:700;">학생 수</td>', total = 0; for (var g = 1; g <= 6; g++) { var c = gd[String(g)] || 0; total += c; gh += '<th>' + g + '학년</th>'; gv += '<td>' + c + '</td>'; } gh += '<th>합계</th></tr>'; gv += '<td style="font-weight:700;color:var(--purple-deep);">' + total + '</td></tr>'; gt.innerHTML = gh + gv; }
+
+function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + esc(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+
+function openAdmStudentModal(ri) { editStudentRow = ri || null; isAdminMode = true; document.getElementById('modal-student-title').innerText = editStudentRow ? '학생 수정' : '학생 추가'; document.getElementById('ms-org-group').style.display = 'block'; var os = document.getElementById('ms-org'); os.innerHTML = '<option value="">기관 선택</option>'; (adminData.orgs || []).forEach(function(o) { var opt = document.createElement('option'); opt.value = o.name; opt.text = o.name; os.appendChild(opt); }); var ps = document.getElementById('ms-prog'); ps.innerHTML = '<option value="">프로그램 선택</option>'; var pn = {}; allProgs.forEach(function(p) { if (!pn[p.orgName + '|' + p.name]) { pn[p.orgName + '|' + p.name] = true; var o = document.createElement('option'); o.value = p.name; o.text = p.orgName + ' - ' + p.name; ps.appendChild(o); } }); ['grade', 'class', 'name', 'day', 'contact', 'note'].forEach(function(f) { document.getElementById('ms-' + f).value = ''; }); document.getElementById('ms-org').value = ''; document.getElementById('ms-arrival').value = ''; document.getElementById('ms-dismissal').value = ''; if (editStudentRow && adminData.students) { var s = adminData.students.find(function(x) { return x.rowIndex === editStudentRow; }); if (s) { document.getElementById('ms-grade').value = s.grade; document.getElementById('ms-class').value = s.classNum; document.getElementById('ms-name').value = s.name; document.getElementById('ms-org').value = s.orgName; document.getElementById('ms-prog').value = s.progName; document.getElementById('ms-day').value = s.day; document.getElementById('ms-contact').value = s.contact; document.getElementById('ms-arrival').value = s.arrival || ''; document.getElementById('ms-dismissal').value = s.dismissal || ''; document.getElementById('ms-note').value = s.note; } } document.getElementById('modal-student').style.display = 'flex'; }
+function delAdmStudent(ri) {
+  if (!confirm('삭제?')) return;
+  showLoading(true);
+  gasPost('deleteStudent', { rowIndex: ri })
+    .then(function() { showLoading(false); showToast('🗑️'); loadAdminData(); })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+function renderAdmOrgs() { if (!adminData) return; var list = document.getElementById('adm-org-list'); var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); var h = ''; (adminData.orgs || []).forEach(function(o) { var icon = o.type === '학교밖 늘봄' ? '📚' : '🏠'; var bc = o.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[o.name] || { percent: 0, missing: [] }; var barCls = cm.percent >= 80 ? 'high' : cm.percent >= 50 ? 'mid' : 'low'; var st = (adminData.stats.orgStats || []).find(function(s) { return s.name === o.name; }); h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:5px solid ' + bc + ';border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);"><div style="font-weight:800;font-size:0.95rem;margin-bottom:8px;">' + icon + ' ' + esc(o.name) + '</div><div style="font-size:0.82rem;color:var(--text-sub);line-height:1.7;">📍 ' + (vp(o.address) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>📞 ' + (vp(o.tel) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>👤 ' + (vp(o.managerName) || '<i style="color:var(--orange-deep);">미입력</i>') + (vp(o.managerTel) ? ' (' + esc(o.managerTel) + ')' : '') + '<br>🕐 ' + (vp(o.hours) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>🚌 ' + (o.transport === '있음' ? (esc(o.transportDetail) || '통학 운영') : '미운영') + '</div>'; if (st) h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"><span class="badge badge-blue">프로그램 ' + st.progCount + '개</span><span class="badge badge-purple">학생 ' + st.studentCount + '명</span></div>'; h += '<div style="margin-top:10px;font-size:0.82rem;font-weight:700;">완성도: ' + cm.percent + '%</div><div class="comp-bar-wrap"><div class="comp-bar ' + barCls + '" style="width:' + cm.percent + '%;"></div></div>'; if (cm.missing && cm.missing.length > 0) h += '<div style="font-size:0.78rem;color:var(--orange-deep);margin-top:4px;">⚠️ 미입력: ' + cm.missing.join(', ') + '</div>'; h += '</div>'; }); list.innerHTML = h; }
+
+function renderAdmPwd() {
+  showLoading(true);
+  gasGet('getPasswordList')
+    .then(function(pwdList) {
+      showLoading(false);
+      var list = document.getElementById('adm-pwd-list');
+      var h = '';
+      pwdList.forEach(function(item) {
+        h += '<div class="student-row"><div class="student-info"><strong>🏢 ' + esc(item.orgName) + '</strong><br><span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: <strong>' + esc(item.password || '미설정') + '</strong></span></div><button class="btn-sm" onclick="openPwdModal(\'' + esc(item.orgName).replace(/'/g, "\\'") + '\',\'' + esc(item.password).replace(/'/g, "\\'") + '\')">변경</button></div>';
+      });
+      list.innerHTML = h;
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+function openPwdModal(org, pwd) { editPwdOrg = org; document.getElementById('modal-pwd-title').innerText = org + ' 비밀번호 변경'; document.getElementById('mpw-input').value = pwd; document.getElementById('modal-pwd').style.display = 'flex'; }
+function savePwd() {
+  var np = document.getElementById('mpw-input').value.trim();
+  if (!np) { showToast('비밀번호를 입력하세요.'); return; }
+  if (!confirm(editPwdOrg + ' 비밀번호를 변경하시겠습니까?')) return;
+  showLoading(true);
+  closeModal('modal-pwd');
+  gasPost('updateOrgPassword', { orgName: editPwdOrg, newPwd: np })
+    .then(function(r) {
+      showLoading(false);
+      if (r) { showToast('✅ 변경!'); renderAdmPwd(); }
+      else showToast('❌ 실패');
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+// --- 보고서 ---
+function exportClipboard() { if (!adminData || !adminData.stats) return; var lines = []; lines.push('순창초 지역연계 저녁늘봄 현황'); lines.push('생성일: ' + new Date().toLocaleDateString('ko-KR')); lines.push(''); lines.push('기관명\t유형\t프로그램\t이용학생'); (adminData.stats.orgStats || []).forEach(function(s) { lines.push(s.name + '\t' + s.type + '\t' + s.progCount + '\t' + s.studentCount); }); var text = lines.join('\n'); if (navigator.clipboard) navigator.clipboard.writeText(text).then(function() { showToast('📋 복사!'); }); else { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('📋 복사!'); } }
+
+// ==========================================
+// 📅 시간표 V3 - 다중 요일 선택 하이브리드
+// ==========================================
+var ttMode = '주중';
+var ttSelectedDays = [];  // 선택된 요일 배열
+var ttOrgFilter = '전체';
+
+function openTimetable() {
+  showView('view-timetable');
+  ttMode = '주중';
+  ttOrgFilter = '전체';
+  // 기본값: 오늘 요일 선택
+  var today = new Date().getDay(); // 0=일,1=월,...
+  var dayMap = ['일','월','화','수','목','금','토'];
+  var todayStr = dayMap[today];
+  if (ttMode === '주중' && '월화수목금'.indexOf(todayStr) !== -1) {
+    ttSelectedDays = [todayStr];
+  } else if (ttMode === '주말' && todayStr === '토') {
+    ttSelectedDays = ['토'];
+  } else {
+    ttSelectedDays = ttMode === '주중' ? ['월'] : ['토'];
+  }
+  renderTTAll();
+}
+
+function renderTTAll() {
+  renderTTTabs();
+  renderTTDayBar();
+  renderTTToolbar();
+  renderTTContent();
+}
+
+// --- 주중/주말 탭 ---
+function renderTTTabs() {
+  var tabs = [{ v: '주중', l: '📅 주중 (월~금)' }, { v: '주말', l: '🌈 주말 (토)' }];
+  var h = '';
+  tabs.forEach(function(t) {
+    h += '<button class="tt-tab' + (ttMode === t.v ? ' active' : '') + '" onclick="setTTMode(\'' + t.v + '\')">' + t.l + '</button>';
+  });
+  document.getElementById('tt-tabs').innerHTML = h;
+}
+
+function setTTMode(mode) {
+  ttMode = mode;
+  ttOrgFilter = '전체';
+  ttSelectedDays = mode === '주중' ? ['월'] : ['토'];
+  closeTTDetail();
+  renderTTAll();
+}
+
+// --- 요일 다중선택 바 ---
+function renderTTDayBar() {
+  var area = document.getElementById('tt-day-bar');
+  var days = ttMode === '주중' ? ['월', '화', '수', '목', '금'] : ['토'];
+
+  // 요일별 프로그램 수
+  var countByDay = {};
+  days.forEach(function(d) { countByDay[d] = 0; });
+  allProgs.forEach(function(p) {
+    if (!p.day || !p.startTime) return;
+    if (ttOrgFilter !== '전체' && p.orgName !== ttOrgFilter) return;
+    var pDays = parseDays(p.day);
+    pDays.forEach(function(d) {
+      if (countByDay[d] !== undefined) countByDay[d]++;
+    });
+  });
+
+  var totalCount = 0;
+  days.forEach(function(d) { totalCount += countByDay[d]; });
+
+  var isAll = ttSelectedDays.length === days.length;
+
+  var h = '<button class="tt-day-btn all' + (isAll ? ' active' : '') + '" onclick="ttToggleAll()">';
+  h += '전체<span class="day-sub">' + totalCount + '</span></button>';
+
+  days.forEach(function(d) {
+    var isOn = ttSelectedDays.indexOf(d) !== -1;
+    h += '<button class="tt-day-btn' + (isOn ? ' active' : '') + '" onclick="ttToggleDay(\'' + d + '\')">';
+    h += d + '<span class="day-sub">' + countByDay[d] + '</span></button>';
+  });
+
+  area.innerHTML = h;
+}
+
+function ttToggleDay(day) {
+  var days = ttMode === '주중' ? ['월', '화', '수', '목', '금'] : ['토'];
+  var idx = ttSelectedDays.indexOf(day);
+  if (idx !== -1) {
+    // 끄기 (최소 1개는 유지)
+    if (ttSelectedDays.length > 1) {
+      ttSelectedDays.splice(idx, 1);
+    }
+  } else {
+    // 켜기
+    ttSelectedDays.push(day);
+    // 요일 순서 정렬
+    ttSelectedDays.sort(function(a, b) {
+      return days.indexOf(a) - days.indexOf(b);
+    });
+  }
+  closeTTDetail();
+  renderTTDayBar();
+  renderTTContent();
+}
+
+function ttToggleAll() {
+  var days = ttMode === '주중' ? ['월', '화', '수', '목', '금'] : ['토'];
+  if (ttSelectedDays.length === days.length) {
+    // 전체 해제 → 첫 요일만
+    ttSelectedDays = [days[0]];
+  } else {
+    ttSelectedDays = days.slice();
+  }
+  closeTTDetail();
+  renderTTDayBar();
+  renderTTContent();
+}
+
+// --- 기관 필터 ---
+function renderTTToolbar() {
+  var area = document.getElementById('tt-toolbar');
+  var used = {};
+  allProgs.forEach(function(p) {
+    if (!p.orgName || !p.day) return;
+    var pDays = parseDays(p.day);
+    var isWeekday = pDays.some(function(d) { return '월화수목금'.indexOf(d) !== -1; });
+    var isWeekend = pDays.some(function(d) { return '토일'.indexOf(d) !== -1; });
+    if (ttMode === '주중' && !isWeekday) return;
+    if (ttMode === '주말' && !isWeekend) return;
+    used[p.orgName] = true;
+  });
+
+  var orgNames = Object.keys(used).sort(function(a, b) { return a.localeCompare(b, 'ko'); });
+  var h = '<div class="tt-toolbar-right" style="width:100%;">';
+  h += '<select class="tt-select" style="width:100%;" onchange="setTTOrgFilter(this.value)">';
+  h += '<option value="전체">🏢 전체 기관</option>';
+  orgNames.forEach(function(name) {
+    var org = allOrgs.find(function(o) { return o.name === name; });
+    var icon = (org && org.type === '학교밖 늘봄') ? '📚' : '🏠';
+    h += '<option value="' + esc(name) + '"' + (ttOrgFilter === name ? ' selected' : '') + '>' + icon + ' ' + esc(name) + '</option>';
+  });
+  h += '</select></div>';
+  area.innerHTML = h;
+}
+
+function setTTOrgFilter(orgName) {
+  ttOrgFilter = orgName || '전체';
+  closeTTDetail();
+  renderTTDayBar();
+  renderTTContent();
+}
+
+// --- 필터링 ---
+function getTTFilteredProgs() {
+  return allProgs.filter(function(p) {
+    if (!p.day || !p.startTime) return false;
+    var progDays = parseDays(p.day);
+    var isWeekday = progDays.some(function(d) { return '월화수목금'.indexOf(d) !== -1; });
+    var isWeekend = progDays.some(function(d) { return '토일'.indexOf(d) !== -1; });
+    if (ttMode === '주중' && !isWeekday) return false;
+    if (ttMode === '주말' && !isWeekend) return false;
+    if (ttOrgFilter !== '전체' && p.orgName !== ttOrgFilter) return false;
+    return true;
+  });
+}
+
+// --- 메인 렌더링 ---
+function renderTTContent() {
+  var area = document.getElementById('tt-content');
+  var hint = document.getElementById('tt-scroll-hint');
+
+  if (ttSelectedDays.length === 1) {
+    // 카드형
+    if (hint) hint.style.display = 'none';
+    area.innerHTML = renderTTCards(ttSelectedDays[0]);
+  } else {
+    // 테이블형
+    if (hint) hint.style.display = ttSelectedDays.length >= 4 ? 'block' : 'none';
+    area.innerHTML = renderTTTable(ttSelectedDays);
+  }
+}
+
+// ==========================================
+// 카드형 (요일 1개 선택 시)
+// ==========================================
+function renderTTCards(day) {
+  var filtered = getTTFilteredProgs();
+  var dayProgs = filtered.filter(function(p) {
+    return parseDays(p.day).indexOf(day) !== -1;
+  });
+
+  if (dayProgs.length === 0) {
+    return '<div class="tt-empty-day"><div class="tt-empty-day-icon">📅</div>' + day + '요일에 운영되는 프로그램이 없습니다.</div>';
+  }
+
+  dayProgs.sort(function(a, b) { return timeToMin(a.startTime) - timeToMin(b.startTime); });
+
+  // 기관별 그룹핑
+  var orgGroups = {};
+  var orgOrder = [];
+  dayProgs.forEach(function(p) {
+    if (!orgGroups[p.orgName]) {
+      orgGroups[p.orgName] = [];
+      orgOrder.push(p.orgName);
+    }
+    var exists = orgGroups[p.orgName].some(function(x) { return x.name === p.name; });
+    if (!exists) orgGroups[p.orgName].push(p);
+  });
+
+  var h = '';
+  orgOrder.forEach(function(orgName) {
+    var progs = orgGroups[orgName];
+    var org = allOrgs.find(function(o) { return o.name === orgName; });
+    var isSchool = org && org.type === '학교밖 늘봄';
+    var icon = isSchool ? '📚' : '🏠';
+    var typeBadge = isSchool
+      ? '<span class="badge badge-blue" style="font-size:0.68rem;">학교밖 늘봄</span>'
+      : '<span class="badge badge-green" style="font-size:0.68rem;">지역사회 돌봄</span>';
+    var transportBadge = (org && org.transport === '있음')
+      ? ' <span class="badge badge-orange" style="font-size:0.68rem;">🚌</span>' : '';
+
+    h += '<div class="tt-org-group">';
+    h += '<div class="tt-org-header">';
+    h += '<span class="tt-org-icon">' + icon + '</span>';
+    h += '<span class="tt-org-name-h">' + esc(orgName) + '</span>';
+    h += '<span class="tt-org-badge-h">' + typeBadge + transportBadge + '</span>';
+    h += '</div>';
+
+    progs.forEach(function(p) {
+      var cat = getCat(p.category);
+      var cc = cat.cardClass || 'cat-etc';
+      var stBadge = '';
+      if (p.status) {
+        var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow';
+        stBadge = '<span class="badge ' + sb + '">' + esc(p.status) + '</span>';
+      }
+      var dataKey = esc(p.orgName) + '|||' + esc(p.name);
+
+      h += '<div class="tt-prog-card ' + cc + '" onclick="showTTDetail(\'' + dataKey.replace(/'/g, "\\'") + '\')">';
+      h += '<div class="tt-prog-top"><div class="tt-prog-name">' + cat.icon + ' ' + esc(p.name) + '</div>' + stBadge + '</div>';
+      h += '<div class="tt-prog-info">';
+      h += '<span class="tt-prog-label">🕐 시간</span><span class="tt-prog-value">' + (vp(p.startTime) ? esc(p.startTime) + ' ~ ' + esc(p.endTime) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
+      h += '<span class="tt-prog-label">🎓 대상</span><span class="tt-prog-value">' + (vp(p.grade) ? esc(p.grade) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
+      if (p.capacity) {
+        var cap = parseInt(p.capacity) || 0, cur = parseInt(p.current) || 0, rem = cap - cur;
+        h += '<span class="tt-prog-label">👥 정원</span><span class="tt-prog-value">' + cur + '/' + cap + '명';
+        if (rem > 0) h += ' <span style="color:var(--green-deep);font-weight:700;">잔여 ' + rem + '명</span>';
+        h += '</span>';
+      }
+      h += '<span class="tt-prog-label">💰 수강료</span><span class="tt-prog-value">' + (vp(p.fee) ? esc(p.fee) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
+      h += '</div></div>';
+    });
+
+    h += '</div>';
+  });
+
+  return h;
+}
+
+// ==========================================
+// 테이블형 (요일 2개 이상 선택 시)
+// ==========================================
+function renderTTTable(days) {
+  var filtered = getTTFilteredProgs();
+  var timeSlots = ttMode === '주중' ? buildTimeSlots(900, 1260, 30) : buildTimeSlots(540, 780, 30);
+
+  var grid = {};
+  timeSlots.forEach(function(slot) {
+    grid[slot.key] = {};
+    days.forEach(function(day) { grid[slot.key][day] = []; });
+  });
+
+  filtered.forEach(function(p) {
+    var progDays = parseDays(p.day);
+    var startMin = timeToMin(p.startTime);
+    if (startMin === 0) return;
+    var slotKey = findSlotKey(timeSlots, startMin);
+    if (!slotKey) return;
+
+    progDays.forEach(function(day) {
+      if (days.indexOf(day) === -1) return;
+      if (grid[slotKey] && grid[slotKey][day]) {
+        var exists = grid[slotKey][day].some(function(x) { return x.name === p.name && x.orgName === p.orgName; });
+        if (!exists) grid[slotKey][day].push(p);
+      }
+    });
+  });
+
+  // 테이블 최소 너비
+  var minW = days.length <= 2 ? '100%' : days.length <= 3 ? '400px' : '520px';
+
+  var h = '<div class="tt-scroll"><table class="tt-table" style="min-width:' + minW + ';">';
+  h += '<tr><th>시간</th>';
+  days.forEach(function(d) { h += '<th>' + d + '</th>'; });
+  h += '</tr>';
+
+  var displayedRows = 0;
+  timeSlots.forEach(function(slot) {
+    var hasAny = false;
+    days.forEach(function(day) { if (grid[slot.key][day].length > 0) hasAny = true; });
+    if (!hasAny) return;
+
+    displayedRows++;
+    h += '<tr><td>' + slot.label + '</td>';
+    days.forEach(function(day) {
+      var progs = grid[slot.key][day].slice().sort(function(a, b) {
+        return a.orgName.localeCompare(b.orgName, 'ko');
+      });
+      h += '<td>';
+      progs.forEach(function(p) {
+        var cat = getCat(p.category);
+        var cc = cat.cardClass || 'cat-etc';
+        var si = statusInfo(p.status);
+        var dataKey = esc(p.orgName) + '|||' + esc(p.name);
+        var orgPill = getOrgPillClass(p.orgName);
+
+        h += '<div class="tt-cell ' + cc + '" onclick="showTTDetail(\'' + dataKey.replace(/'/g, "\\'") + '\')">';
+        h += '<div class="tt-cell-name">' + cat.icon + ' ' + esc(p.name) + (si.dot ? ' <span class="status-dot ' + si.dot + '"></span>' : '') + '</div>';
+        h += '<div class="tt-cell-org"><span class="tt-org-pill ' + orgPill + '">' + esc(p.orgName) + '</span></div>';
+        h += '<div class="tt-cell-time">' + esc(p.startTime) + '~' + esc(p.endTime) + '</div>';
+        h += '</div>';
+      });
+      h += '</td>';
+    });
+    h += '</tr>';
+  });
+
+  if (!displayedRows) {
+    h += '<tr><td colspan="' + (days.length + 1) + '"><div class="tt-empty">📅 조건에 맞는 프로그램이 없습니다.</div></td></tr>';
+  }
+
+  h += '</table></div>';
+  return h;
+}
+
+function getOrgPillClass(orgName) {
+  var org = allOrgs.find(function(o) { return o.name === orgName; });
+  return org && org.type === '학교밖 늘봄' ? 'school' : 'community';
+}
+
+function buildTimeSlots(startMin, endMin, step) {
+  var slots = [];
+  for (var m = startMin; m < endMin; m += step) {
+    var hh = Math.floor(m / 60);
+    var mm = m % 60;
+    var label = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+    slots.push({ key: String(m), label: label, min: m });
+  }
+  return slots;
+}
+
+function findSlotKey(slots, startMin) {
+  for (var i = slots.length - 1; i >= 0; i--) {
+    if (startMin >= slots[i].min) return slots[i].key;
+  }
+  return slots.length > 0 ? slots[0].key : null;
+}
+
+// ==========================================
+// 시간표 상세 패널
+// ==========================================
+function showTTDetail(dataKey) {
+  var parts = dataKey.split('|||');
+  var orgName = parts[0];
+  var progName = parts[1];
+
+  var matchedRows = allProgs.filter(function(p) {
+    return p.orgName === orgName && p.name === progName;
+  });
+  if (!matchedRows.length) return;
+
+  var p = matchedRows[0];
+  var cat = getCat(p.category);
+  var si = statusInfo(p.status);
+  var org = allOrgs.find(function(o) { return o.name === orgName; });
+  var hasTransport = org && org.transport === '있음';
+
+  var h = '<div class="tt-detail-card">';
+  h += '<button class="tt-detail-close" onclick="closeTTDetail()">✕</button>';
+  h += '<div class="tt-detail-name">' + cat.icon + ' ' + esc(progName);
+  if (p.status) {
+    var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow';
+    h += ' <span class="badge ' + sb + '">' + esc(p.status) + '</span>';
+  }
+  h += '</div>';
+  h += '<div class="tt-detail-org">📍 ' + esc(orgName);
+  h += org ? (org.type === '학교밖 늘봄' ? ' · 학교밖 늘봄' : ' · 지역사회 돌봄') : '';
+  h += '</div>';
+
+  if (si.text) h += '<div class="prog-status-msg ' + si.cls + '" style="border-radius:8px;margin-bottom:10px;">' + si.text + '</div>';
+
+  h += '<div class="tt-detail-grid">';
+  h += '<div class="tt-detail-label">📂 분류</div><div class="tt-detail-value">' + val(p.category) + '</div>';
+  h += '<div class="tt-detail-label">🎓 대상</div><div class="tt-detail-value">' + val(p.grade) + '</div>';
+  matchedRows.forEach(function(r) {
+    h += '<div class="tt-detail-label">📅 일정</div><div class="tt-detail-value">' + esc(r.day) + (r.startTime ? ' ' + esc(r.startTime) + '~' + esc(r.endTime) : '') + '</div>';
+  });
+  if (p.capacity) {
+    var cap = parseInt(p.capacity) || 0, cur = parseInt(p.current) || 0, rem = cap - cur;
+    h += '<div class="tt-detail-label">👥 정원</div><div class="tt-detail-value">' + cur + '/' + cap + '명';
+    if (rem > 0) h += ' <span style="color:var(--green-deep);font-weight:700;">(잔여 ' + rem + '명)</span>';
+    h += '</div>';
+  } else {
+    h += '<div class="tt-detail-label">👥 정원</div><div class="tt-detail-value pending">확인 중</div>';
+  }
+  h += '<div class="tt-detail-label">💰 수강료</div><div class="tt-detail-value">' + val(p.fee) + '</div>';
+  h += '<div class="tt-detail-label">🚌 통학</div><div class="tt-detail-value">' + (hasTransport ? '운영' : '미운영') + '</div>';
+  h += '</div>';
+
+  if (vp(p.description)) h += '<div style="margin-top:10px;font-size:0.85rem;line-height:1.7;">' + esc(p.description) + '</div>';
+  if (org && org.transport === '있음') h += buildRouteMapBlock(org.routeMapUrl, org.routeMapNote);
+  h += '</div>';
+
+  var detail = document.getElementById('tt-detail');
+  detail.innerHTML = h;
+  detail.className = 'tt-detail show';
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeTTDetail() {
+  var detail = document.getElementById('tt-detail');
+  detail.className = 'tt-detail';
+  detail.innerHTML = '';
+}
+
+// --- 유틸리티 ---
+function parseDays(dayStr) {
+  var s = String(dayStr).replace(/요일/g, '').replace(/\s/g, '');
+  var days = [];
+  if (s.indexOf(',') !== -1) {
+    s.split(',').forEach(function(d) { if (d) days.push(d.trim()); });
+  } else {
+    for (var i = 0; i < s.length; i++) {
+      var ch = s[i];
+      if ('월화수목금토일'.indexOf(ch) !== -1) days.push(ch);
+    }
+  }
+  return days;
+}
+
+function timeToMin(timeStr) {
+  if (!timeStr) return 0;
+  var clean = String(timeStr).trim();
+  var match = clean.match(/(\d{1,2}):(\d{2})/);
+  if (!match) return 0;
+  return parseInt(match[1]) * 60 + parseInt(match[2]);
+}
+
+function exportCSV() { if (!adminData || !adminData.stats) return; var BOM = '\uFEFF'; var rows = ['기관명,유형,프로그램,이용학생']; (adminData.stats.orgStats || []).forEach(function(s) { rows.push(s.name + ',' + s.type + ',' + s.progCount + ',' + s.studentCount); }); var blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' }); var url = URL.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = '순창초_저녁늘봄_현황.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('📥 다운로드!'); }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/neulbom-map-portal/sw.js');
+    });
+  }
+</script>
+</body>
+</html>
 
