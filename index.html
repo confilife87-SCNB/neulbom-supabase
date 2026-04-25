@@ -2053,13 +2053,173 @@ function showRecResults() {
   var area = document.getElementById('rec-flow-area');
   area.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div><div style="margin-top:12px;color:var(--text-sub);">맞춤 프로그램 분석 중...</div></div>';
 
-  gasPost('getMatchingOrgs', { conditions: recConditions })
-    .then(function(results) {
-      renderRecResults(results);
-    })
-    .catch(function(e) {
-      area.innerHTML = '<div class="rec-empty"><div class="rec-empty-icon">😢</div>추천 결과를 불러오지 못했습니다.<br>' + esc(e.message) + '</div>';
+  // Supabase 버전: allOrgs + allProgs 로 프론트에서 직접 계산
+  try {
+    var results = matchingOrgsFromLocal(recConditions);
+    renderRecResults(results);
+  } catch(e) {
+    area.innerHTML = '<div class="rec-empty"><div class="rec-empty-icon">😢</div>추천 결과를 불러오지 못했습니다.</div>';
+  }
+}
+
+// ==========================================
+// 🎯 프론트에서 직접 맞춤 추천 계산
+// ==========================================
+function matchingOrgsFromLocal(conditions) {
+  var purpose      = conditions.purpose      || '';
+  var dayType      = conditions.dayType      || '';
+  var timeSlot     = conditions.timeSlot     || '';
+  var grade        = conditions.grade        || '';
+  var needTransport = conditions.transport   || '';
+  var feeType      = conditions.fee          || '';
+
+  var results = [];
+
+  allOrgs.forEach(function(org) {
+    var orgProgs  = allProgs.filter(function(p) { return p.orgName === org.name; });
+    var score     = 0;
+    var matchedProgs = [];
+    var checks    = [];
+    var isDolbom  = org.type === '지역사회 돌봄';
+
+    // 돌봄 기관 기본 가산
+    if (isDolbom) {
+      if (purpose === '돌봄')       { score += 30; checks.push({ icon: '✅', text: '방과후 돌봄 운영' + (org.hours ? ' (' + org.hours + ')' : '') }); }
+      else if (purpose === '둘다')  { score += 15; checks.push({ icon: '✅', text: '방과후 돌봄 운영' }); }
+    }
+
+    orgProgs.forEach(function(p) {
+      var progScore = 0;
+      var progMatch = true;
+
+      // 주중/주말 필터
+      if (dayType && dayType !== '상관없음') {
+        var wd = isWeekdayProg(p.day);
+        var we = isWeekendProg(p.day);
+        if (dayType === '주중' && !wd) progMatch = false;
+        if (dayType === '주말' && !we) progMatch = false;
+      }
+
+      // 시간대 필터
+      if (timeSlot && timeSlot !== '상관없음' && p.startTime) {
+        var pStart = timeToMin(p.startTime);
+        var pEnd   = timeToMin(p.endTime) || pStart + 90;
+        var slotStart = 0;
+        var slotEnd   = 0;
+        if (timeSlot === '오후')  { slotStart = 960;  slotEnd = 1110; }
+        if (timeSlot === '저녁')  { slotStart = 1110; slotEnd = 1290; }
+        if (timeSlot === '오전')  { slotStart = 540;  slotEnd = 720;  }
+        if (pStart >= slotEnd || pEnd <= slotStart) progMatch = false;
+      }
+
+      // 학년 필터
+      if (grade && p.grade) {
+        var gradeStr = String(p.grade);
+        if (gradeStr.indexOf('전학년') !== -1 || gradeStr.indexOf('전체') !== -1) {
+          progScore += 25;
+        } else if (gradeStr.indexOf(grade) !== -1) {
+          progScore += 25;
+        } else {
+          var rangeMatch = gradeStr.match(/(\d)\s*[~\-]\s*(\d)/);
+          if (rangeMatch) {
+            var low = parseInt(rangeMatch[1]);
+            var high = parseInt(rangeMatch[2]);
+            var g = parseInt(grade);
+            if (g >= low && g <= high) progScore += 25;
+            else progMatch = false;
+          } else {
+            progMatch = false;
+          }
+        }
+      } else if (grade && !p.grade) {
+        progScore += 10;
+      }
+
+      // 수강료 필터
+      if (feeType === '무료만' && p.fee) {
+        var feeStr = String(p.fee).toLowerCase();
+        if (feeStr !== '' && feeStr !== '0' && feeStr.indexOf('무료') === -1) {
+          progMatch = false;
+        }
+      }
+
+      // 모집중 보너스
+      if (p.status === '모집중') progScore += 15;
+
+      if (progMatch && progScore > 0) {
+        matchedProgs.push(p);
+        score += progScore;
+      } else if (progMatch) {
+        matchedProgs.push(p);
+        score += 5;
+      }
     });
+
+    // 통학버스 점수
+    if (needTransport === '필요') {
+      if (org.transport === '있음') {
+        score += 15;
+        checks.push({ icon: '✅', text: '통학버스 운영' + (org.transportDetail ? ' (' + org.transportDetail + ')' : '') });
+      } else {
+        checks.push({ icon: '❌', text: '통학버스 미운영' });
+      }
+    } else {
+      if (org.transport === '있음') {
+        score += 3;
+        checks.push({ icon: '✅', text: '통학버스 운영' });
+      }
+    }
+
+    // 시간대 매칭 보너스
+    if (matchedProgs.length > 0 && timeSlot && timeSlot !== '상관없음') {
+      score += 20;
+    }
+
+    // 무료 체크
+    var hasFree = matchedProgs.some(function(p) {
+      return !p.fee || p.fee === '' || p.fee === '0' || String(p.fee).indexOf('무료') !== -1;
+    });
+    if (hasFree) checks.push({ icon: '✅', text: '무료 프로그램 있음' });
+
+    // 포함 조건
+    var includeOrg = false;
+    if (matchedProgs.length > 0) {
+      includeOrg = true;
+    } else if ((purpose === '돌봄' || purpose === '둘다') && isDolbom) {
+      includeOrg = true;
+    }
+
+    if (includeOrg) {
+      results.push({
+        orgName:         org.name,
+        type:            org.type,
+        transport:       org.transport,
+        transportDetail: org.transportDetail || '',
+        tel:             org.tel             || '',
+        address:         org.address         || '',
+        hours:           org.hours           || '',
+        score:           score,
+        matchedProgs:    matchedProgs,
+        checks:          checks
+      });
+    }
+  });
+
+  results.sort(function(a, b) { return b.score - a.score; });
+  return results;
+}
+
+function isWeekdayProg(dayStr) {
+  if (!dayStr) return true;
+  var d = String(dayStr);
+  return d.indexOf('월') !== -1 || d.indexOf('화') !== -1 || d.indexOf('수') !== -1 ||
+         d.indexOf('목') !== -1 || d.indexOf('금') !== -1;
+}
+
+function isWeekendProg(dayStr) {
+  if (!dayStr) return false;
+  var d = String(dayStr);
+  return d.indexOf('토') !== -1 || d.indexOf('일') !== -1;
 }
   
 function renderRecResults(results) {
@@ -2680,16 +2840,13 @@ function saveOrgPwd() {
   var newPwd = document.getElementById('org-new-pwd').value.trim();
   if (!newPwd) { showToast('새 비밀번호를 입력하세요.'); return; }
   if (!confirm('비밀번호를 변경하시겠습니까?\n다음 로그인부터 새 비밀번호를 사용합니다.')) return;
+
   showLoading(true);
-  gasPost('updateOrgPassword', { orgName: currentOrgName, newPwd: newPwd })
-    .then(function(r) {
+  sbUpdate('organizations', 'name=eq.' + encodeURIComponent(currentOrgName), { password: newPwd })
+    .then(function() {
       showLoading(false);
-      if (r) {
-        document.getElementById('org-new-pwd').value = '';
-        showToast('✅ 비밀번호가 변경되었습니다!');
-      } else {
-        showToast('❌ 변경 실패');
-      }
+      document.getElementById('org-new-pwd').value = '';
+      showToast('✅ 비밀번호가 변경되었습니다!');
     })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -2726,9 +2883,32 @@ function saveOrgInfo() {
     d[k] = document.getElementById('oi-' + k).value;
   });
   d['transportDetail'] = document.getElementById('oi-transportDetail').value;
+
   showLoading(true);
-  gasPost('updateOrgInfo', { orgName: currentOrgName, data: d })
-    .then(function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); loadData(); })
+
+  // 컬럼명 매핑 (프론트 → DB)
+  var dbData = {
+    address:          d.address,
+    tel:              d.tel,
+    manager_name:     d.managerName,
+    manager_tel:      d.managerTel,
+    hours:            d.hours,
+    intro:            d.intro,
+    homepage:         d.homepage,
+    transport:        d.transport,
+    transport_detail: d.transportDetail,
+    route_map_url:    d.routeMapUrl,
+    route_map_note:   d.routeMapNote,
+    updated_at:       new Date().toISOString()
+  };
+
+  sbUpdate('organizations', 'name=eq.' + encodeURIComponent(currentOrgName), dbData)
+    .then(function() {
+      showLoading(false);
+      showToast('✅ 저장!');
+      loadOrgDash();
+      loadData();
+    })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
@@ -2804,11 +2984,29 @@ function saveProg() {
   var ok   = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); loadData(); };
   var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
 
+  // 컬럼명 매핑 (프론트 → DB)
+  var dbData = {
+    org_name:    currentOrgName,
+    name:        d.name,
+    category:    d.category,
+    grade:       d.grade,
+    day:         d.day,
+    start_time:  d.startTime,
+    end_time:    d.endTime,
+    capacity:    d.capacity ? parseInt(d.capacity) : null,
+    current:     d.current  ? parseInt(d.current)  : 0,
+    status:      d.status,
+    fee:         d.fee,
+    description: d.description,
+    note:        d.note,
+    updated_at:  new Date().toISOString()
+  };
+
   if (editProgRow) {
-    gasPost('updateProgram', { orgName: currentOrgName, rowIndex: editProgRow, data: d })
+    sbUpdate('programs', 'id=eq.' + editProgRow, dbData)
       .then(ok).catch(fail);
   } else {
-    gasPost('addProgram', { orgName: currentOrgName, data: d })
+    sbInsert('programs', dbData)
       .then(ok).catch(fail);
   }
 }
@@ -2816,7 +3014,7 @@ function saveProg() {
 function deleteProg(ri) {
   if (!confirm('삭제하시겠습니까?')) return;
   showLoading(true);
-  gasPost('deleteProgram', { orgName: currentOrgName, rowIndex: ri })
+  sbDelete('programs', 'id=eq.' + ri)
     .then(function() { showLoading(false); showToast('🗑️ 삭제'); loadOrgDash(); loadData(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -2826,20 +3024,62 @@ function renderOrgStudents() { var list = document.getElementById('org-student-l
 
 function openStudentModal(ri) { editStudentRow = ri || null; isAdminMode = false; document.getElementById('modal-student-title').innerText = editStudentRow ? '학생 수정' : '학생 추가'; document.getElementById('ms-org-group').style.display = 'none'; var ps = document.getElementById('ms-prog'); ps.innerHTML = '<option value="">프로그램 선택</option>'; var pn = {}; (orgDashData.programs || []).forEach(function(p) { if (!pn[p.name]) { pn[p.name] = true; var o = document.createElement('option'); o.value = p.name; o.text = p.name; ps.appendChild(o); } }); ['grade', 'class', 'name', 'day', 'contact', 'note'].forEach(function(f) { document.getElementById('ms-' + f).value = ''; }); document.getElementById('ms-arrival').value = ''; document.getElementById('ms-dismissal').value = ''; if (editStudentRow && orgDashData.students) { var s = orgDashData.students.find(function(x) { return x.rowIndex === editStudentRow; }); if (s) { document.getElementById('ms-grade').value = s.grade; document.getElementById('ms-class').value = s.classNum; document.getElementById('ms-name').value = s.name; document.getElementById('ms-prog').value = s.progName; document.getElementById('ms-day').value = s.day; document.getElementById('ms-contact').value = s.contact; document.getElementById('ms-arrival').value = s.arrival || ''; document.getElementById('ms-dismissal').value = s.dismissal || ''; document.getElementById('ms-note').value = s.note; } } document.getElementById('modal-student').style.display = 'flex'; }
 
-function saveStudent() { var d = { grade: document.getElementById('ms-grade').value, classNum: document.getElementById('ms-class').value, name: document.getElementById('ms-name').value, progName: document.getElementById('ms-prog').value, day: document.getElementById('ms-day').value, contact: document.getElementById('ms-contact').value, arrival: document.getElementById('ms-arrival').value, dismissal: document.getElementById('ms-dismissal').value, note: document.getElementById('ms-note').value }; if (!d.grade || !d.name) { showToast('학년과 이름을 입력하세요.'); return; } showLoading(true); closeModal('modal-student'); var ok = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData(); else loadOrgDash(); }; var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); }; if (isAdminMode) {
-  d.orgName = document.getElementById('ms-org').value;
-  if (!d.orgName) { showLoading(false); showToast('기관을 선택하세요.'); return; }
-  if (editStudentRow) gasPost('updateStudent', { rowIndex: editStudentRow, data: d }).then(ok).catch(fail);
-  else gasPost('addStudent', { data: d }).then(ok).catch(fail);
-} else {
-  if (editStudentRow) gasPost('updateOrgStudent', { orgName: currentOrgName, rowIndex: editStudentRow, data: d }).then(ok).catch(fail);
-  else gasPost('addOrgStudent', { orgName: currentOrgName, data: d }).then(ok).catch(fail);
-} }
+function saveStudent() {
+  var d = {
+    grade:     document.getElementById('ms-grade').value,
+    classNum:  document.getElementById('ms-class').value,
+    name:      document.getElementById('ms-name').value,
+    progName:  document.getElementById('ms-prog').value,
+    day:       document.getElementById('ms-day').value,
+    contact:   document.getElementById('ms-contact').value,
+    arrival:   document.getElementById('ms-arrival').value,
+    dismissal: document.getElementById('ms-dismissal').value,
+    note:      document.getElementById('ms-note').value
+  };
+
+  if (!d.grade || !d.name) { showToast('학년과 이름을 입력하세요.'); return; }
+
+  showLoading(true);
+  closeModal('modal-student');
+
+  var ok   = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData(); else loadOrgDash(); };
+  var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
+
+  // 컬럼명 매핑 (프론트 → DB)
+  var orgName = isAdminMode
+    ? document.getElementById('ms-org').value
+    : currentOrgName;
+
+  if (isAdminMode && !orgName) {
+    showLoading(false);
+    showToast('기관을 선택하세요.');
+    return;
+  }
+
+  var dbData = {
+    grade:     d.grade     ? parseInt(d.grade)    : null,
+    class_num: d.classNum  ? parseInt(d.classNum) : null,
+    name:      d.name,
+    org_name:  orgName,
+    prog_name: d.progName,
+    day:       d.day,
+    contact:   d.contact,
+    arrival:   d.arrival,
+    dismissal: d.dismissal,
+    note:      d.note
+  };
+
+  if (editStudentRow) {
+    sbUpdate('students', 'id=eq.' + editStudentRow, dbData).then(ok).catch(fail);
+  } else {
+    sbInsert('students', dbData).then(ok).catch(fail);
+  }
+}
 
 function delOrgStudent(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
-  gasPost('deleteOrgStudent', { orgName: currentOrgName, rowIndex: ri })
+  sbDelete('students', 'id=eq.' + ri)
     .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -2847,59 +3087,179 @@ function delOrgStudent(ri) {
 function renderOrgNotices() { var list = document.getElementById('org-notice-list'); var notices = orgDashData.notices || []; if (!notices.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div>공지가 없습니다.</div>'; return; } var h = ''; notices.forEach(function(n) { var sb = n.status === '게시중' ? 'badge-green' : 'badge-red'; h += '<div class="notice-card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="notice-title">' + esc(n.title) + '</div><div class="notice-date">' + esc(n.date) + ' <span class="badge ' + sb + '">' + esc(n.status) + '</span></div></div><div style="display:flex;gap:4px;"><button class="btn-sm" onclick="openNoticeModal(' + n.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delNotice(' + n.rowIndex + ')">🗑️</button></div></div>'; if (n.content) h += '<div class="notice-content">' + esc(n.content) + '</div>'; h += '</div>'; }); list.innerHTML = h; }
 function openNoticeModal(ri) { editNoticeRow = ri || null; document.getElementById('modal-notice-title').innerText = editNoticeRow ? '공지 수정' : '공지사항 작성'; document.getElementById('mn-title').value = ''; document.getElementById('mn-content').value = ''; document.getElementById('mn-status').value = '게시중'; if (editNoticeRow && orgDashData.notices) { var n = orgDashData.notices.find(function(x) { return x.rowIndex === editNoticeRow; }); if (n) { document.getElementById('mn-title').value = n.title; document.getElementById('mn-content').value = n.content; document.getElementById('mn-status').value = n.status || '게시중'; } } document.getElementById('modal-notice').style.display = 'flex'; }
 function saveNotice() {
-  var d = { title: document.getElementById('mn-title').value, content: document.getElementById('mn-content').value, status: document.getElementById('mn-status').value };
+  var d = {
+    title:   document.getElementById('mn-title').value,
+    content: document.getElementById('mn-content').value,
+    status:  document.getElementById('mn-status').value
+  };
   if (!d.title) { showToast('제목을 입력하세요.'); return; }
+
   showLoading(true);
   closeModal('modal-notice');
-  var ok = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); };
+
+  var ok   = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); };
   var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
-  if (editNoticeRow) gasPost('updateNotice', { orgName: currentOrgName, rowIndex: editNoticeRow, data: d }).then(ok).catch(fail);
-  else gasPost('addNotice', { orgName: currentOrgName, data: d }).then(ok).catch(fail);
-}  
+
+  var dbData = {
+    org_name: currentOrgName,
+    title:    d.title,
+    content:  d.content,
+    status:   d.status,
+    date:     new Date().toISOString().substring(0, 10)
+  };
+
+  if (editNoticeRow) {
+    sbUpdate('notices', 'id=eq.' + editNoticeRow, dbData).then(ok).catch(fail);
+  } else {
+    sbInsert('notices', dbData).then(ok).catch(fail);
+  }
+}
 function delNotice(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
-  gasPost('deleteNotice', { orgName: currentOrgName, rowIndex: ri })
+  sbDelete('notices', 'id=eq.' + ri)
     .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 // ==========================================
 // 🟣 관리자
 // ==========================================
+// 관리자 비밀번호 (Supabase에 저장하거나 여기서 직접 관리)
+var ADMIN_PASSWORD = '8962';
+
 function adminLogin() {
   var pwd = document.getElementById('admin-login-pwd').value;
   if (!pwd) { showToast('비밀번호를 입력하세요.'); return; }
-  showLoading(true);
-  gasPost('verifyAdminPassword', { inputPwd: pwd })
-    .then(function(v) {
-      if (v) loadAdminData();
-      else { showLoading(false); showToast('비밀번호가 틀렸습니다.'); }
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+
+  if (String(pwd).trim() === ADMIN_PASSWORD) {
+    loadAdminData();
+  } else {
+    showToast('비밀번호가 틀렸습니다.');
+  }
 }
 function loadAdminData() {
   showLoading(true);
-  gasGet('getAdminDashboard')
-    .then(function(data) {
-      showLoading(false);
-      adminData = data;
-      document.getElementById('adm-orgs').innerText = data.summary.totalOrgs + '곳';
-      document.getElementById('adm-progs').innerText = data.summary.totalProgs + '개';
-      document.getElementById('adm-students').innerText = data.summary.totalStudents + '명';
-      var of = document.getElementById('adm-student-org-filter');
-      var cv = of.value;
-      of.innerHTML = '<option value="전체">전체 기관</option>';
-      data.orgs.forEach(function(o) {
-        var opt = document.createElement('option');
-        opt.value = o.name;
-        opt.text = o.name;
-        of.appendChild(opt);
+
+  Promise.all([
+    sbGet('organizations', 'select=*&order=updated_at.desc'),
+    sbGet('programs',      'select=*'),
+    sbGet('students',      'select=*')
+  ])
+  .then(function(results) {
+    var orgs     = results[0] || [];
+    var progs    = results[1] || [];
+    var students = results[2] || [];
+
+    // 기관별 통계
+    var orgStats = orgs.map(function(o) {
+      var orgProgs    = progs.filter(function(p)    { return p.org_name === o.name; });
+      var orgStudents = students.filter(function(s) { return s.org_name === o.name; });
+      return {
+        name:          o.name,
+        type:          o.type          || '',
+        address:       o.address       || '',
+        tel:           o.tel           || '',
+        managerName:   o.manager_name  || '',
+        managerTel:    o.manager_tel   || '',
+        hours:         o.hours         || '',
+        transport:     o.transport     || '',
+        transportDetail: o.transport_detail || '',
+        progCount:     orgProgs.length,
+        studentCount:  orgStudents.length,
+        totalCapacity: orgProgs.reduce(function(s, p) { return s + (parseInt(p.capacity) || 0); }, 0),
+        totalCurrent:  orgProgs.reduce(function(s, p) { return s + (parseInt(p.current)  || 0); }, 0)
+      };
+    });
+
+    // 학년별 분포
+    var gradeDistribution = {};
+    var seen = {};
+    students.forEach(function(s) {
+      var key = s.grade + '_' + s.class_num + '_' + s.name;
+      if (!seen[key]) {
+        seen[key] = true;
+        var g = String(s.grade || '');
+        gradeDistribution[g] = (gradeDistribution[g] || 0) + 1;
+      }
+    });
+
+    // 학생 매핑
+    var mappedStudents = students.map(function(s) {
+      return {
+        id:        s.id,
+        rowIndex:  s.id,
+        grade:     s.grade     || '',
+        classNum:  s.class_num || '',
+        name:      s.name      || '',
+        orgName:   s.org_name  || '',
+        progName:  s.prog_name || '',
+        day:       s.day       || '',
+        contact:   s.contact   || '',
+        arrival:   s.arrival   || '',
+        dismissal: s.dismissal || '',
+        note:      s.note      || ''
+      };
+    });
+
+    // 완성도 계산
+    var completeness = orgs.map(function(o) {
+      var fields  = ['address','tel','manager_name','manager_tel','hours','transport','intro','homepage'];
+      var filled  = fields.filter(function(k) { return o[k] && String(o[k]).trim(); }).length;
+      var orgProgs = progs.filter(function(p) { return p.org_name === o.name; });
+      if (orgProgs.length > 0) filled++;
+      var total   = fields.length + 1;
+      var missing = fields.filter(function(k) { return !o[k] || !String(o[k]).trim(); }).map(function(k) {
+        var labels = { address:'주소', tel:'대표연락처', manager_name:'담당자명',
+                       manager_tel:'담당자연락처', hours:'운영시간',
+                       transport:'통학지원', intro:'소개글', homepage:'홈페이지' };
+        return labels[k] || k;
       });
-      of.value = cv || '전체';
-      showView('view-admin-dash');
-      switchAdminTab('overview');
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+      if (orgProgs.length === 0) missing.push('프로그램 등록');
+      return {
+        orgName: o.name,
+        percent: Math.round((filled / total) * 100),
+        missing: missing,
+        filled:  filled,
+        total:   total
+      };
+    });
+
+    adminData = {
+      orgs:     orgStats,
+      students: mappedStudents,
+      summary: {
+        totalOrgs:     orgs.length,
+        totalProgs:    progs.length,
+        totalStudents: Object.keys(seen).length
+      },
+      stats: {
+        orgStats:          orgStats,
+        gradeDistribution: gradeDistribution,
+        typeStats:         {}
+      },
+      completeness: completeness
+    };
+
+    showLoading(false);
+    document.getElementById('adm-orgs').innerText     = adminData.summary.totalOrgs     + '곳';
+    document.getElementById('adm-progs').innerText    = adminData.summary.totalProgs    + '개';
+    document.getElementById('adm-students').innerText = adminData.summary.totalStudents + '명';
+
+    var of = document.getElementById('adm-student-org-filter');
+    var cv = of.value;
+    of.innerHTML = '<option value="전체">전체 기관</option>';
+    orgs.forEach(function(o) {
+      var opt = document.createElement('option');
+      opt.value = o.name;
+      opt.text  = o.name;
+      of.appendChild(opt);
+    });
+    of.value = cv || '전체';
+
+    showView('view-admin-dash');
+    switchAdminTab('overview');
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 function switchAdminTab(tab) { ['overview', 'students', 'orgs', 'pwd'].forEach(function(t) { document.getElementById('adm-tab-' + t).classList.toggle('active', t === tab); document.getElementById('adm-area-' + t).style.display = t === tab ? 'block' : 'none'; }); if (tab === 'overview') renderAdmOverview(); if (tab === 'students') renderAdminStudents(); if (tab === 'orgs') renderAdmOrgs(); if (tab === 'pwd') renderAdmPwd(); }
 
@@ -2911,7 +3271,7 @@ function openAdmStudentModal(ri) { editStudentRow = ri || null; isAdminMode = tr
 function delAdmStudent(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
-  gasPost('deleteStudent', { rowIndex: ri })
+  sbDelete('students', 'id=eq.' + ri)
     .then(function() { showLoading(false); showToast('🗑️'); loadAdminData(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -2919,13 +3279,17 @@ function renderAdmOrgs() { if (!adminData) return; var list = document.getElemen
 
 function renderAdmPwd() {
   showLoading(true);
-  gasGet('getPasswordList')
-    .then(function(pwdList) {
+  sbGet('organizations', 'select=name,password&order=name.asc')
+    .then(function(rows) {
       showLoading(false);
       var list = document.getElementById('adm-pwd-list');
       var h = '';
-      pwdList.forEach(function(item) {
-        h += '<div class="student-row"><div class="student-info"><strong>🏢 ' + esc(item.orgName) + '</strong><br><span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: <strong>' + esc(item.password || '미설정') + '</strong></span></div><button class="btn-sm" onclick="openPwdModal(\'' + esc(item.orgName).replace(/'/g, "\\'") + '\',\'' + esc(item.password).replace(/'/g, "\\'") + '\')">변경</button></div>';
+      (rows || []).forEach(function(item) {
+        h += '<div class="student-row">';
+        h += '  <div class="student-info"><strong>🏢 ' + esc(item.name) + '</strong>';
+        h += '  <br><span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: <strong>' + esc(item.password || '미설정') + '</strong></span></div>';
+        h += '  <button class="btn-sm" onclick="openPwdModal(\'' + esc(item.name).replace(/'/g, "\\'") + '\',\'' + esc(item.password || '').replace(/'/g, "\\'") + '\')">변경</button>';
+        h += '</div>';
       });
       list.innerHTML = h;
     })
@@ -2936,13 +3300,15 @@ function savePwd() {
   var np = document.getElementById('mpw-input').value.trim();
   if (!np) { showToast('비밀번호를 입력하세요.'); return; }
   if (!confirm(editPwdOrg + ' 비밀번호를 변경하시겠습니까?')) return;
+
   showLoading(true);
   closeModal('modal-pwd');
-  gasPost('updateOrgPassword', { orgName: editPwdOrg, newPwd: np })
-    .then(function(r) {
+
+  sbUpdate('organizations', 'name=eq.' + encodeURIComponent(editPwdOrg), { password: np })
+    .then(function() {
       showLoading(false);
-      if (r) { showToast('✅ 변경!'); renderAdmPwd(); }
-      else showToast('❌ 실패');
+      showToast('✅ 변경!');
+      renderAdmPwd();
     })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
