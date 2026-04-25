@@ -1,12 +1,11 @@
 {
   "name": "순창초 저녁늘봄 안내",
   "short_name": "늘봄안내",
-  "description": "순창초 지역연계 저녁늘봄 기관 안내 포털",
-  "start_url": "/neulbom-map-portal/",
+  "description": "순창초등학교 지역연계 저녁늘봄 안내 포털",
+  "start_url": "/neulbom-supabase/",
   "display": "standalone",
   "background_color": "#f5f6fa",
   "theme_color": "#0984e3",
-  "lang": "ko",
   "icons": [
     {
       "src": "icons/icon-192.png",
