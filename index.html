@@ -3219,25 +3219,26 @@ function loadAdminData() {
     var students = results[2] || [];
 
     // 기관별 통계
-    var orgStats = orgs.map(function(o) {
-      var orgProgs    = progs.filter(function(p)    { return p.org_name === o.name; });
-      var orgStudents = students.filter(function(s) { return s.org_name === o.name; });
-      return {
-        name:          o.name,
-        type:          o.type          || '',
-        address:       o.address       || '',
-        tel:           o.tel           || '',
-        managerName:   o.manager_name  || '',
-        managerTel:    o.manager_tel   || '',
-        hours:         o.hours         || '',
-        transport:     o.transport     || '',
-        transportDetail: o.transport_detail || '',
-        progCount:     orgProgs.length,
-        studentCount:  orgStudents.length,
-        totalCapacity: orgProgs.reduce(function(s, p) { return s + (parseInt(p.capacity) || 0); }, 0),
-        totalCurrent:  orgProgs.reduce(function(s, p) { return s + (parseInt(p.current)  || 0); }, 0)
-      };
-    });
+var orgStats = orgs.map(function(o) {
+  var orgProgs    = progs.filter(function(p)    { return p.org_name === o.name; });
+  var orgStudents = students.filter(function(s) { return s.org_name === o.name; });
+  return {
+    name:            o.name,
+    type:            o.type             || '',
+    jurisdiction:    o.jurisdiction     || '',  // ✅ 추가
+    address:         o.address          || '',
+    tel:             o.tel              || '',
+    managerName:     o.manager_name     || '',
+    managerTel:      o.manager_tel      || '',
+    hours:           o.hours            || '',
+    transport:       o.transport        || '',
+    transportDetail: o.transport_detail || '',
+    progCount:       orgProgs.length,
+    studentCount:    orgStudents.length,
+    totalCapacity:   orgProgs.reduce(function(s, p) { return s + (parseInt(p.capacity) || 0); }, 0),
+    totalCurrent:    orgProgs.reduce(function(s, p) { return s + (parseInt(p.current)  || 0); }, 0)
+  };
+});
 
     // 학년별 분포
     var gradeDistribution = {};
