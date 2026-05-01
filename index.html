@@ -993,7 +993,7 @@
   <!-- 🟣 관리자 대시보드 -->
   <div id="view-admin-dash" class="view">
     <div class="view-content" style="padding:20px;">
-      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 나가기</button><span style="font-weight:700;color:var(--purple-deep);font-size:0.95rem;">🟣 관리자</span><button class="btn-back" onclick="loadAdminData()">🔄</button></div>
+      <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 나가기</button><span style="font-weight:700;color:var(--purple-deep);font-size:0.95rem;">🟣 관리자</span><button class="btn-back" onclick="loadAdminData(currentAdminTab)">🔄</button></div>
       <div class="stat-grid"><div class="stat-box"><div class="stat-num" id="adm-orgs" style="color:var(--teal-deep);">-</div><div class="stat-label">전체 기관</div></div><div class="stat-box"><div class="stat-num" id="adm-progs" style="color:var(--blue-deep);">-</div><div class="stat-label">프로그램</div></div><div class="stat-box"><div class="stat-num" id="adm-students" style="color:var(--purple-deep);">-</div><div class="stat-label">참여 학생</div></div></div>
 <div class="tabs">
   <button class="btn-tab purple active" id="adm-tab-overview" onclick="switchAdminTab('overview')">📊 현황</button>
@@ -2754,7 +2754,7 @@ function orgLogin() {
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
-function loadOrgDash() {
+function loadOrgDash(keepTab) {
   showLoading(true);
 
   Promise.all([
@@ -2866,7 +2866,7 @@ function loadOrgDash() {
     document.getElementById('org-dash-title').innerText = currentOrgName;
     renderOrgWelcome();
     showView('view-org-dash');
-    switchOrgTab('info');
+    switchOrgTab(keepTab || 'info');  // ✅ 탭 유지
   })
   .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -2962,12 +2962,12 @@ function saveOrgInfo() {
     .then(function() {
       showLoading(false);
       showToast('✅ 저장!');
-      loadOrgDash();
+      loadOrgDash('info');  // ✅ 정보탭 유지
       loadData();
     })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
-
+  
 function renderOrgProgs() { var list = document.getElementById('org-prog-list'); var progs = orgDashData.programs || []; if (!progs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>프로그램이 없습니다.</div>'; return; } var h = ''; progs.forEach(function(p) { var cat = getCat(p.category); var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow'; h += '<div class="prog-card-manage" style="border-left:4px solid ' + (cat.color || '#636e72') + ';"><div class="prog-manage-title"><span>' + cat.icon + ' ' + esc(p.name) + '</span>'; if (p.status) h += '<span class="badge ' + sb + '">' + esc(p.status) + '</span>'; h += '</div><div class="prog-manage-detail">📅 ' + esc(p.day) + ' ' + esc(p.startTime) + '~' + esc(p.endTime); if (p.grade) h += ' | 🎓 ' + esc(p.grade); if (p.capacity) h += '<br>👥 ' + esc(p.current || 0) + '/' + esc(p.capacity) + '명'; if (p.fee) h += ' | 💰 ' + esc(p.fee); h += '</div><div class="prog-actions"><button class="btn-sm" onclick="openProgModal(' + p.rowIndex + ')">✏️ 수정</button><button class="btn-sm danger" onclick="deleteProg(' + p.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
 
 function openProgModal(ri) {
@@ -3037,7 +3037,7 @@ function saveProg() {
   showLoading(true);
   closeModal('modal-prog');
 
-  var ok   = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); loadData(); };
+  var ok = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash('prog'); loadData(); };
   var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
 
   // 컬럼명 매핑 (프론트 → DB)
@@ -3071,7 +3071,7 @@ function deleteProg(ri) {
   if (!confirm('삭제하시겠습니까?')) return;
   showLoading(true);
   sbDelete('programs', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️ 삭제'); loadOrgDash(); loadData(); })
+    .then(function() { showLoading(false); showToast('🗑️ 삭제'); loadOrgDash('prog'); loadData(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
   
@@ -3098,7 +3098,7 @@ function saveStudent() {
   showLoading(true);
   closeModal('modal-student');
 
-  var ok   = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData(); else loadOrgDash(); };
+  var ok = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData('students'); else loadOrgDash('student'); };
   var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
 
   // 컬럼명 매핑 (프론트 → DB)
@@ -3136,7 +3136,7 @@ function delOrgStudent(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
   sbDelete('students', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
+    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash('student'); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 // --- 공지 ---
@@ -3153,7 +3153,7 @@ function saveNotice() {
   showLoading(true);
   closeModal('modal-notice');
 
-  var ok   = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash(); };
+  var ok = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash('notice'); };
   var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
 
   var dbData = {
@@ -3174,7 +3174,7 @@ function delNotice(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
   sbDelete('notices', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash(); })
+    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash('notice'); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 // ==========================================
@@ -3205,7 +3205,7 @@ function adminLogin() {
       showToast('❌ ' + e.message);
     });
 }
-function loadAdminData() {
+function loadAdminData(keepTab) {
   showLoading(true);
 
   Promise.all([
@@ -3326,7 +3326,7 @@ var orgStats = orgs.map(function(o) {
     of.value = cv || '전체';
 
     showView('view-admin-dash');
-    switchAdminTab('overview');
+    switchAdminTab(keepTab || 'overview');  // ✅ 탭 유지
   })
   .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
@@ -3339,7 +3339,7 @@ function delAdmStudent(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
   sbDelete('students', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️'); loadAdminData(); })
+    .then(function() { showLoading(false); showToast('🗑️'); loadAdminData('students'); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
@@ -3997,7 +3997,10 @@ function reloadAdminOrgsOnly() {
 }
 
 // switchAdminTab 에 setting 추가
+var currentAdminTab = 'overview'; // 글로벌 변수 추가 (adminData 선언부 근처)
+
 function switchAdminTab(tab) {
+  currentAdminTab = tab; // ✅ 현재 탭 저장
   ['overview', 'students', 'orgs', 'pwd', 'setting'].forEach(function(t) {
     document.getElementById('adm-tab-' + t).classList.toggle('active', t === tab);
     document.getElementById('adm-area-' + t).style.display = t === tab ? 'block' : 'none';
