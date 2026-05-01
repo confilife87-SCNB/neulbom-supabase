@@ -995,7 +995,31 @@
     <div class="view-content" style="padding:20px;">
       <div class="nav-top"><button class="btn-back" onclick="goPortal()">← 나가기</button><span style="font-weight:700;color:var(--purple-deep);font-size:0.95rem;">🟣 관리자</span><button class="btn-back" onclick="loadAdminData()">🔄</button></div>
       <div class="stat-grid"><div class="stat-box"><div class="stat-num" id="adm-orgs" style="color:var(--teal-deep);">-</div><div class="stat-label">전체 기관</div></div><div class="stat-box"><div class="stat-num" id="adm-progs" style="color:var(--blue-deep);">-</div><div class="stat-label">프로그램</div></div><div class="stat-box"><div class="stat-num" id="adm-students" style="color:var(--purple-deep);">-</div><div class="stat-label">참여 학생</div></div></div>
-      <div class="tabs"><button class="btn-tab purple active" id="adm-tab-overview" onclick="switchAdminTab('overview')">📊 현황</button><button class="btn-tab purple" id="adm-tab-students" onclick="switchAdminTab('students')">🧑‍🎓 학생</button><button class="btn-tab purple" id="adm-tab-orgs" onclick="switchAdminTab('orgs')">🏢 기관</button><button class="btn-tab purple" id="adm-tab-pwd" onclick="switchAdminTab('pwd')">🔑 비번</button></div>
+<div class="tabs">
+  <button class="btn-tab purple active" id="adm-tab-overview" onclick="switchAdminTab('overview')">📊 현황</button>
+  <button class="btn-tab purple" id="adm-tab-students" onclick="switchAdminTab('students')">🧑‍🎓 학생</button>
+  <button class="btn-tab purple" id="adm-tab-orgs" onclick="switchAdminTab('orgs')">🏢 기관</button>
+  <button class="btn-tab purple" id="adm-tab-pwd" onclick="switchAdminTab('pwd')">🔑 비번</button>
+  <button class="btn-tab purple" id="adm-tab-setting" onclick="switchAdminTab('setting')">⚙️ 설정</button>
+</div>
+
+<!-- 기존 비번 탭 영역 뒤에 설정 탭 영역 추가 -->
+<div id="adm-area-setting" class="tab-area" style="display:none;">
+  <div class="section-title" style="color:var(--purple-deep);">⚙️ 관리자 설정</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;">
+    <div style="font-weight:800;font-size:0.95rem;margin-bottom:14px;">🔑 관리자 비밀번호 변경</div>
+    <div style="font-size:0.85rem;color:var(--text-sub);margin-bottom:14px;line-height:1.6;">
+      변경 후 다음 로그인부터 새 비밀번호를 사용합니다.
+    </div>
+    <div class="form-group">
+      <label class="form-label">새 비밀번호</label>
+      <input type="text" id="adm-new-pwd" placeholder="새 비밀번호 입력" maxlength="20">
+    </div>
+    <button class="btn-action purple" onclick="saveAdminPwd()">🔑 비밀번호 변경</button>
+  </div>
+</div>
+      
       <div id="adm-area-overview" class="tab-area"><div class="section-title">🏢 기관별 현황</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-org-table"></table></div><div class="section-title" style="margin-top:20px;">📊 학년별 분포</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-grade-table"></table></div><div style="display:flex;gap:8px;margin-top:16px;"><button class="btn-action purple sm" onclick="exportClipboard()">📋 클립보드 복사</button><button class="btn-action gray sm" onclick="exportCSV()">📥 CSV 다운로드</button></div></div>
       <div id="adm-area-students" class="tab-area" style="display:none;"><button class="btn-action purple sm" onclick="openAdmStudentModal()" style="margin-bottom:12px;">+ 학생 추가</button><div style="display:flex;gap:8px;margin-bottom:12px;"><select id="adm-student-org-filter" onchange="renderAdminStudents()" style="flex:1;"><option value="전체">전체 기관</option></select><input type="text" id="adm-student-search" placeholder="이름 검색..." onkeyup="renderAdminStudents()" style="flex:1;"></div><div id="adm-student-list"></div></div>
       <div id="adm-area-orgs" class="tab-area" style="display:none;"><div id="adm-org-list"></div></div>
@@ -1112,6 +1136,36 @@
   <!-- 모달: 공지 -->
   <div id="modal-notice" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-notice')"><div class="modal-content"><div class="modal-title" id="modal-notice-title">공지사항 작성</div><div class="form-group"><label class="form-label">제목</label><input type="text" id="mn-title"></div><div class="form-group"><label class="form-label">내용</label><textarea id="mn-content" style="min-height:120px;"></textarea></div><div class="form-group"><label class="form-label">상태</label><select id="mn-status"><option>게시중</option><option>종료</option></select></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-notice')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveNotice()">저장</button></div></div></div>
 
+  <!-- 모달: 기관 유형 편집 -->
+<div id="modal-org-type" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-org-type')">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-org-type-title">기관 유형 편집</div>
+
+    <div class="form-group">
+      <label class="form-label">🏷️ 기관 유형</label>
+      <select id="mot-type">
+        <option value="">선택</option>
+        <option value="학교밖 늘봄">📚 학교밖 늘봄</option>
+        <option value="지역사회 돌봄">🏠 지역사회 돌봄</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🗂️ 관할</label>
+      <select id="mot-jurisdiction">
+        <option value="">선택</option>
+        <option value="교육지원청">교육지원청</option>
+        <option value="지자체">지자체</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-org-type')">취소</button>
+      <button class="btn-action purple" style="flex:2;" onclick="saveOrgType()">저장</button>
+    </div>
+  </div>
+</div>
+  
   <!-- 모달: 비번 -->
   <div id="modal-pwd" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-pwd')"><div class="modal-content"><div class="modal-title" id="modal-pwd-title">비밀번호 변경</div><div class="form-group"><label class="form-label">새 비밀번호</label><input type="text" id="mpw-input" maxlength="10"></div><button class="btn-action purple" onclick="savePwd()">변경</button></div></div>
 </div>
@@ -2661,12 +2715,14 @@ function onOrgCardClick(name) {
   if (found) {
     kakaoMap.setCenter(found.marker.getPosition());
     kakaoMap.setLevel(3);
-    closeAllInfo();
+    // 기존 인포윈도우 모두 닫기
+    kakaoMarkers.forEach(function(m) { m.info.close(); });
     found.info.open(kakaoMap, found.marker);
-    currentOpenInfo = found.info;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  showDetail(name);
+  // 기관 상세로 이동
+  detailBackTo = 'view-map';
+  openOrgDetail(name);
 }
 
 // ==========================================
@@ -3125,17 +3181,29 @@ function delNotice(ri) {
 // 🟣 관리자
 // ==========================================
 // 관리자 비밀번호 (Supabase에 저장하거나 여기서 직접 관리)
-var ADMIN_PASSWORD = '8962';
-
 function adminLogin() {
   var pwd = document.getElementById('admin-login-pwd').value;
   if (!pwd) { showToast('비밀번호를 입력하세요.'); return; }
 
-  if (String(pwd).trim() === ADMIN_PASSWORD) {
-    loadAdminData();
-  } else {
-    showToast('비밀번호가 틀렸습니다.');
-  }
+  showLoading(true);
+  sbGet('admin_settings', 'select=value&key=eq.admin_password')
+    .then(function(rows) {
+      showLoading(false);
+      if (!rows || rows.length === 0) {
+        showToast('❌ 관리자 설정을 찾을 수 없습니다.');
+        return;
+      }
+      var storedPwd = String(rows[0].value || '').trim();
+      if (String(pwd).trim() === storedPwd) {
+        loadAdminData();
+      } else {
+        showToast('비밀번호가 틀렸습니다.');
+      }
+    })
+    .catch(function(e) {
+      showLoading(false);
+      showToast('❌ ' + e.message);
+    });
 }
 function loadAdminData() {
   showLoading(true);
@@ -3261,8 +3329,6 @@ function loadAdminData() {
   })
   .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
-function switchAdminTab(tab) { ['overview', 'students', 'orgs', 'pwd'].forEach(function(t) { document.getElementById('adm-tab-' + t).classList.toggle('active', t === tab); document.getElementById('adm-area-' + t).style.display = t === tab ? 'block' : 'none'; }); if (tab === 'overview') renderAdmOverview(); if (tab === 'students') renderAdminStudents(); if (tab === 'orgs') renderAdmOrgs(); if (tab === 'pwd') renderAdmPwd(); }
-
 function renderAdmOverview() { if (!adminData || !adminData.stats) return; var t = document.getElementById('adm-org-table'); var h = '<tr><th>기관명</th><th>유형</th><th>프로그램</th><th>이용학생</th><th>완성도</th></tr>'; var stats = adminData.stats.orgStats || []; var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); stats.forEach(function(s) { var clr = s.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[s.name] || { percent: 0 }; var cc = cm.percent >= 80 ? 'var(--green-deep)' : cm.percent >= 50 ? 'var(--orange-deep)' : 'var(--red-deep)'; var ci = cm.percent >= 80 ? '✅' : cm.percent >= 50 ? '⚠️' : '🔴'; h += '<tr><td style="text-align:left;font-weight:600;">' + esc(s.name) + '</td><td style="color:' + clr + ';font-size:0.78rem;">' + esc(s.type) + '</td><td>' + s.progCount + '</td><td style="font-weight:700;color:var(--purple-deep);">' + s.studentCount + '</td><td style="color:' + cc + ';font-weight:700;">' + ci + ' ' + cm.percent + '%</td></tr>'; }); t.innerHTML = h; var gt = document.getElementById('adm-grade-table'); var gd = adminData.stats.gradeDistribution || {}; var gh = '<tr><th>학년</th>', gv = '<tr><td style="font-weight:700;">학생 수</td>', total = 0; for (var g = 1; g <= 6; g++) { var c = gd[String(g)] || 0; total += c; gh += '<th>' + g + '학년</th>'; gv += '<td>' + c + '</td>'; } gh += '<th>합계</th></tr>'; gv += '<td style="font-weight:700;color:var(--purple-deep);">' + total + '</td></tr>'; gt.innerHTML = gh + gv; }
 
 function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + esc(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
@@ -3275,8 +3341,63 @@ function delAdmStudent(ri) {
     .then(function() { showLoading(false); showToast('🗑️'); loadAdminData(); })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
-function renderAdmOrgs() { if (!adminData) return; var list = document.getElementById('adm-org-list'); var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); var h = ''; (adminData.orgs || []).forEach(function(o) { var icon = o.type === '학교밖 늘봄' ? '📚' : '🏠'; var bc = o.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[o.name] || { percent: 0, missing: [] }; var barCls = cm.percent >= 80 ? 'high' : cm.percent >= 50 ? 'mid' : 'low'; var st = (adminData.stats.orgStats || []).find(function(s) { return s.name === o.name; }); h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:5px solid ' + bc + ';border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);"><div style="font-weight:800;font-size:0.95rem;margin-bottom:8px;">' + icon + ' ' + esc(o.name) + '</div><div style="font-size:0.82rem;color:var(--text-sub);line-height:1.7;">📍 ' + (vp(o.address) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>📞 ' + (vp(o.tel) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>👤 ' + (vp(o.managerName) || '<i style="color:var(--orange-deep);">미입력</i>') + (vp(o.managerTel) ? ' (' + esc(o.managerTel) + ')' : '') + '<br>🕐 ' + (vp(o.hours) || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>🚌 ' + (o.transport === '있음' ? (esc(o.transportDetail) || '통학 운영') : '미운영') + '</div>'; if (st) h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"><span class="badge badge-blue">프로그램 ' + st.progCount + '개</span><span class="badge badge-purple">학생 ' + st.studentCount + '명</span></div>'; h += '<div style="margin-top:10px;font-size:0.82rem;font-weight:700;">완성도: ' + cm.percent + '%</div><div class="comp-bar-wrap"><div class="comp-bar ' + barCls + '" style="width:' + cm.percent + '%;"></div></div>'; if (cm.missing && cm.missing.length > 0) h += '<div style="font-size:0.78rem;color:var(--orange-deep);margin-top:4px;">⚠️ 미입력: ' + cm.missing.join(', ') + '</div>'; h += '</div>'; }); list.innerHTML = h; }
 
+function renderAdmOrgs() {
+  if (!adminData) return;
+  var list = document.getElementById('adm-org-list');
+  var comp = adminData.completeness || [];
+  var compMap = {};
+  comp.forEach(function(c) { compMap[c.orgName] = c; });
+
+  var h = '';
+  (adminData.orgs || []).forEach(function(o) {
+    var icon  = o.type === '학교밖 늘봄' ? '📚' : '🏠';
+    var bc    = o.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)';
+    var cm    = compMap[o.name] || { percent: 0, missing: [] };
+    var barCls = cm.percent >= 80 ? 'high' : cm.percent >= 50 ? 'mid' : 'low';
+    var st    = (adminData.stats.orgStats || []).find(function(s) { return s.name === o.name; });
+
+    h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:5px solid ' + bc + ';border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);">';
+    h += '  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">';
+    h += '    <div style="font-weight:800;font-size:0.95rem;">' + icon + ' ' + esc(o.name) + '</div>';
+    h += '    <button class="btn-sm" onclick="openOrgTypeModal(\'' + esc(o.name).replace(/'/g,"\\'") + '\',\'' + esc(o.type||'').replace(/'/g,"\\'") + '\',\'' + esc(o.jurisdiction||'').replace(/'/g,"\\'") + '\')">✏️ 유형 편집</button>';
+    h += '  </div>';
+
+    // 유형 / 관할 뱃지
+    h += '  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
+    h += '    <span class="badge ' + (o.type === '학교밖 늘봄' ? 'badge-blue' : 'badge-green') + '">' + esc(o.type || '미설정') + '</span>';
+    h += '    <span class="badge badge-teal">' + esc(o.jurisdiction || '관할 미설정') + '</span>';
+    h += '  </div>';
+
+    h += '  <div style="font-size:0.82rem;color:var(--text-sub);line-height:1.7;">';
+    h += '    📍 ' + (vp(o.address)     || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>';
+    h += '    📞 ' + (vp(o.tel)         || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>';
+    h += '    👤 ' + (vp(o.managerName) || '<i style="color:var(--orange-deep);">미입력</i>');
+    if (vp(o.managerTel)) h += ' (' + esc(o.managerTel) + ')';
+    h += '<br>';
+    h += '    🕐 ' + (vp(o.hours)       || '<i style="color:var(--orange-deep);">미입력</i>') + '<br>';
+    h += '    🚌 ' + (o.transport === '있음' ? (esc(o.transportDetail) || '통학 운영') : '미운영');
+    h += '  </div>';
+
+    if (st) {
+      h += '  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">';
+      h += '    <span class="badge badge-blue">프로그램 ' + st.progCount + '개</span>';
+      h += '    <span class="badge badge-purple">학생 ' + st.studentCount + '명</span>';
+      h += '  </div>';
+    }
+
+    h += '  <div style="margin-top:10px;font-size:0.82rem;font-weight:700;">완성도: ' + cm.percent + '%</div>';
+    h += '  <div class="comp-bar-wrap"><div class="comp-bar ' + barCls + '" style="width:' + cm.percent + '%;"></div></div>';
+    if (cm.missing && cm.missing.length > 0) {
+      h += '  <div style="font-size:0.78rem;color:var(--orange-deep);margin-top:4px;">⚠️ 미입력: ' + cm.missing.join(', ') + '</div>';
+    }
+    h += '</div>';
+  });
+
+  list.innerHTML = h;
+}
+  
+  
 function renderAdmPwd() {
   showLoading(true);
   sbGet('organizations', 'select=name,password&order=name.asc')
@@ -3763,12 +3884,79 @@ function timeToMin(timeStr) {
   return parseInt(match[1]) * 60 + parseInt(match[2]);
 }
 
+// ==========================================
+// ⚙️ 관리자 설정
+// ==========================================
+
+// 관리자 비밀번호 변경
+function saveAdminPwd() {
+  var newPwd = document.getElementById('adm-new-pwd').value.trim();
+  if (!newPwd) { showToast('새 비밀번호를 입력하세요.'); return; }
+  if (!confirm('관리자 비밀번호를 변경하시겠습니까?')) return;
+
+  showLoading(true);
+  sbUpdate('admin_settings', 'key=eq.admin_password', { value: newPwd, updated_at: new Date().toISOString() })
+    .then(function() {
+      showLoading(false);
+      document.getElementById('adm-new-pwd').value = '';
+      showToast('✅ 관리자 비밀번호가 변경되었습니다!');
+    })
+    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+// ==========================================
+// 🏢 기관 유형/관할 편집 모달
+// ==========================================
+var editOrgTypeName = '';
+
+function openOrgTypeModal(orgName, type, jurisdiction) {
+  editOrgTypeName = orgName;
+  document.getElementById('modal-org-type-title').innerText = orgName + ' — 유형 편집';
+  document.getElementById('mot-type').value         = type         || '';
+  document.getElementById('mot-jurisdiction').value = jurisdiction || '';
+  document.getElementById('modal-org-type').style.display = 'flex';
+}
+
+function saveOrgType() {
+  var type         = document.getElementById('mot-type').value;
+  var jurisdiction = document.getElementById('mot-jurisdiction').value;
+
+  if (!type) { showToast('유형을 선택하세요.'); return; }
+
+  showLoading(true);
+  closeModal('modal-org-type');
+
+  sbUpdate('organizations',
+    'name=eq.' + encodeURIComponent(editOrgTypeName),
+    { type: type, jurisdiction: jurisdiction, updated_at: new Date().toISOString() }
+  )
+  .then(function() {
+    showLoading(false);
+    showToast('✅ 저장!');
+    loadAdminData();
+    loadData();
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+// switchAdminTab 에 setting 추가
+function switchAdminTab(tab) {
+  ['overview', 'students', 'orgs', 'pwd', 'setting'].forEach(function(t) {
+    document.getElementById('adm-tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('adm-area-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'overview') renderAdmOverview();
+  if (tab === 'students') renderAdminStudents();
+  if (tab === 'orgs')     renderAdmOrgs();
+  if (tab === 'pwd')      renderAdmPwd();
+}
+  
 function exportCSV() { if (!adminData || !adminData.stats) return; var BOM = '\uFEFF'; var rows = ['기관명,유형,프로그램,이용학생']; (adminData.stats.orgStats || []).forEach(function(s) { rows.push(s.name + ',' + s.type + ',' + s.progCount + ',' + s.studentCount); }); var blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' }); var url = URL.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = '순창초_저녁늘봄_현황.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('📥 다운로드!'); }
 </script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/neulbom-map-portal/sw.js');
+      navigator.serviceWorker.register('/neulbom-supabase/sw.js');
     });
   }
 </script>
