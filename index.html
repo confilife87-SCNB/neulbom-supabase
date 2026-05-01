@@ -3934,10 +3934,66 @@ function saveOrgType() {
   .then(function() {
     showLoading(false);
     showToast('✅ 저장!');
-    loadAdminData();
+    reloadAdminOrgsOnly(); // ✅ 화면 이동 없이 기관탭만 갱신
     loadData();
   })
   .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+}
+
+// ✅ 기관 탭만 갱신 (화면 이동 없음)
+function reloadAdminOrgsOnly() {
+  sbGet('organizations', 'select=*&order=updated_at.desc')
+    .then(function(orgs) {
+      var updatedStats = orgs.map(function(o) {
+        var existing = (adminData.stats.orgStats || []).find(function(s) {
+          return s.name === o.name;
+        }) || {};
+        return {
+          name:            o.name,
+          type:            o.type             || '',
+          jurisdiction:    o.jurisdiction     || '',
+          address:         o.address          || '',
+          tel:             o.tel              || '',
+          managerName:     o.manager_name     || '',
+          managerTel:      o.manager_tel      || '',
+          hours:           o.hours            || '',
+          transport:       o.transport        || '',
+          transportDetail: o.transport_detail || '',
+          progCount:       existing.progCount     || 0,
+          studentCount:    existing.studentCount  || 0,
+          totalCapacity:   existing.totalCapacity || 0,
+          totalCurrent:    existing.totalCurrent  || 0
+        };
+      });
+
+      adminData.orgs           = updatedStats;
+      adminData.stats.orgStats = updatedStats;
+
+      adminData.completeness = orgs.map(function(o) {
+        var fields  = ['address','tel','manager_name','manager_tel','hours','transport','intro','homepage'];
+        var filled  = fields.filter(function(k) { return o[k] && String(o[k]).trim(); }).length;
+        var st      = updatedStats.find(function(s) { return s.name === o.name; }) || {};
+        if ((st.progCount || 0) > 0) filled++;
+        var total   = fields.length + 1;
+        var missing = fields.filter(function(k) { return !o[k] || !String(o[k]).trim(); }).map(function(k) {
+          var labels = {
+            address:'주소', tel:'대표연락처', manager_name:'담당자명',
+            manager_tel:'담당자연락처', hours:'운영시간',
+            transport:'통학지원', intro:'소개글', homepage:'홈페이지'
+          };
+          return labels[k] || k;
+        });
+        if ((st.progCount || 0) === 0) missing.push('프로그램 등록');
+        return {
+          orgName: o.name,
+          percent: Math.round((filled / total) * 100),
+          missing: missing
+        };
+      });
+
+      renderAdmOrgs(); // ✅ 기관 탭만 다시 그리기
+    })
+    .catch(function(e) { showToast('❌ 갱신 실패: ' + e.message); });
 }
 
 // switchAdminTab 에 setting 추가
