@@ -1022,7 +1022,12 @@
       
       <div id="adm-area-overview" class="tab-area"><div class="section-title">🏢 기관별 현황</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-org-table"></table></div><div class="section-title" style="margin-top:20px;">📊 학년별 분포</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-grade-table"></table></div><div style="display:flex;gap:8px;margin-top:16px;"><button class="btn-action purple sm" onclick="exportClipboard()">📋 클립보드 복사</button><button class="btn-action gray sm" onclick="exportCSV()">📥 CSV 다운로드</button></div></div>
       <div id="adm-area-students" class="tab-area" style="display:none;"><button class="btn-action purple sm" onclick="openAdmStudentModal()" style="margin-bottom:12px;">+ 학생 추가</button><div style="display:flex;gap:8px;margin-bottom:12px;"><select id="adm-student-org-filter" onchange="renderAdminStudents()" style="flex:1;"><option value="전체">전체 기관</option></select><input type="text" id="adm-student-search" placeholder="이름 검색..." onkeyup="renderAdminStudents()" style="flex:1;"></div><div id="adm-student-list"></div></div>
-      <div id="adm-area-orgs" class="tab-area" style="display:none;"><div id="adm-org-list"></div></div>
+      <div id="adm-area-orgs" class="tab-area" style="display:none;">
+        <button class="btn-action purple sm" onclick="openAddOrgModal()" style="margin-bottom:14px;">
+          + 기관 추가
+        </button>
+        <div id="adm-org-list"></div>
+      </div>
       <div id="adm-area-pwd" class="tab-area" style="display:none;"><div class="section-title">🔑 기관 비밀번호 관리</div><div id="adm-pwd-list"></div></div>
     </div>
   </div>
@@ -1163,6 +1168,123 @@
       <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-org-type')">취소</button>
       <button class="btn-action purple" style="flex:2;" onclick="saveOrgType()">저장</button>
     </div>
+  </div>
+</div>
+  <!-- 모달: 기관 추가 -->
+<div id="modal-add-org" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-add-org')">
+  <div class="modal-content">
+    <div class="modal-title">🏢 신규 기관 추가</div>
+
+    <div class="form-group">
+      <label class="form-label">🏷️ 기관명 <span style="color:var(--red-deep);">*</span></label>
+      <input type="text" id="ao-name" placeholder="예: 순창군청소년문화의집">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🏷️ 기관 유형 <span style="color:var(--red-deep);">*</span></label>
+      <select id="ao-type">
+        <option value="">선택하세요</option>
+        <option value="학교밖 늘봄">📚 학교밖 늘봄</option>
+        <option value="지역사회 돌봄">🏠 지역사회 돌봄</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🗂️ 관할</label>
+      <select id="ao-jurisdiction">
+        <option value="">선택하세요</option>
+        <option value="교육지원청">교육지원청</option>
+        <option value="지자체">지자체</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📍 주소</label>
+      <input type="text" id="ao-address" placeholder="예: 전북 순창군 순창읍 ...">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">📞 대표 연락처</label>
+        <input type="text" id="ao-tel" placeholder="063-000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">👤 담당자명</label>
+        <input type="text" id="ao-manager-name" placeholder="홍길동">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📱 담당자 연락처</label>
+      <input type="text" id="ao-manager-tel" placeholder="010-0000-0000">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🕐 운영시간</label>
+      <input type="text" id="ao-hours" placeholder="예: 평일 13:00~20:00">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🚌 통학지원</label>
+      <select id="ao-transport">
+        <option value="없음">없음</option>
+        <option value="있음">있음</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📝 소개글</label>
+      <textarea id="ao-intro" placeholder="기관 소개를 간단히 입력하세요..." style="min-height:80px;"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🔑 초기 비밀번호 <span style="color:var(--red-deep);">*</span></label>
+      <input type="text" id="ao-password" placeholder="기관 담당자 로그인용 비밀번호" maxlength="10">
+      <div style="font-size:0.78rem;color:var(--text-sub);margin-top:4px;">
+        ※ 기관 담당자가 로그인할 때 사용하는 비밀번호입니다.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-add-org')">취소</button>
+      <button class="btn-action purple" style="flex:2;" onclick="saveNewOrg()">✅ 기관 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 기관 삭제 확인 -->
+<div id="modal-delete-org" class="modal-overlay">
+  <div class="modal-content">
+
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--red-deep);">기관 삭제 경고</div>
+    </div>
+
+    <div style="background:rgba(214,48,49,0.06);border:1.5px solid var(--red);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;text-align:center;">
+      <div style="font-size:0.8rem;color:var(--text-sub);margin-bottom:4px;">삭제할 기관</div>
+      <div style="font-size:1.05rem;font-weight:800;" id="del-org-name-display"></div>
+    </div>
+
+    <div id="del-org-related-info" style="margin-bottom:14px;"></div>
+
+    <div id="del-org-confirm-wrap" style="display:none;margin-bottom:14px;">
+      <div style="font-size:0.85rem;color:var(--text-sub);margin-bottom:8px;line-height:1.6;">
+        정말 삭제하시려면 아래에 <strong style="color:var(--red-deep);">기관명을 정확히 입력</strong>하세요.
+      </div>
+      <input type="text" id="del-org-name-input"
+        placeholder="기관명 입력..."
+        oninput="checkDelOrgName()"
+        style="border:2px solid var(--red);border-radius:var(--radius-sm);">
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-delete-org')">취소</button>
+      <button class="btn-action danger" style="flex:2;" id="btn-confirm-delete-org" onclick="confirmDeleteOrg()">
+        🗑️ 완전 삭제
+      </button>
+    </div>
+
   </div>
 </div>
   
@@ -3361,8 +3483,11 @@ function renderAdmOrgs() {
     h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:5px solid ' + bc + ';border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);">';
     h += '  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">';
     h += '    <div style="font-weight:800;font-size:0.95rem;">' + icon + ' ' + esc(o.name) + '</div>';
-    h += '    <button class="btn-sm" onclick="openOrgTypeModal(\'' + esc(o.name).replace(/'/g,"\\'") + '\',\'' + esc(o.type||'').replace(/'/g,"\\'") + '\',\'' + esc(o.jurisdiction||'').replace(/'/g,"\\'") + '\')">✏️ 유형 편집</button>';
-    h += '  </div>';
+    h += '    <div style="display:flex;gap:6px;">';
+    h += '      <button class="btn-sm" onclick="openOrgTypeModal(\'' + esc(o.name).replace(/\'/g,"\\'") + '\',\'' + esc(o.type||'').replace(/\'/g,"\\'") + '\',\'' + esc(o.jurisdiction||'').replace(/\'/g,"\\'") + '\')">✏️ 유형 편집</button>';
+    h += '      <button class="btn-sm danger" onclick="openDeleteOrgModal(\'' + esc(o.name).replace(/\'/g,"\\'") + '\')">🗑️ 삭제</button>';
+    h += '    </div>';
+    h += '  </div>';  // ✅ 이 줄 추가 (justify-content:space-between div 닫기)
 
     // 유형 / 관할 뱃지
     h += '  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
@@ -4019,6 +4144,199 @@ function exportCSV() { if (!adminData || !adminData.stats) return; var BOM = '\u
       navigator.serviceWorker.register('/neulbom-supabase/sw.js');
     });
   }
+</script>
+
+<script>
+// ==========================================
+// 🏢 관리자 - 기관 추가
+// ==========================================
+function openAddOrgModal() {
+  ['ao-name','ao-address','ao-tel','ao-manager-name',
+   'ao-manager-tel','ao-hours','ao-intro','ao-password'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('ao-type').value         = '';
+  document.getElementById('ao-jurisdiction').value = '';
+  document.getElementById('ao-transport').value    = '없음';
+  document.getElementById('modal-add-org').style.display = 'flex';
+}
+
+function saveNewOrg() {
+  var name     = document.getElementById('ao-name').value.trim();
+  var type     = document.getElementById('ao-type').value;
+  var password = document.getElementById('ao-password').value.trim();
+
+  if (!name) {
+    showToast('⚠️ 기관명을 입력하세요.');
+    document.getElementById('ao-name').focus();
+    return;
+  }
+  if (!type) {
+    showToast('⚠️ 기관 유형을 선택하세요.');
+    return;
+  }
+  if (!password) {
+    showToast('⚠️ 초기 비밀번호를 입력하세요.');
+    document.getElementById('ao-password').focus();
+    return;
+  }
+
+  // 기관명 중복 체크
+  var isDuplicate = allOrgs.some(function(o) { return o.name === name; });
+  if (isDuplicate) {
+    showToast('⚠️ 이미 등록된 기관명입니다.');
+    return;
+  }
+
+  var dbData = {
+    org_id:       'ORG_' + Date.now(),
+    name:         name,
+    type:         type,
+    jurisdiction: document.getElementById('ao-jurisdiction').value || '',
+    address:      document.getElementById('ao-address').value.trim(),
+    tel:          document.getElementById('ao-tel').value.trim(),
+    manager_name: document.getElementById('ao-manager-name').value.trim(),
+    manager_tel:  document.getElementById('ao-manager-tel').value.trim(),
+    hours:        document.getElementById('ao-hours').value.trim(),
+    transport:    document.getElementById('ao-transport').value,
+    intro:        document.getElementById('ao-intro').value.trim(),
+    password:     password,
+    updated_at:   new Date().toISOString()
+  };
+
+  showLoading(true);
+  closeModal('modal-add-org');
+
+  sbInsert('organizations', dbData)
+    .then(function(result) {
+      showLoading(false);
+      if (result && result.code) {
+        showToast('❌ 추가 실패: ' + (result.message || result.code));
+        return;
+      }
+      showToast('✅ ' + name + ' 기관이 추가되었습니다!');
+      loadData();
+      loadAdminData('orgs');
+    })
+    .catch(function(e) {
+      showLoading(false);
+      showToast('❌ 오류: ' + (e.message || '알 수 없는 오류'));
+    });
+}
+</script>
+
+<script>
+// ==========================================
+// 🗑️ 관리자 - 기관 삭제
+// ==========================================
+var deleteTargetOrgName = '';
+
+function openDeleteOrgModal(orgName) {
+  deleteTargetOrgName = orgName;
+
+  document.getElementById('del-org-name-display').innerText = orgName;
+  document.getElementById('del-org-name-input').value       = '';
+  document.getElementById('del-org-confirm-wrap').style.display = 'none';
+  document.getElementById('btn-confirm-delete-org').disabled = true;
+  document.getElementById('del-org-related-info').innerHTML =
+    '<div style="text-align:center;padding:12px;color:var(--text-sub);font-size:0.85rem;">⏳ 연관 데이터 확인 중...</div>';
+
+  document.getElementById('modal-delete-org').style.display = 'flex';
+
+  // 연관 데이터 조회
+  Promise.all([
+    sbGet('programs', 'select=id&org_name=eq.' + encodeURIComponent(orgName)),
+    sbGet('students', 'select=id&org_name=eq.' + encodeURIComponent(orgName)),
+    sbGet('notices',  'select=id&org_name=eq.' + encodeURIComponent(orgName))
+  ])
+  .then(function(results) {
+    var progCount    = (results[0] || []).length;
+    var studentCount = (results[1] || []).length;
+    var noticeCount  = (results[2] || []).length;
+    var totalRelated = progCount + studentCount + noticeCount;
+    var h = '';
+
+    if (totalRelated === 0) {
+      // 연관 데이터 없음 → 바로 삭제 버튼 활성화
+      h += '<div style="background:rgba(0,184,148,0.08);border:1px solid rgba(0,184,148,0.3);';
+      h += 'border-radius:var(--radius-sm);padding:14px;text-align:center;">';
+      h += '<div style="font-size:1.2rem;margin-bottom:4px;">✅</div>';
+      h += '<div style="font-size:0.88rem;color:var(--green-deep);font-weight:700;">연관 데이터가 없습니다.</div>';
+      h += '<div style="font-size:0.8rem;color:var(--text-sub);margin-top:4px;">기관 정보만 삭제됩니다.</div>';
+      h += '</div>';
+      document.getElementById('btn-confirm-delete-org').disabled = false;
+
+    } else {
+      // 연관 데이터 있음 → 경고 + 기관명 입력 요구
+      h += '<div style="background:rgba(214,48,49,0.06);border:1.5px solid var(--red);';
+      h += 'border-radius:var(--radius-sm);padding:14px;">';
+      h += '<div style="font-weight:800;color:var(--red-deep);margin-bottom:10px;">⚠️ 아래 데이터가 함께 삭제됩니다!</div>';
+
+      var items = [
+        { icon: '📋', label: '프로그램', count: progCount },
+        { icon: '🧑‍🎓', label: '학생 정보', count: studentCount },
+        { icon: '📢', label: '공지사항', count: noticeCount }
+      ];
+      items.forEach(function(item) {
+        if (item.count > 0) {
+          h += '<div style="display:flex;justify-content:space-between;align-items:center;';
+          h += 'padding:8px 0;border-bottom:1px solid rgba(214,48,49,0.12);">';
+          h += '<span style="font-size:0.88rem;">' + item.icon + ' ' + item.label + '</span>';
+          h += '<span style="font-weight:800;color:var(--red-deep);">' + item.count + '건</span>';
+          h += '</div>';
+        }
+      });
+
+      h += '<div style="margin-top:10px;font-size:0.8rem;color:var(--red-deep);font-weight:700;">';
+      h += '총 ' + totalRelated + '건 영구 삭제 · 복구 불가능</div>';
+      h += '</div>';
+
+      // 기관명 입력창 표시 (연관 데이터 있을 때만)
+      document.getElementById('del-org-confirm-wrap').style.display = 'block';
+    }
+
+    document.getElementById('del-org-related-info').innerHTML = h;
+  })
+  .catch(function() {
+    document.getElementById('del-org-related-info').innerHTML =
+      '<div style="color:var(--red-deep);text-align:center;font-size:0.85rem;">❌ 데이터 조회 실패. 다시 시도해주세요.</div>';
+  });
+}
+
+// 기관명 입력 일치 여부 확인
+function checkDelOrgName() {
+  var input = document.getElementById('del-org-name-input').value.trim();
+  var btn   = document.getElementById('btn-confirm-delete-org');
+  btn.disabled = (input !== deleteTargetOrgName);
+}
+
+// 최종 삭제 실행
+function confirmDeleteOrg() {
+  if (!deleteTargetOrgName) return;
+
+  showLoading(true);
+  closeModal('modal-delete-org');
+
+  // 순서대로 삭제: 공지 → 학생 → 프로그램 → 기관
+  var q = 'org_name=eq.' + encodeURIComponent(deleteTargetOrgName);
+
+  sbDelete('notices',       q)
+  .then(function() { return sbDelete('students',      q); })
+  .then(function() { return sbDelete('programs',      q); })
+  .then(function() { return sbDelete('organizations', 'name=eq.' + encodeURIComponent(deleteTargetOrgName)); })
+  .then(function() {
+    showLoading(false);
+    showToast('🗑️ ' + deleteTargetOrgName + ' 기관이 삭제되었습니다.');
+    deleteTargetOrgName = '';
+    loadData();
+    loadAdminData('orgs');
+  })
+  .catch(function(e) {
+    showLoading(false);
+    showToast('❌ 삭제 실패: ' + (e.message || '오류 발생'));
+  });
+}
 </script>
 </body>
 </html>
