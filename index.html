@@ -1003,23 +1003,6 @@
   <button class="btn-tab purple" id="adm-tab-setting" onclick="switchAdminTab('setting')">⚙️ 설정</button>
 </div>
 
-<!-- 기존 비번 탭 영역 뒤에 설정 탭 영역 추가 -->
-<div id="adm-area-setting" class="tab-area" style="display:none;">
-  <div class="section-title" style="color:var(--purple-deep);">⚙️ 관리자 설정</div>
-
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;">
-    <div style="font-weight:800;font-size:0.95rem;margin-bottom:14px;">🔑 관리자 비밀번호 변경</div>
-    <div style="font-size:0.85rem;color:var(--text-sub);margin-bottom:14px;line-height:1.6;">
-      변경 후 다음 로그인부터 새 비밀번호를 사용합니다.
-    </div>
-    <div class="form-group">
-      <label class="form-label">새 비밀번호</label>
-      <input type="text" id="adm-new-pwd" placeholder="새 비밀번호 입력" maxlength="20">
-    </div>
-    <button class="btn-action purple" onclick="saveAdminPwd()">🔑 비밀번호 변경</button>
-  </div>
-</div>
-      
       <div id="adm-area-overview" class="tab-area"><div class="section-title">🏢 기관별 현황</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-org-table"></table></div><div class="section-title" style="margin-top:20px;">📊 학년별 분포</div><div style="overflow-x:auto;"><table class="admin-table" id="adm-grade-table"></table></div><div style="display:flex;gap:8px;margin-top:16px;"><button class="btn-action purple sm" onclick="exportClipboard()">📋 클립보드 복사</button><button class="btn-action gray sm" onclick="exportCSV()">📥 CSV 다운로드</button></div></div>
       <div id="adm-area-students" class="tab-area" style="display:none;"><button class="btn-action purple sm" onclick="openAdmStudentModal()" style="margin-bottom:12px;">+ 학생 추가</button><div style="display:flex;gap:8px;margin-bottom:12px;"><select id="adm-student-org-filter" onchange="renderAdminStudents()" style="flex:1;"><option value="전체">전체 기관</option></select><input type="text" id="adm-student-search" placeholder="이름 검색..." onkeyup="renderAdminStudents()" style="flex:1;"></div><div id="adm-student-list"></div></div>
       <div id="adm-area-orgs" class="tab-area" style="display:none;">
@@ -1029,6 +1012,22 @@
         <div id="adm-org-list"></div>
       </div>
       <div id="adm-area-pwd" class="tab-area" style="display:none;"><div class="section-title">🔑 기관 비밀번호 관리</div><div id="adm-pwd-list"></div></div>
+
+      <!-- ✅ setting 탭은 맨 마지막으로 이동 -->
+      <div id="adm-area-setting" class="tab-area" style="display:none;">
+        <div class="section-title" style="color:var(--purple-deep);">⚙️ 관리자 설정</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;">
+          <div style="font-weight:800;font-size:0.95rem;margin-bottom:14px;">🔑 관리자 비밀번호 변경</div>
+          <div style="font-size:0.85rem;color:var(--text-sub);margin-bottom:14px;line-height:1.6;">
+            변경 후 다음 로그인부터 새 비밀번호를 사용합니다.
+          </div>
+          <div class="form-group">
+            <label class="form-label">새 비밀번호</label>
+            <input type="text" id="adm-new-pwd" placeholder="새 비밀번호 입력" maxlength="20">
+          </div>
+          <button class="btn-action purple" onclick="saveAdminPwd()">🔑 비밀번호 변경</button>
+        </div>
+      </div>
     </div>
   </div>
 
