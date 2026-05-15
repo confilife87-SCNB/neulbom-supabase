@@ -1558,7 +1558,7 @@
       </div>
       <div style="font-size:0.75rem;color:var(--text-sub);
                   margin-top:4px;">
-        ※ 현원 \geq 정원이면 상태를 '마감'으로 변경해주세요.
+        ※ 현원이 정원 이상이면 상태를 '마감'으로 변경해주세요.
       </div>
     </div>
 
@@ -2716,7 +2716,17 @@ function renderOrgDetail(org, progs, notices) {
 
       g.schedules.forEach(function(s) {
         programHtml += '    <div class="detail-label">📅 일정</div>';
-        programHtml += '    <div class="detail-value">' + esc(s.day) + (s.start ? ' ' + esc(s.start) + '~' + esc(s.end) : '') + '</div>';
+        var dayChips = dayChipsHtml(s.day);
+        var timeStr  = s.start
+          ? to12h(s.start) + ' ~ ' + to12h(s.end)
+          : '';
+        programHtml += '    <div class="detail-value">' +
+          dayChips +
+          (timeStr
+            ? '<span style="font-size:0.85rem;color:var(--text-sub);margin-left:4px;">' +
+              timeStr + '</span>'
+            : '') +
+          '</div>';
       });
 
       if (p.capacity) {
@@ -4488,7 +4498,7 @@ var orgStats = orgs.map(function(o) {
 }
 function renderAdmOverview() { if (!adminData || !adminData.stats) return; var t = document.getElementById('adm-org-table'); var h = '<tr><th>기관명</th><th>유형</th><th>프로그램</th><th>이용학생</th><th>완성도</th></tr>'; var stats = adminData.stats.orgStats || []; var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); stats.forEach(function(s) { var clr = s.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[s.name] || { percent: 0 }; var cc = cm.percent >= 80 ? 'var(--green-deep)' : cm.percent >= 50 ? 'var(--orange-deep)' : 'var(--red-deep)'; var ci = cm.percent >= 80 ? '✅' : cm.percent >= 50 ? '⚠️' : '🔴'; h += '<tr><td style="text-align:left;font-weight:600;">' + esc(s.name) + '</td><td style="color:' + clr + ';font-size:0.78rem;">' + esc(s.type) + '</td><td>' + s.progCount + '</td><td style="font-weight:700;color:var(--purple-deep);">' + s.studentCount + '</td><td style="color:' + cc + ';font-weight:700;">' + ci + ' ' + cm.percent + '%</td></tr>'; }); t.innerHTML = h; var gt = document.getElementById('adm-grade-table'); var gd = adminData.stats.gradeDistribution || {}; var gh = '<tr><th>학년</th>', gv = '<tr><td style="font-weight:700;">학생 수</td>', total = 0; for (var g = 1; g <= 6; g++) { var c = gd[String(g)] || 0; total += c; gh += '<th>' + g + '학년</th>'; gv += '<td>' + c + '</td>'; } gh += '<th>합계</th></tr>'; gv += '<td style="font-weight:700;color:var(--purple-deep);">' + total + '</td></tr>'; gt.innerHTML = gh + gv; }
 
-function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + esc(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + dayChipsHtml(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
 
 function openAdmStudentModal(ri) {
   editStudentRow = ri || null;
@@ -4911,7 +4921,7 @@ function renderTTCards(day) {
       h += '<div class="tt-prog-card ' + cc + '" onclick="showTTDetail(\'' + dataKey.replace(/'/g, "\\'") + '\')">';
       h += '<div class="tt-prog-top"><div class="tt-prog-name">' + cat.icon + ' ' + esc(p.name) + '</div>' + stBadge + '</div>';
       h += '<div class="tt-prog-info">';
-      h += '<span class="tt-prog-label">🕐 시간</span><span class="tt-prog-value">' + (vp(p.startTime) ? esc(p.startTime) + ' ~ ' + esc(p.endTime) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
+      h += '<span class="tt-prog-label">🕐 시간</span><span class="tt-prog-value">' + (vp(p.startTime) ? to12h(p.startTime) + ' ~ ' + to12h(p.endTime) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
       h += '<span class="tt-prog-label">🎓 대상</span><span class="tt-prog-value">' + (vp(p.grade) ? esc(p.grade) : '<i class="tt-prog-value pending">확인 중</i>') + '</span>';
       if (p.capacity) {
         var cap = parseInt(p.capacity) || 0, cur = parseInt(p.current) || 0, rem = cap - cur;
@@ -4989,7 +4999,9 @@ function renderTTTable(days) {
         h += '<div class="tt-cell ' + cc + '" onclick="showTTDetail(\'' + dataKey.replace(/'/g, "\\'") + '\')">';
         h += '<div class="tt-cell-name">' + cat.icon + ' ' + esc(p.name) + (si.dot ? ' <span class="status-dot ' + si.dot + '"></span>' : '') + '</div>';
         h += '<div class="tt-cell-org"><span class="tt-org-pill ' + orgPill + '">' + esc(p.orgName) + '</span></div>';
-        h += '<div class="tt-cell-time">' + esc(p.startTime) + '~' + esc(p.endTime) + '</div>';
+        h += '<div class="tt-cell-time">' +
+             to12h(p.startTime) + '~' + to12h(p.endTime) +
+             '</div>';        
         h += '</div>';
       });
       h += '</td>';
@@ -5065,7 +5077,17 @@ function showTTDetail(dataKey) {
   h += '<div class="tt-detail-label">📂 분류</div><div class="tt-detail-value">' + val(p.category) + '</div>';
   h += '<div class="tt-detail-label">🎓 대상</div><div class="tt-detail-value">' + val(p.grade) + '</div>';
   matchedRows.forEach(function(r) {
-    h += '<div class="tt-detail-label">📅 일정</div><div class="tt-detail-value">' + esc(r.day) + (r.startTime ? ' ' + esc(r.startTime) + '~' + esc(r.endTime) : '') + '</div>';
+    var timeStr = r.startTime
+      ? to12h(r.startTime) + ' ~ ' + to12h(r.endTime)
+      : '';
+    h += '<div class="tt-detail-label">📅 일정</div>' +
+         '<div class="tt-detail-value">' +
+         dayChipsHtml(r.day) +
+         (timeStr
+           ? '<span style="font-size:0.85rem;color:var(--text-sub);margin-left:4px;">' +
+             timeStr + '</span>'
+           : '') +
+         '</div>';
   });
   if (p.capacity) {
     var cap = parseInt(p.capacity) || 0, cur = parseInt(p.current) || 0, rem = cap - cur;
@@ -5316,7 +5338,7 @@ function buildGradeString(grades) {
   // 세그먼트 → 문자열
   var parts = segments.map(function(seg) {
     if (seg.s === seg.e) return seg.s + '학년';
-    if (seg.e - seg.s === 1) return seg.s + ',' + seg.e + '학년';
+    if (seg.e - seg.s === 1) return seg.s + '~' + seg.e + '학년';
     return seg.s + '~' + seg.e + '학년';
   });
 
