@@ -813,6 +813,198 @@
   filter: brightness(1.1);
   transform: translateY(-2px);
 }
+
+/* =====================================================
+   🆕 UX 개선: 토스트 색상 구분
+   ===================================================== */
+#toast.success {
+  background: var(--green-deep);
+  color: white;
+}
+#toast.error {
+  background: var(--red-deep);
+  color: white;
+}
+#toast.warning {
+  background: #e17055;
+  color: white;
+}
+
+/* =====================================================
+   🆕 UX 개선: 비밀번호 마스킹
+   ===================================================== */
+.pwd-mask-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pwd-mask-text {
+  font-family: monospace;
+  letter-spacing: 2px;
+  color: var(--text-sub);
+  font-size: 0.88rem;
+}
+.btn-pwd-toggle {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  transition: 0.15s;
+}
+.btn-pwd-toggle:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* =====================================================
+   🆕 UX 개선: 관리자 학생 정렬 버튼
+   ===================================================== */
+.sort-header {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.sort-label {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+.btn-sort {
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-sub);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.btn-sort:hover {
+  border-color: var(--purple-deep);
+  color: var(--purple-deep);
+}
+.btn-sort.active {
+  background: var(--purple-deep);
+  border-color: var(--purple-deep);
+  color: white;
+}
+.sort-arrow {
+  font-size: 0.7rem;
+}
+
+/* =====================================================
+   🆕 UX 개선: 맞춤 추천 진행률 바
+   ===================================================== */
+.rec-progress-wrap {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.rec-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.rec-progress-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+}
+.rec-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+}
+.rec-progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.rec-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal-deep), var(--green-deep));
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.rec-progress-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* =====================================================
+   🆕 UX 개선: 기관 정보탭 저장 안내 배너
+   ===================================================== */
+.info-save-banner {
+  background: rgba(0, 206, 201, 0.06);
+  border: 1px solid rgba(0, 206, 201, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.info-save-banner-text {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+.btn-save-top {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #00cec9, #81ecec);
+  color: white;
+  font-weight: 800;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.btn-save-top:hover { opacity: 0.85; }
+
+/* =====================================================
+   🆕 UX 개선: 미입력 항목 클릭 링크
+   ===================================================== */
+.missing-item-link {
+  color: var(--orange-deep);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+.missing-item-link:hover {
+  color: var(--red-deep);
+}
+
+/* =====================================================
+   🆕 UX 개선: 프로그램 하이라이트
+   ===================================================== */
+.prog-detail-card.highlighted {
+  border: 2px solid var(--teal-deep);
+  box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.15);
+  animation: highlight-pulse 0.6s ease 2;
+}
+@keyframes highlight-pulse {
+  0%   { box-shadow: 0 0 0 3px rgba(0,206,201,0.15); }
+  50%  { box-shadow: 0 0 0 6px rgba(0,206,201,0.3); }
+  100% { box-shadow: 0 0 0 3px rgba(0,206,201,0.15); }
+}
     /* =====================================================
    🆕 추가: 버튼 토글 (학년·요일 다중선택)
    ===================================================== */
@@ -2098,6 +2290,7 @@ var kakaoMap = null;
 var kakaoMarkers = [];
 var mapFilter = '전체';
 var mapSearchQuery = '';
+var highlightProgName = '';
   // ==========================================
 // 🔍 초성 검색 헬퍼
 // ==========================================
@@ -2190,10 +2383,37 @@ function val(v,fb) { return vp(v) ? esc(v) : '<span class="detail-value pending"
 // 유틸리티
 // ==========================================
 function showLoading(v){document.getElementById('loading').style.display=v?'flex':'none';}
-function showToast(m){var t=document.getElementById('toast');t.innerText=m;t.className='show';setTimeout(function(){t.className='';},3000);}
+function showToast(m) {
+  var t = document.getElementById('toast');
+  t.innerText = m;
+
+  // 메시지 앞글자로 타입 판단
+  var cls = 'show';
+  if (m && (m.indexOf('✅') === 0 || m.indexOf('📋') === 0 ||
+            m.indexOf('📥') === 0 || m.indexOf('🗑️') === 0)) {
+    cls = 'show success';
+  } else if (m && (m.indexOf('❌') === 0)) {
+    cls = 'show error';
+  } else if (m && (m.indexOf('⚠️') === 0)) {
+    cls = 'show warning';
+  }
+
+  t.className = cls;
+  setTimeout(function() { t.className = ''; }, 3000);
+}
 function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
 function showView(id){document.querySelectorAll('.view').forEach(function(el){el.style.display='none';});document.getElementById(id).style.display='flex';}
-function goPortal(){showView('view-portal');currentOrgName='';isAdminMode=false;}
+function goPortal() {
+  showView('view-portal');
+  currentOrgName  = '';
+  isAdminMode     = false;
+  orgDashData     = null;   // 기관 담당자 데이터 초기화
+  adminData       = null;   // 관리자 데이터 초기화
+  editProgRow     = null;
+  editStudentRow  = null;
+  editNoticeRow   = null;
+  editPwdOrg      = '';
+}
 function closeModal(id){document.getElementById(id).style.display='none';}
 function toggleDark(){var n=document.body.getAttribute('data-theme')==='dark'?'light':'dark';document.body.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.querySelector('.btn-theme').innerText=n==='dark'?'🌙':'☀️';}
 function handleContact(num,type){var c=String(num).replace(/[^0-9\-]/g,'');if(!c){showToast('연락처 정보가 없습니다.');return;}var full=c.startsWith('0')?c:'010-'+c;var digits=full.replace(/\-/g,'');var mob=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);if(type==='sms'){mob?window.location.href='sms:'+digits:(navigator.clipboard.writeText(full),showToast('📱 '+full+' 복사'));}else{mob?window.location.href='tel:'+digits:(navigator.clipboard.writeText(full),showToast('📞 '+full+' 복사'));}}
@@ -2302,7 +2522,7 @@ function handleUrlHash() {
       if (orgName && allOrgs.find(function(o) { return o.name === orgName; })) {
         openParentView();
         setTimeout(function() {
-          detailBackTo = 'view-parent';
+          detailBackTo      = 'view-parent';
           openOrgDetail(orgName);
         }, 500);
         return;
@@ -2492,8 +2712,8 @@ function buildPCard(g) {
   var h = '';
   h += '<div class="p-card" style="' + cardBorder + '"' +
        ' onclick="openOrgDetailFrom(\'' +
-       esc(p.orgName).replace(/'/g, "\\'") + '\')">';
-
+       esc(p.orgName).replace(/'/g, "\\'") + '\',\'' +
+       esc(p.name).replace(/'/g, "\\'") + '\')">';
   // 상단: 모집상태 + 잔여인원
   h += '<div class="p-card-header-bar">';
   h += statusLabel
@@ -2554,8 +2774,11 @@ function buildPCard(g) {
 
 function toggleClosed(){var el=document.getElementById('closed-list');if(!el)return;var show=el.style.display==='none';el.style.display=show?'block':'none';el.previousElementSibling.querySelector('.sec-toggle').innerText=show?'접기 ▲':'펼치기 ▼';}
 
-function openOrgDetailFrom(orgName){detailBackTo='view-parent';openOrgDetail(orgName);}
-
+function openOrgDetailFrom(orgName, progName) {
+  detailBackTo      = 'view-parent';
+  highlightProgName = progName || '';
+  openOrgDetail(orgName);
+}
 // ==========================================
 // 📋 기관 상세 (공개)
 // ==========================================
@@ -2817,6 +3040,30 @@ function renderOrgDetail(org, progs, notices) {
   h += buildDetailAccordion('intro', '💬 기관 소개', introHtml, false);
 
   c.innerHTML = h;
+
+  // 🆕 특정 프로그램 하이라이트 처리
+  if (highlightProgName) {
+    setTimeout(function() {
+      // 프로그램 아코디언 강제 오픈
+      var accEl = document.getElementById('detail-acc-program');
+      if (accEl && !accEl.classList.contains('open')) {
+        accEl.classList.add('open');
+      }
+
+      // 해당 프로그램 카드 찾아서 하이라이트
+      var progCards = document.querySelectorAll('.prog-detail-card');
+      progCards.forEach(function(card) {
+        var nameEl = card.querySelector('.prog-detail-name');
+        if (nameEl && nameEl.innerText.indexOf(highlightProgName) !== -1) {
+          card.classList.add('highlighted');
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      // 하이라이트 초기화 (다음 진입 시 영향 없게)
+      highlightProgName = '';
+    }, 200);
+  }
 }
 // ==========================================
 // 🎯 맞춤 추천 플로우
@@ -2895,27 +3142,47 @@ function renderRecStep() {
   }
 
   var stepDef = REC_STEPS[getStepIndex(recStep)];
-  var options = stepDef.dynamic ? getTimeOptions() : stepDef.options;
+  var options  = stepDef.dynamic ? getTimeOptions() : stepDef.options;
 
-  // 진행률 점
-  var dots = '<div class="rec-progress">';
+  // 🆕 진행률: 텍스트 + 바 + 점 조합
+  var pct = Math.round((recStep / totalSteps) * 100);
+  var stepLabels = ['목적', '요일', '시간대', '학년', '통학버스', '수강료'];
+  var currentLabel = stepLabels[getStepIndex(recStep)] || (recStep + 1) + '단계';
+
+  var h = '<div class="rec-progress-wrap">';
+  h += '  <div class="rec-progress-header">';
+  h += '    <span class="rec-progress-text">' +
+       (recStep + 1) + ' / ' + totalSteps + '단계</span>';
+  h += '    <span class="rec-progress-label">' + currentLabel + '</span>';
+  h += '  </div>';
+  h += '  <div class="rec-progress-bar-wrap">';
+  h += '    <div class="rec-progress-bar" style="width:' + pct + '%;"></div>';
+  h += '  </div>';
+
+  // 기존 점(dot)도 유지
+  h += '  <div class="rec-progress-dots">';
   for (var i = 0; i < totalSteps; i++) {
     var cls = i < recStep ? 'done' : i === recStep ? 'active' : '';
-    dots += '<div class="rec-dot ' + cls + '"></div>';
+    h += '<div class="rec-dot ' + cls + '"></div>';
   }
-  dots += '</div>';
+  h += '  </div>';
+  h += '</div>';
 
-  var h = dots;
+  // 질문 + 선택지
   h += '<div class="rec-step">';
   h += '<div class="rec-q">' + stepDef.question + '</div>';
   h += '<div class="rec-options">';
   options.forEach(function(opt) {
-    h += '<button class="btn-rec" onclick="selectRecOption(\'' + stepDef.id + '\',\'' + opt.value + '\')">' + opt.label + '</button>';
+    h += '<button class="btn-rec"' +
+         ' onclick="selectRecOption(\'' + stepDef.id + '\',\'' +
+         opt.value + '\')">' + opt.label + '</button>';
   });
   h += '</div></div>';
 
   if (recStep > 0) {
-    h += '<button class="btn-action gray" style="margin-top:20px;max-width:200px;" onclick="recStepBack()">← 이전</button>';
+    h += '<button class="btn-action gray"' +
+         ' style="margin-top:20px;max-width:200px;"' +
+         ' onclick="recStepBack()">← 이전</button>';
   }
 
   area.innerHTML = h;
@@ -3709,13 +3976,65 @@ function renderOrgWelcome() {
   var area = document.getElementById('org-welcome-area');
   var comp = orgDashData.completeness || { percent: 0, missing: [] };
   var barCls = comp.percent >= 80 ? 'high' : comp.percent >= 50 ? 'mid' : 'low';
-  var h = '<div class="welcome-box"><div class="welcome-title">👋 ' + esc(currentOrgName) + '님 환영합니다</div>';
-  h += '<div class="welcome-sub">기관 정보와 프로그램을 관리하실 수 있습니다.<br>비어있는 정보를 채워주시면 학부모에게 더 정확한 안내가 제공됩니다.</div>';
+
+  var labelToField = {
+    '주소':        'oi-address',
+    '대표연락처':  'oi-tel',
+    '담당자명':    'oi-managerName',
+    '담당자연락처':'oi-managerTel',
+    '운영시간':    'oi-hours',
+    '소개글':      'oi-intro',
+    '홈페이지':    'oi-homepage'
+  };
+
+  var h = '<div class="welcome-box">';
+  h += '<div class="welcome-title">👋 ' + esc(currentOrgName) + '님 환영합니다</div>';
+  h += '<div class="welcome-sub">기관 정보와 프로그램을 관리하실 수 있습니다.<br>';
+  h += '비어있는 정보를 채워주시면 학부모에게 더 정확한 안내가 제공됩니다.</div>';
   h += '<div style="margin-top:12px;font-size:0.85rem;font-weight:700;">정보 완성도: ' + comp.percent + '%</div>';
   h += '<div class="comp-bar-wrap"><div class="comp-bar ' + barCls + '" style="width:' + comp.percent + '%;"></div></div>';
-  if (comp.missing && comp.missing.length > 0) h += '<div class="missing-list">⚠️ 미입력: ' + comp.missing.join(', ') + '</div>';
+
+  if (comp.missing && comp.missing.length > 0) {
+    h += '<div class="missing-list">⚠️ 미입력: ';
+    var missingLinks = comp.missing.map(function(label) {
+      var fieldId = labelToField[label];
+      if (fieldId) {
+        return '<span class="missing-item-link"' +
+               ' onclick="focusMissingField(\'' + fieldId + '\')">' +
+               label + '</span>';
+      }
+      // 프로그램 등록 등 필드 없는 항목
+      return '<span class="missing-item-link"' +
+             ' onclick="switchOrgTab(\'prog\')">' +
+             label + '</span>';
+    });
+    h += missingLinks.join(', ');
+    h += '</div>';
+  }
+
   h += '</div>';
   area.innerHTML = h;
+}
+
+// 🆕 미입력 필드 포커스 헬퍼
+function focusMissingField(fieldId) {
+  // 정보 탭으로 전환
+  switchOrgTab('info');
+  // 렌더링 완료 후 포커스 (setTimeout으로 DOM 완성 대기)
+  setTimeout(function() {
+    var el = document.getElementById(fieldId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.focus();
+      // 포커스 강조 효과
+      el.style.borderColor = 'var(--teal-deep)';
+      el.style.boxShadow   = '0 0 0 3px rgba(0,206,201,0.2)';
+      setTimeout(function() {
+        el.style.borderColor = '';
+        el.style.boxShadow   = '';
+      }, 2000);
+    }
+  }, 100);
 }
 
 function switchOrgTab(tab) {
@@ -3743,27 +4062,75 @@ function saveOrgPwd() {
 
 function renderOrgInfoForm() {
   var o = orgDashData.orgInfo || {};
-  var fields = [{ key: 'address', label: '주소', icon: '📍' }, { key: 'tel', label: '대표연락처', icon: '📞' }, { key: 'managerName', label: '담당자명', icon: '👤' }, { key: 'managerTel', label: '담당자 연락처', icon: '📱' }, { key: 'hours', label: '운영시간', icon: '🕐' }, { key: 'intro', label: '소개글', icon: '📝', ta: true }, { key: 'homepage', label: '홈페이지/SNS', icon: '🔗' }, { key: 'routeMapUrl', label: '통학노선도 링크', icon: '🗺️' }, { key: 'routeMapNote', label: '통학노선도 설명', icon: '🚌', ta: true }];
-  var h = '';
+  var fields = [
+    { key: 'address',     label: '주소',           icon: '📍' },
+    { key: 'tel',         label: '대표연락처',       icon: '📞' },
+    { key: 'managerName', label: '담당자명',         icon: '👤' },
+    { key: 'managerTel',  label: '담당자 연락처',    icon: '📱' },
+    { key: 'hours',       label: '운영시간',         icon: '🕐' },
+    { key: 'intro',       label: '소개글',           icon: '📝', ta: true },
+    { key: 'homepage',    label: '홈페이지/SNS',     icon: '🔗' },
+    { key: 'routeMapUrl', label: '통학노선도 링크',  icon: '🗺️' },
+    { key: 'routeMapNote',label: '통학노선도 설명',  icon: '🚌', ta: true }
+  ];
+
+  // 🆕 상단 저장 안내 배너
+  var h = '<div class="info-save-banner">';
+  h += '  <div class="info-save-banner-text">';
+  h += '    📝 정보를 수정한 후 반드시 저장 버튼을 눌러주세요.<br>';
+  h += '    <span style="color:var(--orange-deep);font-size:0.75rem;">';
+  h += '    저장하지 않으면 변경 내용이 사라집니다.</span>';
+  h += '  </div>';
+  h += '  <button class="btn-save-top" onclick="saveOrgInfo()">💾 저장</button>';
+  h += '</div>';
+
   fields.forEach(function(f) {
-    h += '<div class="form-group"><label class="form-label">' + f.icon + ' ' + f.label + '</label>' + (f.ta ? '<textarea id="oi-' + f.key + '">' + esc(o[f.key] || '') + '</textarea>' : '<input type="text" id="oi-' + f.key + '" value="' + esc(o[f.key] || '') + '">') + '</div>';
+    h += '<div class="form-group">';
+    h += '<label class="form-label">' + f.icon + ' ' + f.label + '</label>';
+    if (f.ta) {
+      h += '<textarea id="oi-' + f.key + '">' + esc(o[f.key] || '') + '</textarea>';
+    } else {
+      h += '<input type="text" id="oi-' + f.key + '" value="' + esc(o[f.key] || '') + '">';
+    }
+    h += '</div>';
   });
-  h += '<div class="form-group"><label class="form-label">🚌 통학지원</label><select id="oi-transport"><option value="있음"' + (o.transport === '있음' ? ' selected' : '') + '>있음</option><option value="없음"' + (o.transport === '없음' ? ' selected' : '') + '>없음</option></select></div>';
-var tdVal = o.transportDetail || '';
-var tdPreset = ['없음','스쿨버스','자체버스'];
-var tdIsDirect = tdVal !== '' && tdPreset.indexOf(tdVal) === -1;
-h += '<div class="form-group"><label class="form-label">🚌 통학 상세</label>';
-h += '<select id="oi-transportDetail-select" onchange="syncCombo(\'oi-transportDetail-select\',\'oi-transportDetail-custom\',\'oi-transportDetail\')">';
-h += '<option value="">선택</option>';
-tdPreset.forEach(function(v) {
-  h += '<option' + (tdVal === v ? ' selected' : '') + '>' + v + '</option>';
-});
-h += '<option value="__direct__"' + (tdIsDirect ? ' selected' : '') + '>직접입력...</option>';
-h += '</select>';
-h += '<input type="text" id="oi-transportDetail-custom" placeholder="직접 입력" style="margin-top:6px;' + (tdIsDirect ? '' : 'display:none;') + '" oninput="onCustomInput(\'oi-transportDetail-custom\',\'oi-transportDetail\')" value="' + (tdIsDirect ? esc(tdVal) : '') + '">';
-h += '<input type="hidden" id="oi-transportDetail" value="' + esc(tdVal) + '">';
-h += '</div>';
+
+  // 통학지원 select
+  h += '<div class="form-group">';
+  h += '<label class="form-label">🚌 통학지원</label>';
+  h += '<select id="oi-transport">';
+  h += '<option value="있음"' + (o.transport === '있음' ? ' selected' : '') + '>있음</option>';
+  h += '<option value="없음"' + (o.transport === '없음' ? ' selected' : '') + '>없음</option>';
+  h += '</select>';
+  h += '</div>';
+
+  // 통학 상세 콤보박스
+  var tdVal      = o.transportDetail || '';
+  var tdPreset   = ['없음', '스쿨버스', '자체버스'];
+  var tdIsDirect = tdVal !== '' && tdPreset.indexOf(tdVal) === -1;
+
+  h += '<div class="form-group">';
+  h += '<label class="form-label">🚌 통학 상세</label>';
+  h += '<select id="oi-transportDetail-select"' +
+       ' onchange="syncCombo(\'oi-transportDetail-select\',' +
+       '\'oi-transportDetail-custom\',\'oi-transportDetail\')">';
+  h += '<option value="">선택</option>';
+  tdPreset.forEach(function(v) {
+    h += '<option' + (tdVal === v ? ' selected' : '') + '>' + v + '</option>';
+  });
+  h += '<option value="__direct__"' + (tdIsDirect ? ' selected' : '') + '>직접입력...</option>';
+  h += '</select>';
+  h += '<input type="text" id="oi-transportDetail-custom"' +
+       ' placeholder="직접 입력"' +
+       ' style="margin-top:6px;' + (tdIsDirect ? '' : 'display:none;') + '"' +
+       ' oninput="onCustomInput(\'oi-transportDetail-custom\',\'oi-transportDetail\')"' +
+       ' value="' + (tdIsDirect ? esc(tdVal) : '') + '">';
+  h += '<input type="hidden" id="oi-transportDetail" value="' + esc(tdVal) + '">';
+  h += '</div>';
+
+  // 🆕 하단 저장 버튼 유지
   h += '<button class="btn-action teal" onclick="saveOrgInfo()">💾 저장</button>';
+
   document.getElementById('org-info-form').innerHTML = h;
 }
 
@@ -3802,8 +4169,70 @@ function saveOrgInfo() {
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
   
-function renderOrgProgs() { var list = document.getElementById('org-prog-list'); var progs = orgDashData.programs || []; if (!progs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>프로그램이 없습니다.</div>'; return; } var h = ''; progs.forEach(function(p) { var cat = getCat(p.category); var sb = p.status === '모집중' ? 'badge-green' : p.status === '마감' ? 'badge-red' : 'badge-yellow'; h += '<div class="prog-card-manage" style="border-left:4px solid ' + (cat.color || '#636e72') + ';"><div class="prog-manage-title"><span>' + cat.icon + ' ' + esc(p.name) + '</span>'; if (p.status) h += '<span class="badge ' + sb + '">' + esc(p.status) + '</span>'; h += '</div><div class="prog-manage-detail">📅 ' + esc(p.day) + ' ' + esc(p.startTime) + '~' + esc(p.endTime); if (p.grade) h += ' | 🎓 ' + esc(p.grade); if (p.capacity) h += '<br>👥 ' + esc(p.current || 0) + '/' + esc(p.capacity) + '명'; if (p.fee) h += ' | 💰 ' + esc(p.fee); h += '</div><div class="prog-actions"><button class="btn-sm" onclick="openProgModal(' + p.rowIndex + ')">✏️ 수정</button><button class="btn-sm danger" onclick="deleteProg(' + p.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+function renderOrgProgs() {
+  var list  = document.getElementById('org-prog-list');
+  var progs = orgDashData.programs || [];
 
+  if (!progs.length) {
+    list.innerHTML =
+      '<div class="empty-state">' +
+      '<div class="empty-icon">📋</div>' +
+      '프로그램이 없습니다.</div>';
+    return;
+  }
+
+  var h = '';
+  progs.forEach(function(p) {
+    var cat = getCat(p.category);
+    var sb  = p.status === '모집중' ? 'badge-green'
+            : p.status === '마감'   ? 'badge-red'
+            : 'badge-yellow';
+
+    // 🆕 12시간제 시간 표시 + 요일 칩
+    var timeDisplay = (vp(p.startTime) && vp(p.endTime))
+      ? to12h(p.startTime) + ' ~ ' + to12h(p.endTime)
+      : '시간 미설정';
+
+    h += '<div class="prog-card-manage"' +
+         ' style="border-left:4px solid ' + (cat.color || '#636e72') + ';">';
+
+    // 제목 행: 프로그램명 + 상태 뱃지
+    h += '<div class="prog-manage-title">';
+    h += '  <span>' + cat.icon + ' ' + esc(p.name) + '</span>';
+    if (p.status) {
+      h += '  <span class="badge ' + sb + '">' + esc(p.status) + '</span>';
+    }
+    h += '</div>';
+
+    // 상세 행: 요일칩 + 12시간제 시간 + 학년 + 정원 + 수강료
+    h += '<div class="prog-manage-detail">';
+    h += '📅 ' + dayChipsHtml(p.day) +
+         ' <span style="font-size:0.8rem;color:var(--text-sub);">' +
+         timeDisplay + '</span>';
+    if (p.grade) {
+      h += ' | 🎓 ' + esc(p.grade);
+    }
+    if (p.capacity) {
+      h += '<br>👥 ' + esc(p.current || 0) + '/' + esc(p.capacity) + '명';
+    }
+    if (p.fee) {
+      h += ' | 💰 ' + esc(p.fee);
+    }
+    h += '</div>';
+
+    // 액션 버튼
+    h += '<div class="prog-actions">';
+    h += '  <button class="btn-sm"' +
+         ' onclick="openProgModal(' + p.rowIndex + ')">✏️ 수정</button>';
+    h += '  <button class="btn-sm danger"' +
+         ' onclick="deleteProg(' + p.rowIndex + ')">🗑️</button>';
+    h += '</div>';
+
+    h += '</div>';
+  });
+
+  list.innerHTML = h;
+}
 function openProgModal(ri) {
   editProgRow = ri || null;
   document.getElementById('modal-prog-title').innerText =
@@ -4299,10 +4728,25 @@ function saveStudent() {
 }
 
 function delOrgStudent(ri) {
-  if (!confirm('삭제?')) return;
+  // 🆕 학생 이름 포함 확인 메시지
+  var student = (orgDashData.students || []).find(function(s) {
+    return s.rowIndex === ri;
+  });
+  var studentName = student
+    ? (student.grade + '학년 ' + student.classNum + '반 ' + student.name)
+    : '이 학생';
+
+  if (!confirm('[ ' + studentName + ' ]\n학생 정보를 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) {
+    return;
+  }
+
   showLoading(true);
   sbDelete('students', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️'); loadOrgDash('student'); })
+    .then(function() {
+      showLoading(false);
+      showToast('🗑️ ' + studentName + ' 삭제 완료');
+      loadOrgDash('student');
+    })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 // --- 공지 ---
@@ -4498,8 +4942,105 @@ var orgStats = orgs.map(function(o) {
 }
 function renderAdmOverview() { if (!adminData || !adminData.stats) return; var t = document.getElementById('adm-org-table'); var h = '<tr><th>기관명</th><th>유형</th><th>프로그램</th><th>이용학생</th><th>완성도</th></tr>'; var stats = adminData.stats.orgStats || []; var comp = adminData.completeness || []; var compMap = {}; comp.forEach(function(c) { compMap[c.orgName] = c; }); stats.forEach(function(s) { var clr = s.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)'; var cm = compMap[s.name] || { percent: 0 }; var cc = cm.percent >= 80 ? 'var(--green-deep)' : cm.percent >= 50 ? 'var(--orange-deep)' : 'var(--red-deep)'; var ci = cm.percent >= 80 ? '✅' : cm.percent >= 50 ? '⚠️' : '🔴'; h += '<tr><td style="text-align:left;font-weight:600;">' + esc(s.name) + '</td><td style="color:' + clr + ';font-size:0.78rem;">' + esc(s.type) + '</td><td>' + s.progCount + '</td><td style="font-weight:700;color:var(--purple-deep);">' + s.studentCount + '</td><td style="color:' + cc + ';font-weight:700;">' + ci + ' ' + cm.percent + '%</td></tr>'; }); t.innerHTML = h; var gt = document.getElementById('adm-grade-table'); var gd = adminData.stats.gradeDistribution || {}; var gh = '<tr><th>학년</th>', gv = '<tr><td style="font-weight:700;">학생 수</td>', total = 0; for (var g = 1; g <= 6; g++) { var c = gd[String(g)] || 0; total += c; gh += '<th>' + g + '학년</th>'; gv += '<td>' + c + '</td>'; } gh += '<th>합계</th></tr>'; gv += '<td style="font-weight:700;color:var(--purple-deep);">' + total + '</td></tr>'; gt.innerHTML = gh + gv; }
 
-function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + dayChipsHtml(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+// 🆕 정렬 상태 변수
+var admStudentSortKey = 'grade';  // 기본: 학년순
+var admStudentSortAsc = true;
 
+function renderAdminStudents() {
+  if (!adminData) return;
+  var list     = document.getElementById('adm-student-list');
+  var students = adminData.students || [];
+  var orgF     = document.getElementById('adm-student-org-filter').value;
+  var search   = document.getElementById('adm-student-search').value.trim();
+
+  // 필터링
+  var filtered = students.filter(function(s) {
+    if (orgF !== '전체' && s.orgName !== orgF) return false;
+    if (search && s.name.indexOf(search) === -1) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>';
+    return;
+  }
+
+  // 🆕 정렬 (원본 보호를 위해 slice() 복사 후 정렬)
+  var sorted = filtered.slice().sort(function(a, b) {
+    var va, vb;
+    if (admStudentSortKey === 'grade') {
+      va = (parseInt(a.grade) || 0) * 100 + (parseInt(a.classNum) || 0);
+      vb = (parseInt(b.grade) || 0) * 100 + (parseInt(b.classNum) || 0);
+    } else if (admStudentSortKey === 'org') {
+      va = a.orgName || '';
+      vb = b.orgName || '';
+    } else if (admStudentSortKey === 'name') {
+      va = a.name || '';
+      vb = b.name || '';
+    } else {
+      va = a.name || '';
+      vb = b.name || '';
+    }
+    if (va < vb) return admStudentSortAsc ? -1 : 1;
+    if (va > vb) return admStudentSortAsc ? 1 : -1;
+    return 0;
+  });
+
+  // 🆕 정렬 버튼 헤더
+  var sortBtns = [
+    { key: 'grade', label: '학년순' },
+    { key: 'org',   label: '기관순' },
+    { key: 'name',  label: '이름순' }
+  ];
+
+  var h = '<div class="sort-header">';
+  h += '<span class="sort-label">정렬:</span>';
+  sortBtns.forEach(function(btn) {
+    var isActive = admStudentSortKey === btn.key;
+    var arrow    = isActive ? (admStudentSortAsc ? ' ↑' : ' ↓') : '';
+    h += '<button class="btn-sort' + (isActive ? ' active' : '') + '"' +
+         ' onclick="setAdmStudentSort(\'' + btn.key + '\')">' +
+         btn.label + '<span class="sort-arrow">' + arrow + '</span>' +
+         '</button>';
+  });
+  h += '</div>';
+
+  h += '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' +
+       sorted.length + '명</div>';
+
+  sorted.forEach(function(s) {
+    h += '<div class="student-row">';
+    h += '<div class="student-info">';
+    h += '<strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br>';
+    h += '<span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName);
+    if (s.progName) h += ' | 📋 ' + esc(s.progName);
+    if (s.day)      h += ' | 📅 ' + dayChipsHtml(s.day);
+    if (s.contact)  h += '<br>📞 ' + esc(s.contact);
+    h += ' | 🔵등원: ' + (vp(s.arrival)   || '미입력');
+    h += ' | 🟠하원: ' + (vp(s.dismissal) || '미입력');
+    h += '</span></div>';
+    h += '<div class="student-actions">';
+    h += '<button class="btn-sm"' +
+         ' onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button>';
+    h += '<button class="btn-sm danger"' +
+         ' onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button>';
+    h += '</div></div>';
+  });
+
+  list.innerHTML = h;
+}
+
+// 🆕 정렬 키 변경 함수
+function setAdmStudentSort(key) {
+  if (admStudentSortKey === key) {
+    // 같은 키 클릭 시 오름/내림 토글
+    admStudentSortAsc = !admStudentSortAsc;
+  } else {
+    admStudentSortKey = key;
+    admStudentSortAsc = true;
+  }
+  renderAdminStudents();
+}
 function openAdmStudentModal(ri) {
   editStudentRow = ri || null;
   isAdminMode    = true;
@@ -4576,13 +5117,28 @@ function openAdmStudentModal(ri) {
   document.getElementById('modal-student').style.display = 'flex';
 }  
 function delAdmStudent(ri) {
-  if (!confirm('삭제?')) return;
+  // 🆕 학생 이름 포함 확인 메시지
+  var student = (adminData.students || []).find(function(s) {
+    return s.rowIndex === ri;
+  });
+  var studentName = student
+    ? (student.grade + '학년 ' + student.classNum + '반 ' + student.name +
+       ' (' + student.orgName + ')')
+    : '이 학생';
+
+  if (!confirm('[ ' + studentName + ' ]\n학생 정보를 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) {
+    return;
+  }
+
   showLoading(true);
   sbDelete('students', 'id=eq.' + ri)
-    .then(function() { showLoading(false); showToast('🗑️'); loadAdminData('students'); })
+    .then(function() {
+      showLoading(false);
+      showToast('🗑️ ' + studentName + ' 삭제 완료');
+      loadAdminData('students');
+    })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
-
 function renderAdmOrgs() {
   if (!adminData) return;
   var list = document.getElementById('adm-org-list');
@@ -4641,7 +5197,9 @@ function renderAdmOrgs() {
   list.innerHTML = h;
 }
   
-  
+// 🆕 비밀번호 마스킹 상태 저장
+var pwdRevealMap = {};
+
 function renderAdmPwd() {
   showLoading(true);
   sbGet('organizations', 'select=name,password&order=name.asc')
@@ -4649,17 +5207,44 @@ function renderAdmPwd() {
       showLoading(false);
       var list = document.getElementById('adm-pwd-list');
       var h = '';
-      (rows || []).forEach(function(item) {
+      (rows || []).forEach(function(item, idx) {
+        var isRevealed = pwdRevealMap[item.name] || false;
+        var pwdDisplay = isRevealed
+          ? '<strong style="color:var(--text);font-family:monospace;">' +
+            esc(item.password || '미설정') + '</strong>'
+          : '<span class="pwd-mask-text">••••••</span>';
+        var toggleLabel = isRevealed ? '🙈 숨기기' : '👁️ 보기';
+
         h += '<div class="student-row">';
-        h += '  <div class="student-info"><strong>🏢 ' + esc(item.name) + '</strong>';
-        h += '  <br><span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: <strong>' + esc(item.password || '미설정') + '</strong></span></div>';
-        h += '  <button class="btn-sm" onclick="openPwdModal(\'' + esc(item.name).replace(/'/g, "\\'") + '\',\'' + esc(item.password || '').replace(/'/g, "\\'") + '\')">변경</button>';
+        h += '  <div class="student-info">';
+        h += '    <strong>🏢 ' + esc(item.name) + '</strong><br>';
+        h += '    <div class="pwd-mask-wrap">';
+        h += '      <span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: </span>';
+        h += '      ' + pwdDisplay;
+        h += '      <button class="btn-pwd-toggle"' +
+             ' onclick="togglePwdReveal(\'' +
+             esc(item.name).replace(/'/g, "\\'") + '\')">' +
+             toggleLabel + '</button>';
+        h += '    </div>';
+        h += '  </div>';
+        h += '  <button class="btn-sm"' +
+             ' onclick="openPwdModal(\'' +
+             esc(item.name).replace(/'/g, "\\'") + '\',\'' +
+             esc(item.password || '').replace(/'/g, "\\'") +
+             '\')">변경</button>';
         h += '</div>';
       });
       list.innerHTML = h;
     })
     .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
+
+// 🆕 비밀번호 보기/숨기기 토글
+function togglePwdReveal(orgName) {
+  pwdRevealMap[orgName] = !pwdRevealMap[orgName];
+  renderAdmPwd();
+}
+  
 function openPwdModal(org, pwd) { editPwdOrg = org; document.getElementById('modal-pwd-title').innerText = org + ' 비밀번호 변경'; document.getElementById('mpw-input').value = pwd; document.getElementById('modal-pwd').style.display = 'flex'; }
 function savePwd() {
   var np = document.getElementById('mpw-input').value.trim();
