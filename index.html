@@ -813,6 +813,321 @@
   filter: brightness(1.1);
   transform: translateY(-2px);
 }
+    /* =====================================================
+   🆕 추가: 버튼 토글 (학년·요일 다중선택)
+   ===================================================== */
+.toggle-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.toggle-btn {
+  padding: 8px 0;
+  width: 44px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-sub);
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.15s;
+  user-select: none;
+}
+.toggle-btn:hover {
+  border-color: var(--teal-deep);
+  color: var(--teal-deep);
+}
+.toggle-btn.active {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: white;
+}
+.toggle-btn.all-btn {
+  width: auto;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+}
+.toggle-result {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--teal-deep);
+  font-weight: 700;
+  min-height: 20px;
+}
+.toggle-warn {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--orange-deep);
+  font-weight: 600;
+  display: none;
+}
+.toggle-warn.show { display: block; }
+
+/* =====================================================
+   🆕 추가: 커스텀 Time Picker
+   ===================================================== */
+.time-picker-wrap { position: relative; }
+.time-picker-display {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.time-picker-display:focus,
+.time-picker-display.open { border-color: var(--teal-deep); }
+.time-picker-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 260px;
+  background: var(--surface);
+  border: 2px solid var(--teal-deep);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 200;
+  padding: 12px;
+}
+.time-picker-panel.open { display: block; }
+.time-picker-ampm {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.time-picker-ampm button {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-sub);
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.time-picker-ampm button.active {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: white;
+}
+.time-picker-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-bottom: 5px;
+}
+.time-picker-grid {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.time-picker-grid.hour-grid { grid-template-columns: repeat(6, 1fr); }
+.time-picker-grid.min-grid  { grid-template-columns: repeat(6, 1fr); }
+.time-picker-grid button {
+  padding: 7px 2px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.12s;
+  text-align: center;
+}
+.time-picker-grid button:hover {
+  border-color: var(--teal-deep);
+  color: var(--teal-deep);
+}
+.time-picker-grid button.active {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: white;
+}
+.time-picker-preview {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--teal-deep);
+  margin-bottom: 8px;
+  padding: 8px;
+  background: rgba(0,206,201,0.08);
+  border-radius: var(--radius-sm);
+}
+.time-picker-confirm {
+  width: 100%;
+  padding: 9px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--teal-deep);
+  color: white;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* =====================================================
+   🆕 추가: 수강료 상세 입력
+   ===================================================== */
+.fee-detail-box {
+  display: none;
+  margin-top: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.fee-detail-box.show { display: block; }
+.fee-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.fee-amount-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  text-align: right;
+}
+.fee-unit { font-size: 0.9rem; font-weight: 700; color: var(--text-sub); }
+.fee-preview {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--teal-deep);
+  font-weight: 700;
+}
+
+/* =====================================================
+   🆕 추가: 정원/현원 검증
+   ===================================================== */
+.capacity-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.capacity-remain {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.capacity-remain.ok  { background: rgba(0,184,148,0.1); color: var(--green-deep); }
+.capacity-remain.warn{ background: rgba(214,48,49,0.08); color: var(--red-deep); }
+
+/* =====================================================
+   🆕 추가: 필수항목 표시
+   ===================================================== */
+.form-label .required { color: var(--red-deep); margin-left: 2px; }
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+  border-color: var(--red-deep) !important;
+  box-shadow: 0 0 0 2px rgba(214,48,49,0.15);
+}
+.form-error-msg {
+  font-size: 0.78rem;
+  color: var(--red-deep);
+  margin-top: 4px;
+  display: none;
+}
+.form-group.has-error .form-error-msg { display: block; }
+
+/* =====================================================
+   🆕 추가: 학생 현황 요약 박스
+   ===================================================== */
+.student-summary-box {
+  background: linear-gradient(135deg,
+    rgba(0,206,201,0.06), rgba(9,132,227,0.06));
+  border: 1px solid rgba(0,206,201,0.2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.student-summary-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--teal-deep);
+  margin-bottom: 10px;
+}
+.student-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.student-summary-item {
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px;
+}
+.student-summary-num {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.student-summary-lbl {
+  font-size: 0.68rem;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+.student-day-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.student-day-chip {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(0,206,201,0.1);
+  color: var(--teal-deep);
+}
+
+/* =====================================================
+   🆕 추가: 요일 칩 (학부모 카드 표시)
+   ===================================================== */
+.day-chip {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: rgba(0,206,201,0.1);
+  color: var(--teal-deep);
+  margin-right: 3px;
+}
+.day-chip.weekend {
+  background: rgba(253,203,110,0.2);
+  color: #c0823a;
+}
+
+/* =====================================================
+   🆕 추가: 시간 12시간제 표시
+   ===================================================== */
+.time-display-12h {
+  font-size: 0.88rem;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
   </style>
 </head>
 <body>
@@ -1031,15 +1346,31 @@
     </div>
   </div>
 
-<!-- 모달: 프로그램 -->
-<div id="modal-prog" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-prog')">
+<!-- 모달: 프로그램 (🆕 전체 개선) -->
+<div id="modal-prog" class="modal-overlay"
+     onclick="if(event.target===this)closeModal('modal-prog')">
   <div class="modal-content">
     <div class="modal-title" id="modal-prog-title">프로그램 추가</div>
-    <div class="form-group"><label class="form-label">프로그램명</label><input type="text" id="mp-name"></div>
 
-    <div class="form-group">
-      <label class="form-label">분류</label>
-      <select id="mp-category-select" onchange="syncCombo('mp-category-select','mp-category-custom','mp-category')">
+    <!-- 프로그램명 (필수) -->
+    <div class="form-group" id="fg-mp-name">
+      <label class="form-label">
+        프로그램명 <span class="required">*</span>
+      </label>
+      <input type="text" id="mp-name" placeholder="예: 로봇코딩 기초반">
+      <div class="form-error-msg">프로그램명을 입력해주세요.</div>
+    </div>
+
+    <!-- 분류 (기존 콤보박스 유지) -->
+    <div class="form-group" id="fg-mp-category">
+      <label class="form-label">
+        분류 <span class="required">*</span>
+      </label>
+      <select id="mp-category-select"
+              onchange="syncCombo(
+                'mp-category-select',
+                'mp-category-custom',
+                'mp-category')">
         <option value="">선택</option>
         <option>코딩/AI</option>
         <option>미술/공예</option>
@@ -1050,61 +1381,192 @@
         <option>돌봄</option>
         <option value="__direct__">직접입력...</option>
       </select>
-      <input type="text" id="mp-category-custom" placeholder="직접 입력" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-category-custom','mp-category')">
+      <input type="text" id="mp-category-custom"
+             placeholder="직접 입력"
+             style="display:none;margin-top:6px;"
+             oninput="onCustomInput('mp-category-custom','mp-category')">
       <input type="hidden" id="mp-category">
+      <div class="form-error-msg">분류를 선택해주세요.</div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">대상학년</label>
-      <select id="mp-grade-select" onchange="syncCombo('mp-grade-select','mp-grade-custom','mp-grade')">
-        <option value="">선택</option>
-        <option>1학년</option>
-        <option>2학년</option>
-        <option>3학년</option>
-        <option>4학년</option>
-        <option>5학년</option>
-        <option>6학년</option>
-        <option>1~2학년</option>
-        <option>1~3학년</option>
-        <option>3~6학년</option>
-        <option>전학년</option>
-        <option value="__direct__">직접입력...</option>
-      </select>
-      <input type="text" id="mp-grade-custom" placeholder="직접 입력 예: 2~4학년" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-grade-custom','mp-grade')">
+    <!-- 🆕 대상학년 — 버튼 토글 다중선택 -->
+    <div class="form-group" id="fg-mp-grade">
+      <label class="form-label">
+        대상학년 <span class="required">*</span>
+      </label>
+      <div class="toggle-btn-group" id="mp-grade-btns">
+        <button type="button" class="toggle-btn"
+                data-val="1" onclick="toggleGrade(1)">1학년</button>
+        <button type="button" class="toggle-btn"
+                data-val="2" onclick="toggleGrade(2)">2학년</button>
+        <button type="button" class="toggle-btn"
+                data-val="3" onclick="toggleGrade(3)">3학년</button>
+        <button type="button" class="toggle-btn"
+                data-val="4" onclick="toggleGrade(4)">4학년</button>
+        <button type="button" class="toggle-btn"
+                data-val="5" onclick="toggleGrade(5)">5학년</button>
+        <button type="button" class="toggle-btn"
+                data-val="6" onclick="toggleGrade(6)">6학년</button>
+        <button type="button" class="toggle-btn all-btn"
+                onclick="toggleGradeAll()">전학년</button>
+      </div>
+      <div class="toggle-result" id="mp-grade-result">
+        학년을 선택하세요
+      </div>
       <input type="hidden" id="mp-grade">
+      <div class="form-error-msg">대상학년을 선택해주세요.</div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">요일</label>
-      <select id="mp-day-select" onchange="syncCombo('mp-day-select','mp-day-custom','mp-day')">
-        <option value="">선택</option>
-        <option>월</option>
-        <option>화</option>
-        <option>수</option>
-        <option>목</option>
-        <option>금</option>
-        <option>토</option>
-        <option>월,수</option>
-        <option>화,목</option>
-        <option>월,수,금</option>
-        <option>화,목,토</option>
-        <option value="__direct__">직접입력...</option>
-      </select>
-      <input type="text" id="mp-day-custom" placeholder="직접 입력 예: 월,화,수" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-day-custom','mp-day')">
+    <!-- 🆕 요일 — 버튼 토글 다중선택 -->
+    <div class="form-group" id="fg-mp-day">
+      <label class="form-label">
+        운영 요일 <span class="required">*</span>
+      </label>
+      <div class="toggle-btn-group" id="mp-day-btns">
+        <button type="button" class="toggle-btn"
+                data-val="월" onclick="toggleProgDay('월')">월</button>
+        <button type="button" class="toggle-btn"
+                data-val="화" onclick="toggleProgDay('화')">화</button>
+        <button type="button" class="toggle-btn"
+                data-val="수" onclick="toggleProgDay('수')">수</button>
+        <button type="button" class="toggle-btn"
+                data-val="목" onclick="toggleProgDay('목')">목</button>
+        <button type="button" class="toggle-btn"
+                data-val="금" onclick="toggleProgDay('금')">금</button>
+        <button type="button" class="toggle-btn"
+                data-val="토" onclick="toggleProgDay('토')">토</button>
+        <button type="button" class="toggle-btn"
+                data-val="일" onclick="toggleProgDay('일')">일</button>
+      </div>
+      <div class="toggle-result" id="mp-day-result">
+        요일을 선택하세요
+      </div>
       <input type="hidden" id="mp-day">
+      <div class="form-error-msg">운영 요일을 선택해주세요.</div>
     </div>
 
+    <!-- 🆕 시작·종료 시간 — 커스텀 Time Picker -->
     <div class="form-row">
-      <div class="form-group"><label class="form-label">시작시간</label><input type="time" id="mp-start"></div>
-      <div class="form-group"><label class="form-label">종료시간</label><input type="time" id="mp-end"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">정원</label><input type="number" id="mp-capacity"></div>
-      <div class="form-group"><label class="form-label">현원</label><input type="number" id="mp-current"></div>
+      <div class="form-group" id="fg-mp-start">
+        <label class="form-label">
+          시작 시간 <span class="required">*</span>
+        </label>
+        <div class="time-picker-wrap">
+          <div class="time-picker-display"
+               id="mp-start-display"
+               onclick="openTimePicker('mp-start')">
+            <span id="mp-start-display-text"
+                  style="color:var(--text-sub);">
+              시간 선택
+            </span>
+            <span>🕐</span>
+          </div>
+          <div class="time-picker-panel" id="tp-mp-start">
+            <div class="time-picker-ampm">
+              <button type="button" id="tp-mp-start-am"
+                      class="active"
+                      onclick="setTimePicker('mp-start','ampm','am')">
+                오전
+              </button>
+              <button type="button" id="tp-mp-start-pm"
+                      onclick="setTimePicker('mp-start','ampm','pm')">
+                오후
+              </button>
+            </div>
+            <div class="time-picker-label">시</div>
+            <div class="time-picker-grid hour-grid"
+                 id="tp-mp-start-hours"></div>
+            <div class="time-picker-label">분</div>
+            <div class="time-picker-grid min-grid"
+                 id="tp-mp-start-mins"></div>
+            <div class="time-picker-preview"
+                 id="tp-mp-start-preview">--:--</div>
+            <button type="button" class="time-picker-confirm"
+                    onclick="confirmTimePicker('mp-start')">
+              ✓ 확인
+            </button>
+          </div>
+        </div>
+        <input type="hidden" id="mp-start">
+        <div class="form-error-msg">시작 시간을 선택해주세요.</div>
+      </div>
+
+      <div class="form-group" id="fg-mp-end">
+        <label class="form-label">
+          종료 시간 <span class="required">*</span>
+        </label>
+        <div class="time-picker-wrap">
+          <div class="time-picker-display"
+               id="mp-end-display"
+               onclick="openTimePicker('mp-end')">
+            <span id="mp-end-display-text"
+                  style="color:var(--text-sub);">
+              시간 선택
+            </span>
+            <span>🕐</span>
+          </div>
+          <div class="time-picker-panel" id="tp-mp-end">
+            <div class="time-picker-ampm">
+              <button type="button" id="tp-mp-end-am"
+                      class="active"
+                      onclick="setTimePicker('mp-end','ampm','am')">
+                오전
+              </button>
+              <button type="button" id="tp-mp-end-pm"
+                      onclick="setTimePicker('mp-end','ampm','pm')">
+                오후
+              </button>
+            </div>
+            <div class="time-picker-label">시</div>
+            <div class="time-picker-grid hour-grid"
+                 id="tp-mp-end-hours"></div>
+            <div class="time-picker-label">분</div>
+            <div class="time-picker-grid min-grid"
+                 id="tp-mp-end-mins"></div>
+            <div class="time-picker-preview"
+                 id="tp-mp-end-preview">--:--</div>
+            <button type="button" class="time-picker-confirm"
+                    onclick="confirmTimePicker('mp-end')">
+              ✓ 확인
+            </button>
+          </div>
+        </div>
+        <input type="hidden" id="mp-end">
+        <div class="form-error-msg">종료 시간을 선택해주세요.</div>
+      </div>
     </div>
 
+    <!-- 🆕 정원/현원 — 잔여 자동 계산 + 검증 -->
     <div class="form-group">
-      <label class="form-label">상태</label>
+      <label class="form-label">정원 / 현원</label>
+      <div class="capacity-row">
+        <div style="flex:1;">
+          <input type="number" id="mp-capacity"
+                 placeholder="정원"
+                 min="1"
+                 oninput="updateCapacityDisplay()">
+        </div>
+        <div style="flex:1;">
+          <input type="number" id="mp-current"
+                 placeholder="현원"
+                 min="0"
+                 oninput="updateCapacityDisplay()">
+        </div>
+        <div class="capacity-remain" id="mp-remain-badge"
+             style="display:none;">
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-sub);
+                  margin-top:4px;">
+        ※ 현원 \geq 정원이면 상태를 '마감'으로 변경해주세요.
+      </div>
+    </div>
+
+    <!-- 상태 -->
+    <div class="form-group">
+      <label class="form-label">
+        모집 상태 <span class="required">*</span>
+      </label>
       <select id="mp-status">
         <option>모집중</option>
         <option>마감</option>
@@ -1113,30 +1575,237 @@
       </select>
     </div>
 
+    <!-- 🆕 수강료 — 무료/유료 선택 후 상세 입력 -->
     <div class="form-group">
       <label class="form-label">수강료</label>
-      <select id="mp-fee-select" onchange="syncCombo('mp-fee-select','mp-fee-custom','mp-fee')">
-        <option value="">선택</option>
-        <option>무료</option>
-        <option>유료</option>
-        <option value="__direct__">직접입력...</option>
-      </select>
-      <input type="text" id="mp-fee-custom" placeholder="직접 입력 예: 월 30,000원" style="display:none;margin-top:6px;" oninput="onCustomInput('mp-fee-custom','mp-fee')">
+      <div class="toggle-btn-group">
+        <button type="button" class="toggle-btn all-btn"
+                id="fee-btn-free"
+                onclick="setFeeType('free')">
+          🆓 무료
+        </button>
+        <button type="button" class="toggle-btn all-btn"
+                id="fee-btn-paid"
+                onclick="setFeeType('paid')">
+          💰 유료
+        </button>
+      </div>
+      <div class="fee-detail-box" id="fee-detail-box">
+        <div class="fee-row">
+          <select id="fee-cycle"
+                  style="width:90px;padding:9px 8px;
+                         border:1px solid var(--input-border);
+                         border-radius:var(--radius-sm);
+                         background:var(--surface);
+                         color:var(--text);"
+                  onchange="updateFeePreview()">
+            <option value="월">월납</option>
+            <option value="분기">분기납</option>
+            <option value="연">연납</option>
+            <option value="1회">1회</option>
+          </select>
+          <input type="number" class="fee-amount-input"
+                 id="fee-amount"
+                 placeholder="금액"
+                 min="0"
+                 oninput="updateFeePreview()">
+          <span class="fee-unit">원</span>
+        </div>
+        <div class="fee-preview" id="fee-preview"></div>
+      </div>
       <input type="hidden" id="mp-fee">
     </div>
 
-    <div class="form-group"><label class="form-label">설명</label><textarea id="mp-desc"></textarea></div>
-    <div class="form-group"><label class="form-label">비고</label><input type="text" id="mp-note"></div>
+    <!-- 설명 / 비고 -->
+    <div class="form-group">
+      <label class="form-label">설명</label>
+      <textarea id="mp-desc"
+                placeholder="프로그램 소개, 준비물 등을 입력하세요.">
+      </textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">비고</label>
+      <input type="text" id="mp-note"
+             placeholder="기타 안내사항">
+    </div>
+
     <div style="display:flex;gap:8px;">
-      <button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-prog')">취소</button>
-      <button class="btn-action teal" style="flex:2;" onclick="saveProg()">저장</button>
+      <button class="btn-action gray" style="flex:1;"
+              onclick="closeModal('modal-prog')">
+        취소
+      </button>
+      <button class="btn-action teal" style="flex:2;"
+              onclick="saveProg()">
+        저장
+      </button>
     </div>
   </div>
 </div>
 
-  <!-- 모달: 학생 -->
-  <div id="modal-student" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-student')"><div class="modal-content"><div class="modal-title" id="modal-student-title">학생 추가</div><div class="form-row"><div class="form-group"><label class="form-label">학년</label><input type="number" id="ms-grade" min="1" max="6"></div><div class="form-group"><label class="form-label">반</label><input type="number" id="ms-class" min="1" max="10"></div></div><div class="form-group"><label class="form-label">이름</label><input type="text" id="ms-name"></div><div class="form-group" id="ms-org-group" style="display:none;"><label class="form-label">기관</label><select id="ms-org"><option value="">선택</option></select></div><div class="form-group"><label class="form-label">프로그램</label><select id="ms-prog"><option value="">선택</option></select></div><div class="form-group"><label class="form-label">이용요일</label><input type="text" id="ms-day" placeholder="예: 화,목"></div><div class="form-group"><label class="form-label">보호자 연락처</label><input type="text" id="ms-contact" placeholder="010-0000-0000"></div><div class="form-row"><div class="form-group"><label class="form-label">등원방법</label><select id="ms-arrival"><option value="">선택</option><option>기관차량</option><option>스쿨버스</option><option>학부모 동행</option><option>도보(자율)</option><option>사설학원차량</option></select></div><div class="form-group"><label class="form-label">하원방법</label><select id="ms-dismissal"><option value="">선택</option><option>기관차량</option><option>스쿨버스</option><option>학부모 동행</option><option>도보(자율)</option><option>사설학원차량</option></select></div></div><div class="form-group"><label class="form-label">비고</label><input type="text" id="ms-note"></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-student')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveStudent()">저장</button></div></div></div>
+<!-- 모달: 학생 (🆕 전체 개선) -->
+<div id="modal-student" class="modal-overlay"
+     onclick="if(event.target===this)closeModal('modal-student')">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-student-title">학생 추가</div>
 
+    <!-- 🆕 학년/반 드롭박스 -->
+    <div class="form-row">
+      <div class="form-group" id="fg-ms-grade">
+        <label class="form-label">
+          학년 <span class="required">*</span>
+        </label>
+        <select id="ms-grade">
+          <option value="">선택</option>
+          <option value="1">1학년</option>
+          <option value="2">2학년</option>
+          <option value="3">3학년</option>
+          <option value="4">4학년</option>
+          <option value="5">5학년</option>
+          <option value="6">6학년</option>
+        </select>
+        <div class="form-error-msg">학년을 선택해주세요.</div>
+      </div>
+      <div class="form-group" id="fg-ms-class">
+        <label class="form-label">
+          반 <span class="required">*</span>
+        </label>
+        <select id="ms-class">
+          <option value="">선택</option>
+          <option value="1">1반</option>
+          <option value="2">2반</option>
+          <option value="3">3반</option>
+          <option value="4">4반</option>
+          <option value="5">5반</option>
+          <option value="6">6반</option>
+          <option value="7">7반</option>
+          <option value="8">8반</option>
+          <option value="9">9반</option>
+          <option value="10">10반</option>
+        </select>
+        <div class="form-error-msg">반을 선택해주세요.</div>
+      </div>
+    </div>
+
+    <!-- 이름 -->
+    <div class="form-group" id="fg-ms-name">
+      <label class="form-label">
+        이름 <span class="required">*</span>
+      </label>
+      <input type="text" id="ms-name" placeholder="홍길동">
+      <div class="form-error-msg">이름을 입력해주세요.</div>
+    </div>
+
+    <!-- 기관 선택 (관리자 모드에서만 표시) -->
+    <div class="form-group" id="ms-org-group" style="display:none;">
+      <label class="form-label">
+        기관 <span class="required">*</span>
+      </label>
+      <select id="ms-org" onchange="onStudentOrgChange()">
+        <option value="">선택</option>
+      </select>
+    </div>
+
+    <!-- 🆕 프로그램 선택 → 요일 자동채움 연동 -->
+    <div class="form-group">
+      <label class="form-label">프로그램</label>
+      <select id="ms-prog" onchange="onStudentProgChange()">
+        <option value="">선택</option>
+      </select>
+      <!-- 프로그램 선택 시 운영시간 참고 표시 -->
+      <div id="ms-prog-info"
+           style="display:none;margin-top:6px;font-size:0.8rem;
+                  color:var(--teal-deep);font-weight:600;
+                  background:rgba(0,206,201,0.08);
+                  border-radius:var(--radius-sm);padding:6px 10px;">
+      </div>
+    </div>
+
+    <!-- 🆕 이용요일 — 버튼 토글 + 경고 -->
+    <div class="form-group" id="fg-ms-day">
+      <label class="form-label">이용요일</label>
+      <div class="toggle-btn-group" id="ms-day-btns">
+        <button type="button" class="toggle-btn"
+                data-val="월" onclick="toggleStudentDay('월')">월</button>
+        <button type="button" class="toggle-btn"
+                data-val="화" onclick="toggleStudentDay('화')">화</button>
+        <button type="button" class="toggle-btn"
+                data-val="수" onclick="toggleStudentDay('수')">수</button>
+        <button type="button" class="toggle-btn"
+                data-val="목" onclick="toggleStudentDay('목')">목</button>
+        <button type="button" class="toggle-btn"
+                data-val="금" onclick="toggleStudentDay('금')">금</button>
+        <button type="button" class="toggle-btn"
+                data-val="토" onclick="toggleStudentDay('토')">토</button>
+        <button type="button" class="toggle-btn"
+                data-val="일" onclick="toggleStudentDay('일')">일</button>
+      </div>
+      <div class="toggle-result" id="ms-day-result">
+        요일을 선택하세요
+      </div>
+      <!-- 🆕 등록 요일 불일치 경고 -->
+      <div class="toggle-warn" id="ms-day-warn">
+        ⚠️ 프로그램 운영 요일(<span id="ms-day-warn-days"></span>)과
+        다른 요일이 포함되어 있습니다.
+      </div>
+      <input type="hidden" id="ms-day">
+    </div>
+
+    <!-- 🆕 보호자 연락처 — 자동 하이픈 -->
+    <div class="form-group">
+      <label class="form-label">보호자 연락처</label>
+      <input type="text" id="ms-contact"
+             placeholder="01012345678"
+             maxlength="13"
+             oninput="autoHyphenPhone(this)">
+      <div style="font-size:0.75rem;color:var(--text-sub);margin-top:3px;">
+        숫자만 입력하면 자동으로 하이픈이 추가됩니다.
+      </div>
+    </div>
+
+    <!-- 등원/하원 방법 -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">등원방법</label>
+        <select id="ms-arrival">
+          <option value="">선택</option>
+          <option>기관차량</option>
+          <option>스쿨버스</option>
+          <option>학부모 동행</option>
+          <option>도보(자율)</option>
+          <option>사설학원차량</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">하원방법</label>
+        <select id="ms-dismissal">
+          <option value="">선택</option>
+          <option>기관차량</option>
+          <option>스쿨버스</option>
+          <option>학부모 동행</option>
+          <option>도보(자율)</option>
+          <option>사설학원차량</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 비고 -->
+    <div class="form-group">
+      <label class="form-label">비고</label>
+      <input type="text" id="ms-note" placeholder="특이사항 등">
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn-action gray" style="flex:1;"
+              onclick="closeModal('modal-student')">
+        취소
+      </button>
+      <button class="btn-action teal" style="flex:2;"
+              onclick="saveStudent()">
+        저장
+      </button>
+    </div>
+  </div>
+</div>
   <!-- 모달: 공지 -->
   <div id="modal-notice" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-notice')"><div class="modal-content"><div class="modal-title" id="modal-notice-title">공지사항 작성</div><div class="form-group"><label class="form-label">제목</label><input type="text" id="mn-title"></div><div class="form-group"><label class="form-label">내용</label><textarea id="mn-content" style="min-height:120px;"></textarea></div><div class="form-group"><label class="form-label">상태</label><select id="mn-status"><option>게시중</option><option>종료</option></select></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-notice')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveNotice()">저장</button></div></div></div>
 
@@ -1747,103 +2416,137 @@ function renderProgList(){
   area.innerHTML=h;
 }
 
+// 🆕 24시간 → 12시간제 변환 헬퍼
+function to12h(timeStr) {
+  if (!timeStr) return '';
+  var m = String(timeStr).match(/(\d{1,2}):(\d{2})/);
+  if (!m) return timeStr;
+  var h = parseInt(m[1]);
+  var min = m[2];
+  var ampm = h < 12 ? '오전' : '오후';
+  var h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return ampm + ' ' + h12 + ':' + min;
+}
+
+// 🆕 요일 문자열 → 칩 HTML 변환 헬퍼
+function dayChipsHtml(dayStr) {
+  if (!dayStr) return '';
+  var days = parseDays(dayStr);
+  return days.map(function(d) {
+    var isWeekend = d === '토' || d === '일';
+    return '<span class="day-chip' +
+           (isWeekend ? ' weekend' : '') +
+           '">' + d + '</span>';
+  }).join('');
+}
+
 function buildPCard(g) {
   var p = g.info;
   var cat = getCat(p.category);
   var org = allOrgs.find(function(o) { return o.name === p.orgName; });
-  var orgType = org ? (org.type === '학교밖 늘봄' ? '학교밖 늘봄' : '지역사회 돌봄') : '';
+  var orgType = org
+    ? (org.type === '학교밖 늘봄' ? '학교밖 늘봄' : '지역사회 돌봄')
+    : '';
   var hasTransport = org && org.transport === '있음';
 
-  // 모집 상태 설정
+  // 모집 상태
   var statusCls = '';
   var statusLabel = '';
-  if (p.status === '모집중')    { statusCls = 'open';       statusLabel = '🟢 모집중'; }
-  else if (p.status === '마감') { statusCls = 'closed';     statusLabel = '🔴 마감'; }
-  else if (p.status === '대기접수') { statusCls = 'wait';   statusLabel = '🟡 대기접수'; }
-  else if (p.status === '준비중')   { statusCls = 'preparing'; statusLabel = '⚪ 준비중'; }
+  if (p.status === '모집중')      { statusCls = 'open';       statusLabel = '🟢 모집중'; }
+  else if (p.status === '마감')   { statusCls = 'closed';     statusLabel = '🔴 마감'; }
+  else if (p.status === '대기접수') { statusCls = 'wait';    statusLabel = '🟡 대기접수'; }
+  else if (p.status === '준비중') { statusCls = 'preparing';  statusLabel = '⚪ 준비중'; }
   else { statusCls = 'preparing'; statusLabel = p.status || ''; }
 
-  // 잔여 인원 계산
+  // 잔여 인원
   var remainHtml = '';
   if (p.capacity) {
     var cap = parseInt(p.capacity) || 0;
-    var cur = parseInt(p.current) || 0;
+    var cur = parseInt(p.current)  || 0;
     var rem = cap - cur;
     if (rem > 0) {
-      remainHtml = '<span class="p-card-remain">잔여 ' + rem + '명</span>';
+      remainHtml =
+        '<span class="p-card-remain">잔여 ' + rem + '명</span>';
     } else {
-      remainHtml = '<span class="p-card-remain none">' + cur + '/' + cap + '명</span>';
+      remainHtml =
+        '<span class="p-card-remain none">' +
+        cur + '/' + cap + '명</span>';
     }
   }
 
-  // 요일·시간 한 줄로
+  // 🆕 요일 칩 + 12시간제 시간 조합
   var scheduleLines = [];
   g.schedules.forEach(function(s) {
-    var line = esc(s.day || '');
-    if (s.start) line += '  ' + esc(s.start) + '~' + esc(s.end);
-    if (line) scheduleLines.push(line);
+    if (!s.day && !s.start) return;
+    var chips = dayChipsHtml(s.day);
+    var timeStr = '';
+    if (s.start) {
+      timeStr = to12h(s.start) + ' ~ ' + to12h(s.end);
+    }
+    scheduleLines.push({ chips: chips, time: timeStr });
   });
-  var scheduleText = scheduleLines.join(' / ');
 
-  // 카드 왼쪽 컬러 라인 (카테고리 색상 유지)
-  var cardBorder = 'border-left: 4px solid ' + (cat.color || '#636e72') + ';';
+  var cardBorder =
+    'border-left: 4px solid ' + (cat.color || '#636e72') + ';';
 
   var h = '';
-  h += '<div class="p-card" style="' + cardBorder + '" onclick="openOrgDetailFrom(\'' + esc(p.orgName).replace(/'/g, "\\'") + '\')">';
+  h += '<div class="p-card" style="' + cardBorder + '"' +
+       ' onclick="openOrgDetailFrom(\'' +
+       esc(p.orgName).replace(/'/g, "\\'") + '\')">';
 
-  // ① 상단: 모집 상태 뱃지 + 잔여 인원
-  h += '  <div class="p-card-header-bar">';
-  if (statusLabel) {
-    h += '    <span class="p-card-status-badge ' + statusCls + '">' + statusLabel + '</span>';
-  } else {
-    h += '    <span></span>';
+  // 상단: 모집상태 + 잔여인원
+  h += '<div class="p-card-header-bar">';
+  h += statusLabel
+    ? '<span class="p-card-status-badge ' + statusCls + '">' +
+      statusLabel + '</span>'
+    : '<span></span>';
+  h += remainHtml;
+  h += '</div>';
+
+  // 프로그램명 + 기관명
+  h += '<div class="p-card-main">';
+  h += '<div class="p-card-name">' +
+       cat.icon + ' ' + esc(p.name) + '</div>';
+  h += '<div class="p-card-org">📍 ' + esc(p.orgName);
+  if (orgType) {
+    h += ' <span style="color:var(--border);margin:0 2px;">·</span> ' +
+         orgType;
   }
-  h += '    ' + remainHtml;
-  h += '  </div>';
+  h += '</div>';
+  h += '</div>';
 
-  // ② 프로그램명 + 기관명
-  h += '  <div class="p-card-main">';
-  h += '    <div class="p-card-name">' + cat.icon + ' ' + esc(p.name) + '</div>';
-  h += '    <div class="p-card-org">';
-  h += '      📍 ' + esc(p.orgName);
-  if (orgType) h += ' <span style="color:var(--border);margin:0 2px;">·</span> ' + orgType;
-  h += '    </div>';
-  h += '  </div>';
+  // 🆕 요일 칩 + 12시간제 시간 표시
+  h += '<div class="p-card-summary">';
+  scheduleLines.forEach(function(sl) {
+    h += '<div class="p-card-time">';
+    h += '<span class="p-card-time-icon">📅</span>';
+    h += '<span>' + sl.chips + '</span>';
+    if (sl.time) {
+      h += '<span style="font-size:0.82rem;color:var(--text-sub);' +
+           'margin-left:4px;">' + sl.time + '</span>';
+    }
+    h += '</div>';
+  });
 
-  // ③ 핵심 정보 요약
-  h += '  <div class="p-card-summary">';
-
-  // 요일·시간 (굵게)
-  if (scheduleText) {
-    h += '    <div class="p-card-time">';
-    h += '      <span class="p-card-time-icon">📅</span>';
-    h += '      ' + scheduleText;
-    h += '    </div>';
-  }
-
-  // 대상학년 · 수강료 한 줄
-  h += '    <div class="p-card-meta">';
-
+  h += '<div class="p-card-meta">';
   if (vp(p.grade)) {
-    h += '      <span class="p-card-meta-item">🎓 ' + esc(p.grade) + '</span>';
+    h += '<span class="p-card-meta-item">🎓 ' +
+         esc(p.grade) + '</span>';
   }
-
   if (vp(p.grade) && vp(p.fee)) {
-    h += '      <span class="p-card-meta-divider"></span>';
+    h += '<span class="p-card-meta-divider"></span>';
   }
-
   if (vp(p.fee)) {
-    h += '      <span class="p-card-meta-item">💰 ' + esc(p.fee) + '</span>';
+    h += '<span class="p-card-meta-item">💰 ' +
+         esc(p.fee) + '</span>';
   }
-
   if (hasTransport) {
-    h += '      <span class="p-card-meta-divider"></span>';
-    h += '      <span class="p-card-meta-item" style="color:var(--orange-deep);">🚌 통학</span>';
+    h += '<span class="p-card-meta-divider"></span>';
+    h += '<span class="p-card-meta-item" ' +
+         'style="color:var(--orange-deep);">🚌 통학</span>';
   }
-
-  h += '    </div>';
-  h += '  </div>';
-
+  h += '</div>';
+  h += '</div>';
   h += '</div>';
 
   return h;
@@ -3093,38 +3796,75 @@ function renderOrgProgs() { var list = document.getElementById('org-prog-list');
 
 function openProgModal(ri) {
   editProgRow = ri || null;
-  document.getElementById('modal-prog-title').innerText = editProgRow ? '프로그램 수정' : '프로그램 추가';
+  document.getElementById('modal-prog-title').innerText =
+    editProgRow ? '프로그램 수정' : '프로그램 추가';
 
   // 일반 필드 초기화
-  ['name', 'start', 'end', 'capacity', 'current', 'desc', 'note'].forEach(function(f) {
-    var el = document.getElementById('mp-' + f);
+  ['mp-name', 'mp-desc', 'mp-note'].forEach(function(id) {
+    var el = document.getElementById(id);
     if (el) el.value = '';
   });
   document.getElementById('mp-status').value = '모집중';
+  document.getElementById('mp-capacity').value = '';
+  document.getElementById('mp-current').value = '';
+  document.getElementById('mp-remain-badge').style.display = 'none';
 
-  // 콤보박스 초기화
-  restoreCombo('mp-category-select', 'mp-category-custom', 'mp-category', '');
-  restoreCombo('mp-grade-select',    'mp-grade-custom',    'mp-grade',    '');
-  restoreCombo('mp-day-select',      'mp-day-custom',      'mp-day',      '');
-  restoreCombo('mp-fee-select',      'mp-fee-custom',      'mp-fee',      '');
+  // 분류 콤보박스 초기화
+  restoreCombo(
+    'mp-category-select',
+    'mp-category-custom',
+    'mp-category', '');
 
-  if (editProgRow && orgDashData.programs) {
-    var p = orgDashData.programs.find(function(x) { return x.rowIndex === editProgRow; });
+  // 🆕 학년 토글 초기화
+  resetGradeToggle();
+
+  // 🆕 요일 토글 초기화
+  resetProgDayToggle();
+
+  // 🆕 Time Picker 초기화
+  resetTimePicker('mp-start');
+  resetTimePicker('mp-end');
+
+  // 🆕 수강료 초기화
+  resetFeeInput();
+
+  // 에러 상태 초기화
+  clearAllFormErrors('modal-prog');
+
+  // 수정 모드: 기존값 복원
+  if (editProgRow && orgDashData && orgDashData.programs) {
+    var p = orgDashData.programs.find(
+      function(x) { return x.rowIndex === editProgRow; });
     if (p) {
-      document.getElementById('mp-name').value      = p.name;
-      document.getElementById('mp-start').value     = p.startTime;
-      document.getElementById('mp-end').value       = p.endTime;
-      document.getElementById('mp-capacity').value  = p.capacity;
-      document.getElementById('mp-current').value   = p.current;
-      document.getElementById('mp-status').value    = p.status || '모집중';
-      document.getElementById('mp-desc').value      = p.description;
-      document.getElementById('mp-note').value      = p.note;
+      document.getElementById('mp-name').value    = p.name        || '';
+      document.getElementById('mp-status').value  = p.status      || '모집중';
+      document.getElementById('mp-desc').value    = p.description || '';
+      document.getElementById('mp-note').value    = p.note        || '';
+      document.getElementById('mp-capacity').value = p.capacity   || '';
+      document.getElementById('mp-current').value  = p.current    || '';
 
-      // 콤보박스 값 복원
-      restoreCombo('mp-category-select', 'mp-category-custom', 'mp-category', p.category);
-      restoreCombo('mp-grade-select',    'mp-grade-custom',    'mp-grade',    p.grade);
-      restoreCombo('mp-day-select',      'mp-day-custom',      'mp-day',      p.day);
-      restoreCombo('mp-fee-select',      'mp-fee-custom',      'mp-fee',      p.fee);
+      // 분류 복원
+      restoreCombo(
+        'mp-category-select',
+        'mp-category-custom',
+        'mp-category',
+        p.category || '');
+
+      // 🆕 학년 토글 복원
+      restoreGradeToggle(p.grade || '');
+
+      // 🆕 요일 토글 복원
+      restoreProgDayToggle(p.day || '');
+
+      // 🆕 Time Picker 복원
+      restoreTimePicker('mp-start', p.startTime || '');
+      restoreTimePicker('mp-end',   p.endTime   || '');
+
+      // 🆕 수강료 복원
+      restoreFeeInput(p.fee || '');
+
+      // 잔여인원 표시
+      updateCapacityDisplay();
     }
   }
 
@@ -3132,36 +3872,106 @@ function openProgModal(ri) {
 }
 
 function saveProg() {
-  var d = {};
+  // 🆕 필수항목 검증
+  var errors = [];
 
-  // 일반 필드
-  var m = {
-    name:        'mp-name',
-    startTime:   'mp-start',
-    endTime:     'mp-end',
-    capacity:    'mp-capacity',
-    current:     'mp-current',
-    status:      'mp-status',
-    description: 'mp-desc',
-    note:        'mp-note'
+  var name = document.getElementById('mp-name').value.trim();
+  if (!name) {
+    setFormError('fg-mp-name', true);
+    errors.push('mp-name');
+  } else {
+    setFormError('fg-mp-name', false);
+  }
+
+  var category = document.getElementById('mp-category').value;
+  if (!category) {
+    setFormError('fg-mp-category', true);
+    errors.push('mp-category');
+  } else {
+    setFormError('fg-mp-category', false);
+  }
+
+  var grade = document.getElementById('mp-grade').value;
+  if (!grade) {
+    setFormError('fg-mp-grade', true);
+    errors.push('mp-grade');
+  } else {
+    setFormError('fg-mp-grade', false);
+  }
+
+  var day = document.getElementById('mp-day').value;
+  if (!day) {
+    setFormError('fg-mp-day', true);
+    errors.push('mp-day');
+  } else {
+    setFormError('fg-mp-day', false);
+  }
+
+  var startTime = document.getElementById('mp-start').value;
+  if (!startTime) {
+    setFormError('fg-mp-start', true);
+    errors.push('mp-start');
+  } else {
+    setFormError('fg-mp-start', false);
+  }
+
+  var endTime = document.getElementById('mp-end').value;
+  if (!endTime) {
+    setFormError('fg-mp-end', true);
+    errors.push('mp-end');
+  } else {
+    setFormError('fg-mp-end', false);
+  }
+
+  if (errors.length > 0) {
+    showToast('⚠️ 필수 항목을 모두 입력해주세요.');
+    // 첫 번째 에러 항목으로 스크롤
+    var firstEl = document.getElementById(errors[0]);
+    if (firstEl) {
+      firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
+  // 🆕 현원 > 정원 경고
+  var cap = parseInt(document.getElementById('mp-capacity').value) || 0;
+  var cur = parseInt(document.getElementById('mp-current').value)  || 0;
+  var status = document.getElementById('mp-status').value;
+  if (cap > 0 && cur >= cap && status === '모집중') {
+    if (!confirm('현원이 정원 이상입니다.\n상태를 "마감"으로 변경하지 않고 저장하시겠습니까?')) {
+      return;
+    }
+  }
+
+  var d = {
+    name:        name,
+    category:    category,
+    grade:       grade,
+    day:         day,
+    startTime:   startTime,
+    endTime:     endTime,
+    capacity:    document.getElementById('mp-capacity').value,
+    current:     document.getElementById('mp-current').value,
+    status:      status,
+    fee:         document.getElementById('mp-fee').value,
+    description: document.getElementById('mp-desc').value,
+    note:        document.getElementById('mp-note').value
   };
-  for (var k in m) d[k] = document.getElementById(m[k]).value;
-
-  // 콤보박스 hidden 값으로 읽기
-  d['category'] = document.getElementById('mp-category').value;
-  d['grade']    = document.getElementById('mp-grade').value;
-  d['day']      = document.getElementById('mp-day').value;
-  d['fee']      = document.getElementById('mp-fee').value;
-
-  if (!d.name) { showToast('프로그램명을 입력하세요.'); return; }
 
   showLoading(true);
   closeModal('modal-prog');
 
-  var ok = function() { showLoading(false); showToast('✅ 저장!'); loadOrgDash('prog'); loadData(); };
-  var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
+  var ok = function() {
+    showLoading(false);
+    showToast('✅ 저장되었습니다!');
+    loadOrgDash('prog');
+    loadData();
+  };
+  var fail = function(e) {
+    showLoading(false);
+    showToast('❌ ' + e.message);
+  };
 
-  // 컬럼명 매핑 (프론트 → DB)
   var dbData = {
     org_name:    currentOrgName,
     name:        d.name,
@@ -3187,7 +3997,6 @@ function saveProg() {
       .then(ok).catch(fail);
   }
 }
-
 function deleteProg(ri) {
   if (!confirm('삭제하시겠습니까?')) return;
   showLoading(true);
@@ -3197,32 +4006,256 @@ function deleteProg(ri) {
 }
   
 // --- 학생 ---
-function renderOrgStudents() { var list = document.getElementById('org-student-list'); var students = orgDashData.students || []; var search = document.getElementById('org-student-search').value.trim(); var filtered = students.filter(function(s) { return !search || s.name.indexOf(search) !== -1; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>학생이 없습니다.</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">'; if (s.progName) h += '📋 ' + esc(s.progName) + ' | '; if (s.day) h += '📅 ' + esc(s.day) + '<br>'; if (s.contact) h += '📞 ' + esc(s.contact) + ' | '; h += '🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delOrgStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
+function renderOrgStudents() {
+  var list     = document.getElementById('org-student-list');
+  var students = orgDashData.students || [];
+  var search   = document.getElementById('org-student-search')
+                   .value.trim();
+  var filtered = students.filter(function(s) {
+    return !search || s.name.indexOf(search) !== -1;
+  });
 
-function openStudentModal(ri) { editStudentRow = ri || null; isAdminMode = false; document.getElementById('modal-student-title').innerText = editStudentRow ? '학생 수정' : '학생 추가'; document.getElementById('ms-org-group').style.display = 'none'; var ps = document.getElementById('ms-prog'); ps.innerHTML = '<option value="">프로그램 선택</option>'; var pn = {}; (orgDashData.programs || []).forEach(function(p) { if (!pn[p.name]) { pn[p.name] = true; var o = document.createElement('option'); o.value = p.name; o.text = p.name; ps.appendChild(o); } }); ['grade', 'class', 'name', 'day', 'contact', 'note'].forEach(function(f) { document.getElementById('ms-' + f).value = ''; }); document.getElementById('ms-arrival').value = ''; document.getElementById('ms-dismissal').value = ''; if (editStudentRow && orgDashData.students) { var s = orgDashData.students.find(function(x) { return x.rowIndex === editStudentRow; }); if (s) { document.getElementById('ms-grade').value = s.grade; document.getElementById('ms-class').value = s.classNum; document.getElementById('ms-name').value = s.name; document.getElementById('ms-prog').value = s.progName; document.getElementById('ms-day').value = s.day; document.getElementById('ms-contact').value = s.contact; document.getElementById('ms-arrival').value = s.arrival || ''; document.getElementById('ms-dismissal').value = s.dismissal || ''; document.getElementById('ms-note').value = s.note; } } document.getElementById('modal-student').style.display = 'flex'; }
+  // 🆕 현황 요약 박스
+  var summaryHtml = '';
+  if (students.length > 0) {
+    // 등하원 방법별 집계
+    var arrivalMap = {};
+    students.forEach(function(s) {
+      var key = s.arrival || '미입력';
+      arrivalMap[key] = (arrivalMap[key] || 0) + 1;
+    });
+    var dismissalMap = {};
+    students.forEach(function(s) {
+      var key = s.dismissal || '미입력';
+      dismissalMap[key] = (dismissalMap[key] || 0) + 1;
+    });
 
+    // 요일별 집계
+    var dayMap = { '월':0,'화':0,'수':0,'목':0,'금':0,'토':0,'일':0 };
+    students.forEach(function(s) {
+      if (!s.day) return;
+      parseDays(s.day).forEach(function(d) {
+        if (dayMap[d] !== undefined) dayMap[d]++;
+      });
+    });
+
+    summaryHtml  = '<div class="student-summary-box">';
+    summaryHtml += '<div class="student-summary-title">';
+    summaryHtml += '📊 이용 현황 요약</div>';
+
+    // 등원 방법 그리드
+    summaryHtml += '<div style="font-size:0.78rem;font-weight:700;';
+    summaryHtml += 'color:var(--text-sub);margin-bottom:6px;">';
+    summaryHtml += '🔵 등원 방법</div>';
+    summaryHtml += '<div class="student-summary-grid">';
+    var arrivalIcons = {
+      '기관차량':'🚌','스쿨버스':'🚍',
+      '학부모 동행':'👨‍👩‍👧','도보(자율)':'🚶',
+      '사설학원차량':'🚐','미입력':'❓'
+    };
+    Object.keys(arrivalMap).forEach(function(k) {
+      summaryHtml += '<div class="student-summary-item">';
+      summaryHtml += '<div class="student-summary-num" ';
+      summaryHtml += 'style="color:var(--teal-deep);">';
+      summaryHtml += arrivalMap[k] + '명</div>';
+      summaryHtml += '<div class="student-summary-lbl">';
+      summaryHtml += (arrivalIcons[k] || '') + ' ' + k + '</div>';
+      summaryHtml += '</div>';
+    });
+    summaryHtml += '</div>';
+
+    // 요일별 인원 칩
+    summaryHtml += '<div style="font-size:0.78rem;font-weight:700;';
+    summaryHtml += 'color:var(--text-sub);margin:8px 0 6px;">';
+    summaryHtml += '📅 요일별 이용 인원</div>';
+    summaryHtml += '<div class="student-day-chips">';
+    ['월','화','수','목','금','토','일'].forEach(function(d) {
+      if (dayMap[d] > 0) {
+        summaryHtml += '<span class="student-day-chip">';
+        summaryHtml += d + '요일 ' + dayMap[d] + '명</span>';
+      }
+    });
+    summaryHtml += '</div>';
+    summaryHtml += '</div>'; // summary-box 닫기
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = summaryHtml +
+      '<div class="empty-state">' +
+      '<div class="empty-icon">🧑‍🎓</div>' +
+      '학생이 없습니다.</div>';
+    return;
+  }
+
+  var h = summaryHtml;
+  h += '<div style="font-size:0.82rem;color:var(--text-sub);' +
+       'margin-bottom:8px;">총 ' + filtered.length + '명</div>';
+
+  filtered.forEach(function(s) {
+    // 🆕 요일 칩 표시
+    var dayHtml = s.day
+      ? dayChipsHtml(s.day)
+      : '<span style="color:var(--text-sub);">미입력</span>';
+
+    h += '<div class="student-row">';
+    h += '<div class="student-info">';
+    h += '<strong>' +
+         esc(s.grade) + '학년 ' +
+         esc(s.classNum) + '반 ' +
+         esc(s.name) + '</strong><br>';
+    h += '<span style="font-size:0.78rem;color:var(--text-sub);">';
+    if (s.progName) {
+      h += '📋 ' + esc(s.progName) + '<br>';
+    }
+    h += '📅 ' + dayHtml + '<br>';
+    if (s.contact) {
+      h += '📞 ' + esc(s.contact) + ' · ';
+    }
+    h += '🔵 ' + (vp(s.arrival)   || '미입력') + ' · ';
+    h += '🟠 ' + (vp(s.dismissal) || '미입력');
+    h += '</span></div>';
+    h += '<div class="student-actions">';
+    h += '<button class="btn-sm" ' +
+         'onclick="openStudentModal(' + s.rowIndex + ')">✏️</button>';
+    h += '<button class="btn-sm danger" ' +
+         'onclick="delOrgStudent(' + s.rowIndex + ')">🗑️</button>';
+    h += '</div></div>';
+  });
+
+  list.innerHTML = h;
+}
+function openStudentModal(ri) {
+  editStudentRow = ri || null;
+  isAdminMode    = false;
+  document.getElementById('modal-student-title').innerText =
+    editStudentRow ? '학생 수정' : '학생 추가';
+
+  // 기관 선택 숨김 (기관 담당자 모드)
+  document.getElementById('ms-org-group').style.display = 'none';
+
+  // 🆕 학년/반 드롭박스 초기화
+  document.getElementById('ms-grade').value = '';
+  document.getElementById('ms-class').value = '';
+
+  // 이름/연락처/비고 초기화
+  document.getElementById('ms-name').value    = '';
+  document.getElementById('ms-contact').value = '';
+  document.getElementById('ms-note').value    = '';
+
+  // 등하원 초기화
+  document.getElementById('ms-arrival').value   = '';
+  document.getElementById('ms-dismissal').value = '';
+
+  // 🆕 이용요일 토글 초기화
+  resetStudentDayToggle();
+
+  // 🆕 프로그램 목록 채우기 (기관 담당자 기준)
+  var ps = document.getElementById('ms-prog');
+  ps.innerHTML = '<option value="">프로그램 선택</option>';
+  var pn = {};
+  (orgDashData.programs || []).forEach(function(p) {
+    if (!pn[p.name]) {
+      pn[p.name] = true;
+      var o = document.createElement('option');
+      o.value = p.name;
+      o.text  = p.name;
+      ps.appendChild(o);
+    }
+  });
+
+  // 프로그램 참고 정보 숨김
+  document.getElementById('ms-prog-info').style.display = 'none';
+
+  // 에러 초기화
+  clearAllFormErrors('modal-student');
+
+  // 수정 모드: 기존값 복원
+  if (editStudentRow && orgDashData && orgDashData.students) {
+    var s = orgDashData.students.find(
+      function(x) { return x.rowIndex === editStudentRow; });
+    if (s) {
+      document.getElementById('ms-grade').value     = s.grade    || '';
+      document.getElementById('ms-class').value     = s.classNum || '';
+      document.getElementById('ms-name').value      = s.name     || '';
+      document.getElementById('ms-contact').value   = s.contact  || '';
+      document.getElementById('ms-arrival').value   = s.arrival  || '';
+      document.getElementById('ms-dismissal').value = s.dismissal|| '';
+      document.getElementById('ms-note').value      = s.note     || '';
+
+      // 🆕 프로그램 복원 후 연동
+      ps.value = s.progName || '';
+      onStudentProgChange();
+
+      // 🆕 이용요일 복원 (프로그램 연동 후)
+      restoreStudentDayToggle(s.day || '');
+    }
+  }
+
+  document.getElementById('modal-student').style.display = 'flex';
+}
 function saveStudent() {
+  // 🆕 필수항목 검증
+  var errors = [];
+
+  var grade = document.getElementById('ms-grade').value;
+  if (!grade) {
+    setFormError('fg-ms-grade', true);
+    errors.push('ms-grade');
+  } else {
+    setFormError('fg-ms-grade', false);
+  }
+
+  var classNum = document.getElementById('ms-class').value;
+  if (!classNum) {
+    setFormError('fg-ms-class', true);
+    errors.push('ms-class');
+  } else {
+    setFormError('fg-ms-class', false);
+  }
+
+  var name = document.getElementById('ms-name').value.trim();
+  if (!name) {
+    setFormError('fg-ms-name', true);
+    errors.push('ms-name');
+  } else {
+    setFormError('fg-ms-name', false);
+  }
+
+  if (errors.length > 0) {
+    showToast('⚠️ 필수 항목을 모두 입력해주세요.');
+    var firstEl = document.getElementById(errors[0]);
+    if (firstEl) {
+      firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
   var d = {
-    grade:     document.getElementById('ms-grade').value,
-    classNum:  document.getElementById('ms-class').value,
-    name:      document.getElementById('ms-name').value,
+    grade:     grade,
+    classNum:  classNum,
+    name:      name,
     progName:  document.getElementById('ms-prog').value,
-    day:       document.getElementById('ms-day').value,
+    day:       document.getElementById('ms-day').value, // 🆕 hidden input
     contact:   document.getElementById('ms-contact').value,
     arrival:   document.getElementById('ms-arrival').value,
     dismissal: document.getElementById('ms-dismissal').value,
     note:      document.getElementById('ms-note').value
   };
 
-  if (!d.grade || !d.name) { showToast('학년과 이름을 입력하세요.'); return; }
-
   showLoading(true);
   closeModal('modal-student');
 
-  var ok = function() { showLoading(false); showToast('✅ 저장!'); if (isAdminMode) loadAdminData('students'); else loadOrgDash('student'); };
-  var fail = function(e) { showLoading(false); showToast('❌ ' + e.message); };
+  var ok = function() {
+    showLoading(false);
+    showToast('✅ 저장되었습니다!');
+    if (isAdminMode) loadAdminData('students');
+    else loadOrgDash('student');
+  };
+  var fail = function(e) {
+    showLoading(false);
+    showToast('❌ ' + e.message);
+  };
 
-  // 컬럼명 매핑 (프론트 → DB)
   var orgName = isAdminMode
     ? document.getElementById('ms-org').value
     : currentOrgName;
@@ -3247,9 +4280,11 @@ function saveStudent() {
   };
 
   if (editStudentRow) {
-    sbUpdate('students', 'id=eq.' + editStudentRow, dbData).then(ok).catch(fail);
+    sbUpdate('students', 'id=eq.' + editStudentRow, dbData)
+      .then(ok).catch(fail);
   } else {
-    sbInsert('students', dbData).then(ok).catch(fail);
+    sbInsert('students', dbData)
+      .then(ok).catch(fail);
   }
 }
 
@@ -3455,7 +4490,81 @@ function renderAdmOverview() { if (!adminData || !adminData.stats) return; var t
 
 function renderAdminStudents() { if (!adminData) return; var list = document.getElementById('adm-student-list'); var students = adminData.students || []; var orgF = document.getElementById('adm-student-org-filter').value; var search = document.getElementById('adm-student-search').value.trim(); var filtered = students.filter(function(s) { if (orgF !== '전체' && s.orgName !== orgF) return false; if (search && s.name.indexOf(search) === -1) return false; return true; }); if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧑‍🎓</div>결과 없음</div>'; return; } var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:8px;">총 ' + filtered.length + '명</div>'; filtered.forEach(function(s) { h += '<div class="student-row"><div class="student-info"><strong>' + esc(s.grade) + '-' + esc(s.classNum) + ' ' + esc(s.name) + '</strong><br><span style="font-size:0.78rem;color:var(--text-sub);">🏢 ' + esc(s.orgName); if (s.progName) h += ' | 📋 ' + esc(s.progName); if (s.day) h += ' | 📅 ' + esc(s.day); if (s.contact) h += '<br>📞 ' + esc(s.contact); h += ' | 🔵등원: ' + (vp(s.arrival) || '미입력') + ' | 🟠하원: ' + (vp(s.dismissal) || '미입력'); h += '</span></div><div class="student-actions"><button class="btn-sm" onclick="openAdmStudentModal(' + s.rowIndex + ')">✏️</button><button class="btn-sm danger" onclick="delAdmStudent(' + s.rowIndex + ')">🗑️</button></div></div>'; }); list.innerHTML = h; }
 
-function openAdmStudentModal(ri) { editStudentRow = ri || null; isAdminMode = true; document.getElementById('modal-student-title').innerText = editStudentRow ? '학생 수정' : '학생 추가'; document.getElementById('ms-org-group').style.display = 'block'; var os = document.getElementById('ms-org'); os.innerHTML = '<option value="">기관 선택</option>'; (adminData.orgs || []).forEach(function(o) { var opt = document.createElement('option'); opt.value = o.name; opt.text = o.name; os.appendChild(opt); }); var ps = document.getElementById('ms-prog'); ps.innerHTML = '<option value="">프로그램 선택</option>'; var pn = {}; allProgs.forEach(function(p) { if (!pn[p.orgName + '|' + p.name]) { pn[p.orgName + '|' + p.name] = true; var o = document.createElement('option'); o.value = p.name; o.text = p.orgName + ' - ' + p.name; ps.appendChild(o); } }); ['grade', 'class', 'name', 'day', 'contact', 'note'].forEach(function(f) { document.getElementById('ms-' + f).value = ''; }); document.getElementById('ms-org').value = ''; document.getElementById('ms-arrival').value = ''; document.getElementById('ms-dismissal').value = ''; if (editStudentRow && adminData.students) { var s = adminData.students.find(function(x) { return x.rowIndex === editStudentRow; }); if (s) { document.getElementById('ms-grade').value = s.grade; document.getElementById('ms-class').value = s.classNum; document.getElementById('ms-name').value = s.name; document.getElementById('ms-org').value = s.orgName; document.getElementById('ms-prog').value = s.progName; document.getElementById('ms-day').value = s.day; document.getElementById('ms-contact').value = s.contact; document.getElementById('ms-arrival').value = s.arrival || ''; document.getElementById('ms-dismissal').value = s.dismissal || ''; document.getElementById('ms-note').value = s.note; } } document.getElementById('modal-student').style.display = 'flex'; }
+function openAdmStudentModal(ri) {
+  editStudentRow = ri || null;
+  isAdminMode    = true;
+  document.getElementById('modal-student-title').innerText =
+    editStudentRow ? '학생 수정' : '학생 추가';
+
+  // 기관 선택 표시 (관리자 모드)
+  document.getElementById('ms-org-group').style.display = 'block';
+  var os = document.getElementById('ms-org');
+  os.innerHTML = '<option value="">기관 선택</option>';
+  (adminData.orgs || []).forEach(function(o) {
+    var opt = document.createElement('option');
+    opt.value = o.name;
+    opt.text  = o.name;
+    os.appendChild(opt);
+  });
+
+  // 🆕 학년/반 드롭박스 초기화
+  document.getElementById('ms-grade').value = '';
+  document.getElementById('ms-class').value = '';
+
+  // 이름/연락처/비고 초기화
+  document.getElementById('ms-name').value    = '';
+  document.getElementById('ms-contact').value = '';
+  document.getElementById('ms-note').value    = '';
+
+  // 등하원 초기화
+  document.getElementById('ms-arrival').value   = '';
+  document.getElementById('ms-dismissal').value = '';
+
+  // 🆕 이용요일 토글 초기화
+  resetStudentDayToggle();
+
+  // 🆕 프로그램 목록 채우기
+  var ps = document.getElementById('ms-prog');
+  ps.innerHTML = '<option value="">프로그램 선택</option>';
+  var pn = {};
+  allProgs.forEach(function(p) {
+    if (!pn[p.orgName + '|' + p.name]) {
+      pn[p.orgName + '|' + p.name] = true;
+      var o = document.createElement('option');
+      o.value = p.name;
+      o.text  = p.orgName + ' - ' + p.name;
+      ps.appendChild(o);
+    }
+  });
+
+  document.getElementById('ms-prog-info').style.display = 'none';
+  clearAllFormErrors('modal-student');
+
+  // 수정 모드: 기존값 복원
+  if (editStudentRow && adminData && adminData.students) {
+    var s = adminData.students.find(
+      function(x) { return x.rowIndex === editStudentRow; });
+    if (s) {
+      document.getElementById('ms-grade').value     = s.grade    || '';
+      document.getElementById('ms-class').value     = s.classNum || '';
+      document.getElementById('ms-name').value      = s.name     || '';
+      document.getElementById('ms-org').value       = s.orgName  || '';
+      document.getElementById('ms-contact').value   = s.contact  || '';
+      document.getElementById('ms-arrival').value   = s.arrival  || '';
+      document.getElementById('ms-dismissal').value = s.dismissal|| '';
+      document.getElementById('ms-note').value      = s.note     || '';
+
+      // 🆕 프로그램 복원 후 연동
+      ps.value = s.progName || '';
+      onStudentProgChange();
+
+      // 🆕 이용요일 복원
+      restoreStudentDayToggle(s.day || '');
+    }
+  }
+
+  document.getElementById('modal-student').style.display = 'flex';
+}  
 function delAdmStudent(ri) {
   if (!confirm('삭제?')) return;
   showLoading(true);
@@ -4136,6 +5245,698 @@ function switchAdminTab(tab) {
 }
   
 function exportCSV() { if (!adminData || !adminData.stats) return; var BOM = '\uFEFF'; var rows = ['기관명,유형,프로그램,이용학생']; (adminData.stats.orgStats || []).forEach(function(s) { rows.push(s.name + ',' + s.type + ',' + s.progCount + ',' + s.studentCount); }); var blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' }); var url = URL.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = '순창초_저녁늘봄_현황.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('📥 다운로드!'); }
+// =====================================================
+// 🆕 학년 버튼 토글 헬퍼
+// =====================================================
+var selectedGrades = [];
+
+function toggleGrade(num) {
+  var idx = selectedGrades.indexOf(num);
+  if (idx !== -1) {
+    selectedGrades.splice(idx, 1);
+  } else {
+    selectedGrades.push(num);
+    selectedGrades.sort(function(a, b) { return a - b; });
+  }
+  updateGradeToggleUI();
+}
+
+function toggleGradeAll() {
+  if (selectedGrades.length === 6) {
+    selectedGrades = [];
+  } else {
+    selectedGrades = [1, 2, 3, 4, 5, 6];
+  }
+  updateGradeToggleUI();
+}
+
+function updateGradeToggleUI() {
+  // 버튼 활성 상태
+  for (var i = 1; i <= 6; i++) {
+    var btn = document.querySelector(
+      '#mp-grade-btns [data-val="' + i + '"]');
+    if (btn) {
+      btn.classList.toggle('active',
+        selectedGrades.indexOf(i) !== -1);
+    }
+  }
+  var allBtn = document.querySelector('#mp-grade-btns .all-btn');
+  if (allBtn) {
+    allBtn.classList.toggle('active', selectedGrades.length === 6);
+  }
+
+  // 결과 문자열 생성
+  var result = buildGradeString(selectedGrades);
+  document.getElementById('mp-grade-result').innerText =
+    result || '학년을 선택하세요';
+  document.getElementById('mp-grade').value = result;
+}
+
+function buildGradeString(grades) {
+  if (!grades || grades.length === 0) return '';
+  if (grades.length === 6) return '전학년';
+
+  // 연속 구간 탐색
+  var sorted = grades.slice().sort(function(a, b) { return a - b; });
+  var segments = [];
+  var start = sorted[0];
+  var prev  = sorted[0];
+
+  for (var i = 1; i < sorted.length; i++) {
+    if (sorted[i] === prev + 1) {
+      prev = sorted[i];
+    } else {
+      segments.push({ s: start, e: prev });
+      start = sorted[i];
+      prev  = sorted[i];
+    }
+  }
+  segments.push({ s: start, e: prev });
+
+  // 세그먼트 → 문자열
+  var parts = segments.map(function(seg) {
+    if (seg.s === seg.e) return seg.s + '학년';
+    if (seg.e - seg.s === 1) return seg.s + ',' + seg.e + '학년';
+    return seg.s + '~' + seg.e + '학년';
+  });
+
+  return parts.join(',');
+}
+
+function resetGradeToggle() {
+  selectedGrades = [];
+  updateGradeToggleUI();
+}
+
+function restoreGradeToggle(gradeStr) {
+  selectedGrades = [];
+  if (!gradeStr) { updateGradeToggleUI(); return; }
+
+  if (gradeStr === '전학년') {
+    selectedGrades = [1, 2, 3, 4, 5, 6];
+    updateGradeToggleUI();
+    return;
+  }
+
+  // "1~3학년", "1,3,5학년", "2학년" 파싱
+  var clean = gradeStr.replace(/학년/g, '').replace(/\s/g, '');
+  var parts = clean.split(',');
+  parts.forEach(function(part) {
+    var rangeMatch = part.match(/^(\d)~(\d)$/);
+    if (rangeMatch) {
+      var lo = parseInt(rangeMatch[1]);
+      var hi = parseInt(rangeMatch[2]);
+      for (var i = lo; i <= hi; i++) {
+        if (selectedGrades.indexOf(i) === -1) selectedGrades.push(i);
+      }
+    } else {
+      var num = parseInt(part);
+      if (!isNaN(num) && selectedGrades.indexOf(num) === -1) {
+        selectedGrades.push(num);
+      }
+    }
+  });
+  selectedGrades.sort(function(a, b) { return a - b; });
+  updateGradeToggleUI();
+}
+
+// =====================================================
+// 🆕 프로그램 요일 버튼 토글 헬퍼
+// =====================================================
+var selectedProgDays = [];
+var DAY_ORDER = ['월','화','수','목','금','토','일'];
+
+function toggleProgDay(day) {
+  var idx = selectedProgDays.indexOf(day);
+  if (idx !== -1) {
+    selectedProgDays.splice(idx, 1);
+  } else {
+    selectedProgDays.push(day);
+    selectedProgDays.sort(function(a, b) {
+      return DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b);
+    });
+  }
+  updateProgDayUI();
+}
+
+function updateProgDayUI() {
+  DAY_ORDER.forEach(function(d) {
+    var btn = document.querySelector(
+      '#mp-day-btns [data-val="' + d + '"]');
+    if (btn) {
+      btn.classList.toggle('active',
+        selectedProgDays.indexOf(d) !== -1);
+    }
+  });
+  var result = selectedProgDays.join(',');
+  document.getElementById('mp-day-result').innerText =
+    result ? result + '요일' : '요일을 선택하세요';
+  document.getElementById('mp-day').value = result;
+}
+
+function resetProgDayToggle() {
+  selectedProgDays = [];
+  updateProgDayUI();
+}
+
+function restoreProgDayToggle(dayStr) {
+  selectedProgDays = [];
+  if (!dayStr) { updateProgDayUI(); return; }
+  var days = parseDays(dayStr);
+  days.forEach(function(d) {
+    if (DAY_ORDER.indexOf(d) !== -1 &&
+        selectedProgDays.indexOf(d) === -1) {
+      selectedProgDays.push(d);
+    }
+  });
+  selectedProgDays.sort(function(a, b) {
+    return DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b);
+  });
+  updateProgDayUI();
+}
+
+// =====================================================
+// 🆕 학생 이용요일 버튼 토글 헬퍼
+// =====================================================
+var selectedStudentDays = [];
+var currentProgDays = []; // 선택된 프로그램의 운영 요일
+
+function toggleStudentDay(day) {
+  var idx = selectedStudentDays.indexOf(day);
+  if (idx !== -1) {
+    selectedStudentDays.splice(idx, 1);
+  } else {
+    selectedStudentDays.push(day);
+    selectedStudentDays.sort(function(a, b) {
+      return DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b);
+    });
+  }
+  updateStudentDayUI();
+}
+
+function updateStudentDayUI() {
+  DAY_ORDER.forEach(function(d) {
+    var btn = document.querySelector(
+      '#ms-day-btns [data-val="' + d + '"]');
+    if (btn) {
+      btn.classList.toggle('active',
+        selectedStudentDays.indexOf(d) !== -1);
+    }
+  });
+
+  var result = selectedStudentDays.join(',');
+  document.getElementById('ms-day-result').innerText =
+    result ? result + '요일' : '요일을 선택하세요';
+  document.getElementById('ms-day').value = result;
+
+  // 🆕 경고 체크
+  checkStudentDayWarn();
+}
+
+function checkStudentDayWarn() {
+  var warnEl   = document.getElementById('ms-day-warn');
+  var warnDays = document.getElementById('ms-day-warn-days');
+  if (!warnEl) return;
+
+  if (currentProgDays.length === 0) {
+    warnEl.classList.remove('show');
+    return;
+  }
+
+  // 선택된 요일 중 프로그램 운영 요일에 없는 것이 있으면 경고
+  var outOfRange = selectedStudentDays.filter(function(d) {
+    return currentProgDays.indexOf(d) === -1;
+  });
+
+  if (outOfRange.length > 0) {
+    warnDays.innerText = currentProgDays.join(',') + '요일';
+    warnEl.classList.add('show');
+  } else {
+    warnEl.classList.remove('show');
+  }
+}
+
+function resetStudentDayToggle() {
+  selectedStudentDays = [];
+  currentProgDays     = [];
+  updateStudentDayUI();
+  var warnEl = document.getElementById('ms-day-warn');
+  if (warnEl) warnEl.classList.remove('show');
+}
+
+function restoreStudentDayToggle(dayStr) {
+  selectedStudentDays = [];
+  if (!dayStr) { updateStudentDayUI(); return; }
+  var days = parseDays(dayStr);
+  days.forEach(function(d) {
+    if (DAY_ORDER.indexOf(d) !== -1 &&
+        selectedStudentDays.indexOf(d) === -1) {
+      selectedStudentDays.push(d);
+    }
+  });
+  selectedStudentDays.sort(function(a, b) {
+    return DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b);
+  });
+  updateStudentDayUI();
+}
+
+// =====================================================
+// 🆕 프로그램 선택 → 요일/시간 자동 연동
+// =====================================================
+function onStudentProgChange() {
+  var progName = document.getElementById('ms-prog').value;
+  var infoEl   = document.getElementById('ms-prog-info');
+
+  if (!progName) {
+    currentProgDays = [];
+    infoEl.style.display = 'none';
+    checkStudentDayWarn();
+    return;
+  }
+
+  // 기관 담당자 모드: orgDashData 사용
+  // 관리자 모드: allProgs 사용
+  var progList = isAdminMode ? allProgs : (orgDashData.programs || []);
+
+  // 같은 이름의 프로그램 모두 찾기 (요일 여러 개일 수 있음)
+  var matched = progList.filter(function(p) {
+    return p.name === progName;
+  });
+
+  if (!matched.length) {
+    currentProgDays = [];
+    infoEl.style.display = 'none';
+    checkStudentDayWarn();
+    return;
+  }
+
+  // 운영 요일 수집
+  var allDays = [];
+  matched.forEach(function(p) {
+    parseDays(p.day || '').forEach(function(d) {
+      if (allDays.indexOf(d) === -1) allDays.push(d);
+    });
+  });
+  allDays.sort(function(a, b) {
+    return DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b);
+  });
+  currentProgDays = allDays;
+
+  // 참고 정보 표시 (시간, 요일)
+  var p0 = matched[0];
+  var timeStr = '';
+  if (p0.startTime) {
+    timeStr = to12h(p0.startTime) + ' ~ ' + to12h(p0.endTime);
+  }
+  var dayStr = allDays.join(',') + '요일';
+
+  infoEl.innerHTML =
+    '📅 운영 요일: <strong>' + dayStr + '</strong>' +
+    (timeStr ? '　🕐 ' + timeStr : '');
+  infoEl.style.display = 'block';
+
+  // 이용요일 자동 채우기 (비어있을 때만)
+  if (selectedStudentDays.length === 0) {
+    restoreStudentDayToggle(allDays.join(','));
+  }
+
+  checkStudentDayWarn();
+}
+
+// 관리자 모드에서 기관 변경 시 프로그램 목록 갱신
+function onStudentOrgChange() {
+  var orgName = document.getElementById('ms-org').value;
+  var ps      = document.getElementById('ms-prog');
+  ps.innerHTML = '<option value="">프로그램 선택</option>';
+
+  if (!orgName) return;
+
+  var orgProgs = allProgs.filter(function(p) {
+    return p.orgName === orgName;
+  });
+  var pn = {};
+  orgProgs.forEach(function(p) {
+    if (!pn[p.name]) {
+      pn[p.name] = true;
+      var o = document.createElement('option');
+      o.value = p.name;
+      o.text  = p.name;
+      ps.appendChild(o);
+    }
+  });
+
+  // 프로그램 참고 정보 초기화
+  document.getElementById('ms-prog-info').style.display = 'none';
+  currentProgDays = [];
+  resetStudentDayToggle();
+}
+
+// =====================================================
+// 🆕 커스텀 Time Picker 헬퍼
+// =====================================================
+var timePickerState = {};
+// 구조: { 'mp-start': { ampm:'pm', hour:4, min:30 }, ... }
+
+function openTimePicker(fieldId) {
+  // 다른 열린 패널 모두 닫기
+  document.querySelectorAll('.time-picker-panel.open')
+    .forEach(function(el) {
+      if (el.id !== 'tp-' + fieldId) {
+        el.classList.remove('open');
+        var dispId = el.id.replace('tp-', '') + '-display';
+        var disp = document.getElementById(dispId);
+        if (disp) disp.classList.remove('open');
+      }
+    });
+
+  var panel = document.getElementById('tp-' + fieldId);
+  var disp  = document.getElementById(fieldId + '-display');
+  if (!panel) return;
+
+  // 상태 초기화 (없으면)
+  if (!timePickerState[fieldId]) {
+    timePickerState[fieldId] = { ampm: 'pm', hour: 4, min: 0 };
+  }
+
+  // 그리드 렌더링
+  renderTimePickerGrids(fieldId);
+
+  panel.classList.toggle('open');
+  if (disp) disp.classList.toggle('open');
+
+  // 외부 클릭 시 닫기
+  setTimeout(function() {
+    document.addEventListener('click', function handler(e) {
+      var wrap = panel.closest('.time-picker-wrap');
+      if (wrap && !wrap.contains(e.target)) {
+        panel.classList.remove('open');
+        if (disp) disp.classList.remove('open');
+        document.removeEventListener('click', handler);
+      }
+    });
+  }, 0);
+}
+
+function renderTimePickerGrids(fieldId) {
+  var state     = timePickerState[fieldId] ||
+                  { ampm: 'pm', hour: 4, min: 0 };
+  var hoursEl   = document.getElementById('tp-' + fieldId + '-hours');
+  var minsEl    = document.getElementById('tp-' + fieldId + '-mins');
+  var amBtn     = document.getElementById('tp-' + fieldId + '-am');
+  var pmBtn     = document.getElementById('tp-' + fieldId + '-pm');
+
+  if (!hoursEl || !minsEl) return;
+
+  // 오전/오후 버튼
+  if (amBtn && pmBtn) {
+    amBtn.classList.toggle('active', state.ampm === 'am');
+    pmBtn.classList.toggle('active', state.ampm === 'pm');
+  }
+
+  // 시 버튼 (1~12)
+  var hHtml = '';
+  for (var h = 1; h <= 12; h++) {
+    hHtml +=
+      '<button type="button"' +
+      (state.hour === h ? ' class="active"' : '') +
+      ' onclick="setTimePicker(\'' + fieldId + '\',\'hour\',' + h + ')">' +
+      h + '</button>';
+  }
+  hoursEl.innerHTML = hHtml;
+
+  // 분 버튼 (00~55, 5분 단위)
+  var mHtml = '';
+  for (var m = 0; m < 60; m += 5) {
+    var mm = (m < 10 ? '0' : '') + m;
+    mHtml +=
+      '<button type="button"' +
+      (state.min === m ? ' class="active"' : '') +
+      ' onclick="setTimePicker(\'' + fieldId + '\',\'min\',' + m + ')">' +
+      mm + '</button>';
+  }
+  minsEl.innerHTML = mHtml;
+
+  updateTimePickerPreview(fieldId);
+}
+
+function setTimePicker(fieldId, type, value) {
+  if (!timePickerState[fieldId]) {
+    timePickerState[fieldId] = { ampm: 'pm', hour: 4, min: 0 };
+  }
+  timePickerState[fieldId][type] = value;
+  renderTimePickerGrids(fieldId);
+}
+
+function updateTimePickerPreview(fieldId) {
+  var state   = timePickerState[fieldId];
+  var preview = document.getElementById('tp-' + fieldId + '-preview');
+  if (!state || !preview) return;
+
+  var ampmLabel = state.ampm === 'am' ? '오전' : '오후';
+  var mm = (state.min < 10 ? '0' : '') + state.min;
+  preview.innerText = ampmLabel + ' ' + state.hour + ':' + mm;
+}
+
+function confirmTimePicker(fieldId) {
+  var state = timePickerState[fieldId];
+  if (!state) return;
+
+  // 24시간제 변환
+  var h24 = state.hour;
+  if (state.ampm === 'am' && state.hour === 12) h24 = 0;
+  if (state.ampm === 'pm' && state.hour !== 12) h24 = state.hour + 12;
+
+  var hStr = (h24 < 10 ? '0' : '') + h24;
+  var mStr = (state.min < 10 ? '0' : '') + state.min;
+  var val24 = hStr + ':' + mStr;
+
+  // hidden input에 24시간제 저장
+  document.getElementById(fieldId).value = val24;
+
+  // 표시 텍스트에 12시간제 표시
+  var dispText = document.getElementById(fieldId + '-display-text');
+  if (dispText) {
+    var ampmLabel = state.ampm === 'am' ? '오전' : '오후';
+    dispText.innerText =
+      ampmLabel + ' ' + state.hour + ':' + mStr;
+    dispText.style.color = 'var(--text)';
+  }
+
+  // 패널 닫기
+  var panel = document.getElementById('tp-' + fieldId);
+  var disp  = document.getElementById(fieldId + '-display');
+  if (panel) panel.classList.remove('open');
+  if (disp)  disp.classList.remove('open');
+}
+
+function resetTimePicker(fieldId) {
+  timePickerState[fieldId] = { ampm: 'pm', hour: 4, min: 0 };
+  document.getElementById(fieldId).value = '';
+  var dispText = document.getElementById(fieldId + '-display-text');
+  if (dispText) {
+    dispText.innerText    = '시간 선택';
+    dispText.style.color  = 'var(--text-sub)';
+  }
+}
+
+function restoreTimePicker(fieldId, timeStr) {
+  if (!timeStr) { resetTimePicker(fieldId); return; }
+
+  var m = String(timeStr).match(/(\d{1,2}):(\d{2})/);
+  if (!m) { resetTimePicker(fieldId); return; }
+
+  var h24  = parseInt(m[1]);
+  var min  = parseInt(m[2]);
+  var ampm = h24 < 12 ? 'am' : 'pm';
+  var h12  = h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24;
+
+  timePickerState[fieldId] = { ampm: ampm, hour: h12, min: min };
+
+  // hidden input
+  document.getElementById(fieldId).value = timeStr;
+
+  // 표시 텍스트
+  var dispText = document.getElementById(fieldId + '-display-text');
+  if (dispText) {
+    var mm = (min < 10 ? '0' : '') + min;
+    dispText.innerText   = (ampm === 'am' ? '오전' : '오후') +
+                           ' ' + h12 + ':' + mm;
+    dispText.style.color = 'var(--text)';
+  }
+}
+
+// =====================================================
+// 🆕 수강료 입력 헬퍼
+// =====================================================
+var feeType = ''; // 'free' | 'paid'
+
+function setFeeType(type) {
+  feeType = type;
+  var freeBtn   = document.getElementById('fee-btn-free');
+  var paidBtn   = document.getElementById('fee-btn-paid');
+  var detailBox = document.getElementById('fee-detail-box');
+
+  if (type === 'free') {
+    freeBtn.classList.add('active');
+    paidBtn.classList.remove('active');
+    detailBox.classList.remove('show');
+    document.getElementById('mp-fee').value = '무료';
+    document.getElementById('fee-preview').innerText = '';
+  } else {
+    paidBtn.classList.add('active');
+    freeBtn.classList.remove('active');
+    detailBox.classList.add('show');
+    updateFeePreview();
+  }
+}
+
+function updateFeePreview() {
+  var cycle   = document.getElementById('fee-cycle').value;
+  var amount  = parseInt(
+    document.getElementById('fee-amount').value) || 0;
+  var preview = document.getElementById('fee-preview');
+
+  if (!amount) {
+    preview.innerText = '';
+    document.getElementById('mp-fee').value = '유료';
+    return;
+  }
+
+  var formatted = amount.toLocaleString('ko-KR');
+  var cycleLabel = {
+    '월':'월', '분기':'분기', '연':'연', '1회':'1회'
+  }[cycle] || cycle;
+
+  var result = cycleLabel + ' ' + formatted + '원';
+  preview.innerText = '→ ' + result;
+  document.getElementById('mp-fee').value = result;
+}
+
+function resetFeeInput() {
+  feeType = '';
+  var freeBtn   = document.getElementById('fee-btn-free');
+  var paidBtn   = document.getElementById('fee-btn-paid');
+  var detailBox = document.getElementById('fee-detail-box');
+  if (freeBtn)   freeBtn.classList.remove('active');
+  if (paidBtn)   paidBtn.classList.remove('active');
+  if (detailBox) detailBox.classList.remove('show');
+  var amountEl = document.getElementById('fee-amount');
+  if (amountEl) amountEl.value = '';
+  var previewEl = document.getElementById('fee-preview');
+  if (previewEl) previewEl.innerText = '';
+  document.getElementById('mp-fee').value = '';
+}
+
+function restoreFeeInput(feeStr) {
+  if (!feeStr) { resetFeeInput(); return; }
+
+  if (feeStr === '무료' || feeStr === '0') {
+    setFeeType('free');
+    return;
+  }
+
+  // 유료: 파싱 시도 (예: "월 30,000원")
+  setFeeType('paid');
+  var cycleMap = { '월':'월', '분기':'분기', '연':'연', '1회':'1회' };
+  var foundCycle = '월';
+  Object.keys(cycleMap).forEach(function(k) {
+    if (feeStr.indexOf(k) !== -1) foundCycle = k;
+  });
+  var numMatch = feeStr.replace(/,/g, '').match(/\d+/);
+  if (numMatch) {
+    document.getElementById('fee-cycle').value  = foundCycle;
+    document.getElementById('fee-amount').value = numMatch[0];
+    updateFeePreview();
+  } else {
+    // 파싱 불가 → 직접 표시
+    document.getElementById('mp-fee').value = feeStr;
+  }
+}
+
+// =====================================================
+// 🆕 정원/현원 잔여 자동 계산
+// =====================================================
+function updateCapacityDisplay() {
+  var cap    = parseInt(document.getElementById('mp-capacity').value) || 0;
+  var cur    = parseInt(document.getElementById('mp-current').value)  || 0;
+  var badge  = document.getElementById('mp-remain-badge');
+  if (!badge) return;
+
+  if (cap <= 0) {
+    badge.style.display = 'none';
+    return;
+  }
+
+  var rem = cap - cur;
+  badge.style.display = 'block';
+  if (rem > 0) {
+    badge.className    = 'capacity-remain ok';
+    badge.innerText    = '잔여 ' + rem + '명';
+  } else {
+    badge.className    = 'capacity-remain warn';
+    badge.innerText    = '정원 초과';
+  }
+}
+
+// =====================================================
+// 🆕 보호자 연락처 자동 하이픈
+// =====================================================
+function autoHyphenPhone(input) {
+  var digits = input.value.replace(/[^0-9]/g, '');
+  var result = '';
+
+  if (digits.length <= 3) {
+    result = digits;
+  } else if (digits.length <= 7) {
+    result = digits.slice(0, 3) + '-' + digits.slice(3);
+  } else if (digits.length <= 11) {
+    // 010-xxxx-xxxx (11자리)
+    // 02-xxx-xxxx (지역번호) 분기
+    if (digits.startsWith('02')) {
+      if (digits.length <= 9) {
+        result = digits.slice(0, 2) + '-' +
+                 digits.slice(2, 5) + '-' +
+                 digits.slice(5);
+      } else {
+        result = digits.slice(0, 2) + '-' +
+                 digits.slice(2, 6) + '-' +
+                 digits.slice(6);
+      }
+    } else {
+      result = digits.slice(0, 3) + '-' +
+               digits.slice(3, 7) + '-' +
+               digits.slice(7);
+    }
+  } else {
+    result = digits.slice(0, 3) + '-' +
+             digits.slice(3, 7) + '-' +
+             digits.slice(7, 11);
+  }
+
+  input.value = result;
+}
+
+// =====================================================
+// 🆕 필수항목 에러 표시 헬퍼
+// =====================================================
+function setFormError(groupId, hasError) {
+  var el = document.getElementById(groupId);
+  if (!el) return;
+  if (hasError) {
+    el.classList.add('has-error');
+  } else {
+    el.classList.remove('has-error');
+  }
+}
+
+function clearAllFormErrors(modalId) {
+  var modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.querySelectorAll('.form-group.has-error')
+    .forEach(function(el) {
+      el.classList.remove('has-error');
+    });
+}
 </script>
 <script>
   if ('serviceWorker' in navigator) {
