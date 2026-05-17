@@ -3835,24 +3835,22 @@ function orgLogin() {
   if (!orgName || !pwd) { showToast('기관과 비밀번호를 입력하세요.'); return; }
 
   showLoading(true);
-
-  sbGet('organizations', 'select=password&name=eq.' + encodeURIComponent(orgName))
-    .then(function(rows) {
-      if (!rows || rows.length === 0) {
-        showLoading(false);
-        showToast('기관을 찾을 수 없습니다.');
-        return;
-      }
-      var storedPwd = String(rows[0].password || '').trim();
-      if (storedPwd === String(pwd).trim()) {
-        currentOrgName = orgName;
-        loadOrgDash();
-      } else {
-        showLoading(false);
-        showToast('비밀번호가 틀렸습니다.');
-      }
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+  fetch(SB_URL + '/functions/v1/org-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orgName: orgName, password: pwd })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    showLoading(false);
+    if (result.success) {
+      currentOrgName = orgName;
+      loadOrgDash();
+    } else {
+      showToast(result.message || '비밀번호가 틀렸습니다.');
+    }
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
 function loadOrgDash(keepTab) {
@@ -3861,7 +3859,11 @@ function loadOrgDash(keepTab) {
   Promise.all([
     sbGet('organizations', 'select=*&name=eq.' + encodeURIComponent(currentOrgName)),
     sbGet('programs',      'select=*&org_name=eq.' + encodeURIComponent(currentOrgName)),
-    sbGet('students',      'select=*&org_name=eq.' + encodeURIComponent(currentOrgName)),
+    fetch(SB_URL + '/functions/v1/get-students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orgName: currentOrgName })
+    }).then(function(r) { return r.json(); }).then(function(res) { return res.data || []; }),
     sbGet('notices',       'select=*&org_name=eq.' + encodeURIComponent(currentOrgName) + '&order=date.desc')
   ])
   .then(function(results) {
@@ -4822,7 +4824,11 @@ function loadAdminData(keepTab) {
   Promise.all([
     sbGet('organizations', 'select=*&order=updated_at.desc'),
     sbGet('programs',      'select=*'),
-    sbGet('students',      'select=*')
+    fetch(SB_URL + '/functions/v1/get-all-students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    }).then(function(r) { return r.json(); }).then(function(res) { return res.data || []; })
   ])
   .then(function(results) {
     var orgs     = results[0] || [];
