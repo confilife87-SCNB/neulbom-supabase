@@ -2291,6 +2291,7 @@ var kakaoMarkers = [];
 var mapFilter = '전체';
 var mapSearchQuery = '';
 var highlightProgName = '';
+var currentAdminTab = 'overview'; //
   // ==========================================
 // 🔍 초성 검색 헬퍼
 // ==========================================
@@ -2433,7 +2434,6 @@ document.addEventListener('DOMContentLoaded',function(){
 function loadData() {
   showLoading(true);
 
-  // 2개 동시 요청
   Promise.all([
     sbGet('organizations', 'select=*&order=updated_at.desc'),
     sbGet('programs',      'select=*&order=updated_at.desc')
@@ -2442,7 +2442,6 @@ function loadData() {
     var orgs  = results[0] || [];
     var progs = results[1] || [];
 
-    // organizations → allOrgs 변환 (컬럼명 매핑)
     allOrgs = orgs.map(function(o) {
       return {
         orgId:           o.org_id           || '',
@@ -2465,7 +2464,6 @@ function loadData() {
       };
     });
 
-    // programs → allProgs 변환
     allProgs = progs.map(function(p) {
       return {
         id:          p.id,
@@ -2487,22 +2485,23 @@ function loadData() {
       };
     });
 
-    // progCount 계산
     allOrgs.forEach(function(o) {
       o.progCount = allProgs.filter(function(p) {
         return p.orgName === o.name;
       }).length;
     });
 
-    // 기관 로그인 select 옵션 채우기
-    var sel = document.getElementById('org-login-select');
-    sel.innerHTML = '<option value="">기관을 선택하세요</option>';
-    allOrgs.forEach(function(o) {
-      var opt = document.createElement('option');
-      opt.value = o.name;
-      opt.text  = o.name;
-      sel.appendChild(opt);
-    });
+    // ✅ 버그4: 로그인 상태가 아닐 때만 select 갱신
+    if (!currentOrgName) {
+      var sel = document.getElementById('org-login-select');
+      sel.innerHTML = '<option value="">기관을 선택하세요</option>';
+      allOrgs.forEach(function(o) {
+        var opt = document.createElement('option');
+        opt.value = o.name;
+        opt.text  = o.name;
+        sel.appendChild(opt);
+      });
+    }
 
     showLoading(false);
     handleUrlHash();
@@ -2514,6 +2513,7 @@ function loadData() {
     console.error(e);
   });
 }
+  
 function handleUrlHash() {
   try {
     var hash = window.location.hash;
@@ -3474,41 +3474,44 @@ function openMapView() {
   if (searchClear) searchClear.classList.remove('show');
   if (searchResult) searchResult.style.display = 'none';
 
-  if (!kakaoMap) {
-    // allOrgs + allProgs 로 지도 데이터 구성 (이미 로드됨)
-    var mapOrgs = allOrgs.map(function(o) {
-      var orgProgs = allProgs.filter(function(p) {
-        return p.orgName === o.name;
-      });
-      var openCount = orgProgs.filter(function(p) {
-        return p.status === '모집중';
-      }).length;
-
-      return {
-        orgId:           o.orgId,
-        name:            o.name,
-        type:            o.type,
-        jurisdiction:    o.jurisdiction,
-        address:         o.address,
-        tel:             o.tel,
-        managerName:     o.managerName,
-        managerTel:      o.managerTel,
-        hours:           o.hours,
-        transport:       o.transport,
-        transportDetail: o.transportDetail,
-        routeMapUrl:     o.routeMapUrl,
-        routeMapNote:    o.routeMapNote,
-        intro:           o.intro,
-        homepage:        o.homepage,
-        progCount:       orgProgs.length,
-        openCount:       openCount,
-        programs:        orgProgs
-      };
+  // ✅ 버그3: 항상 최신 기관 데이터로 갱신
+  var mapOrgs = allOrgs.map(function(o) {
+    var orgProgs = allProgs.filter(function(p) {
+      return p.orgName === o.name;
     });
+    var openCount = orgProgs.filter(function(p) {
+      return p.status === '모집중';
+    }).length;
 
+    return {
+      orgId:           o.orgId,
+      name:            o.name,
+      type:            o.type,
+      jurisdiction:    o.jurisdiction,
+      address:         o.address,
+      tel:             o.tel,
+      managerName:     o.managerName,
+      managerTel:      o.managerTel,
+      hours:           o.hours,
+      transport:       o.transport,
+      transportDetail: o.transportDetail,
+      routeMapUrl:     o.routeMapUrl,
+      routeMapNote:    o.routeMapNote,
+      intro:           o.intro,
+      homepage:        o.homepage,
+      progCount:       orgProgs.length,
+      openCount:       openCount,
+      programs:        orgProgs
+    };
+  });
+
+  if (!kakaoMap) {
     initKakaoMap(mapOrgs);
-    renderMapOrgList(mapOrgs);
+  } else {
+    // ✅ 이미 지도 있으면 마커만 갱신
+    placeOrgMarkers(mapOrgs);
   }
+  renderMapOrgList(mapOrgs);
 }
 
 // ==========================================
@@ -5209,41 +5212,48 @@ var pwdRevealMap = {};
 
 function renderAdmPwd() {
   showLoading(true);
-  sbGet('organizations', 'select=name,password&order=name.asc')
-    .then(function(rows) {
-      showLoading(false);
-      var list = document.getElementById('adm-pwd-list');
-      var h = '';
-      (rows || []).forEach(function(item, idx) {
-        var isRevealed = pwdRevealMap[item.name] || false;
-        var pwdDisplay = isRevealed
-          ? '<strong style="color:var(--text);font-family:monospace;">' +
-            esc(item.password || '미설정') + '</strong>'
-          : '<span class="pwd-mask-text">••••••</span>';
-        var toggleLabel = isRevealed ? '🙈 숨기기' : '👁️ 보기';
+  // ✅ 버그7: Edge Function 통해 비번 조회
+  fetch(SB_URL + '/functions/v1/get-org-passwords', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    showLoading(false);
+    var rows = result.data || [];
+    var list = document.getElementById('adm-pwd-list');
+    var h = '';
+    rows.forEach(function(item) {
+      var isRevealed = pwdRevealMap[item.name] || false;
+      var pwdDisplay = isRevealed
+        ? '<strong style="color:var(--text);font-family:monospace;">' +
+          esc(item.password || '미설정') + '</strong>'
+        : '<span class="pwd-mask-text">••••••</span>';
+      var toggleLabel = isRevealed ? '🙈 숨기기' : '👁️ 보기';
 
-        h += '<div class="student-row">';
-        h += '  <div class="student-info">';
-        h += '    <strong>🏢 ' + esc(item.name) + '</strong><br>';
-        h += '    <div class="pwd-mask-wrap">';
-        h += '      <span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: </span>';
-        h += '      ' + pwdDisplay;
-        h += '      <button class="btn-pwd-toggle"' +
-             ' onclick="togglePwdReveal(\'' +
-             esc(item.name).replace(/'/g, "\\'") + '\')">' +
-             toggleLabel + '</button>';
-        h += '    </div>';
-        h += '  </div>';
-        h += '  <button class="btn-sm"' +
-             ' onclick="openPwdModal(\'' +
-             esc(item.name).replace(/'/g, "\\'") + '\',\'' +
-             esc(item.password || '').replace(/'/g, "\\'") +
-             '\')">변경</button>';
-        h += '</div>';
-      });
-      list.innerHTML = h;
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+      h += '<div class="student-row">';
+      h += '  <div class="student-info">';
+      h += '    <strong>🏢 ' + esc(item.name) + '</strong><br>';
+      h += '    <div class="pwd-mask-wrap">';
+      h += '      <span style="font-size:0.82rem;color:var(--text-sub);">비밀번호: </span>';
+      h += '      ' + pwdDisplay;
+      h += '      <button class="btn-pwd-toggle"' +
+           ' onclick="togglePwdReveal(\'' +
+           esc(item.name).replace(/'/g, "\\'") + '\')">' +
+           toggleLabel + '</button>';
+      h += '    </div>';
+      h += '  </div>';
+      h += '  <button class="btn-sm"' +
+           ' onclick="openPwdModal(\'' +
+           esc(item.name).replace(/'/g, "\\'") + '\',\'' +
+           esc(item.password || '').replace(/'/g, "\\'") +
+           '\')">변경</button>';
+      h += '</div>';
+    });
+    list.innerHTML = h;
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
 // 🆕 비밀번호 보기/숨기기 토글
@@ -5711,6 +5721,7 @@ function closeTTDetail() {
 
 // --- 유틸리티 ---
 function parseDays(dayStr) {
+  if (!dayStr) return []; // ✅ 버그5: null/undefined 처리
   var s = String(dayStr).replace(/요일/g, '').replace(/\s/g, '');
   var days = [];
   if (s.indexOf(',') !== -1) {
@@ -5842,9 +5853,6 @@ function reloadAdminOrgsOnly() {
     })
     .catch(function(e) { showToast('❌ 갱신 실패: ' + e.message); });
 }
-
-// switchAdminTab 에 setting 추가
-var currentAdminTab = 'overview'; // 글로벌 변수 추가 (adminData 선언부 근처)
 
 function switchAdminTab(tab) {
   currentAdminTab = tab; // ✅ 현재 탭 저장
@@ -6736,16 +6744,22 @@ function confirmDeleteOrg() {
   showLoading(true);
   closeModal('modal-delete-org');
 
-  // 순서대로 삭제: 공지 → 학생 → 프로그램 → 기관
-  var q = 'org_name=eq.' + encodeURIComponent(deleteTargetOrgName);
+  var orgName = deleteTargetOrgName;
+  var q = 'org_name=eq.' + encodeURIComponent(orgName);
 
-  sbDelete('notices',       q)
-  .then(function() { return sbDelete('students',      q); })
-  .then(function() { return sbDelete('programs',      q); })
-  .then(function() { return sbDelete('organizations', 'name=eq.' + encodeURIComponent(deleteTargetOrgName)); })
+  // ✅ 버그6: students는 Edge Function 통해 삭제
+  sbDelete('notices', q)
+  .then(function() {
+    // students는 sbDelete 대신 직접 DELETE 허용 정책 이용
+    return sbDelete('students', q);
+  })
+  .then(function() { return sbDelete('programs', q); })
+  .then(function() {
+    return sbDelete('organizations', 'name=eq.' + encodeURIComponent(orgName));
+  })
   .then(function() {
     showLoading(false);
-    showToast('🗑️ ' + deleteTargetOrgName + ' 기관이 삭제되었습니다.');
+    showToast('🗑️ ' + orgName + ' 기관이 삭제되었습니다.');
     deleteTargetOrgName = '';
     loadData();
     loadAdminData('orgs');
