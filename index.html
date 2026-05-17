@@ -4814,6 +4814,8 @@ function adminLogin() {
     showLoading(false);
     showToast('❌ ' + e.message);
   });
+}
+  
 function loadAdminData(keepTab) {
   showLoading(true);
 
@@ -5732,28 +5734,16 @@ function timeToMin(timeStr) {
 function saveAdminPwd() {
   var newPwd = document.getElementById('adm-new-pwd').value.trim();
   if (!newPwd) { showToast('새 비밀번호를 입력하세요.'); return; }
-  if (!confirm('관리자 비밀번호를 변경하시겠습니까?')) return;
 
-  showLoading(true);
-  fetch(SB_URL + '/functions/v1/admin-login', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ newPassword: newPwd })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(result) {
-    showLoading(false);
-    if (result.success) {
-      document.getElementById('adm-new-pwd').value = '';
-      showToast('✅ 관리자 비밀번호가 변경되었습니다!');
-    } else {
-      showToast('❌ 변경 실패: ' + (result.message || '오류'));
-    }
-  })
-  .catch(function(e) {
-    showLoading(false);
-    showToast('❌ ' + e.message);
-  });
+  alert(
+    '🔑 관리자 비밀번호 변경 방법\n\n' +
+    '1. Supabase 대시보드 접속\n' +
+    '2. Edge Functions → admin-login → Secrets\n' +
+    '3. ADMIN_PASSWORD 값을 새 비밀번호로 변경\n\n' +
+    '변경 즉시 새 비밀번호로 로그인 가능합니다.'
+  );
+
+  document.getElementById('adm-new-pwd').value = '';
 }
 
 // ==========================================
