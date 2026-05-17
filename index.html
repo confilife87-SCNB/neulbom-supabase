@@ -6659,11 +6659,15 @@ function openDeleteOrgModal(orgName) {
   document.getElementById('modal-delete-org').style.display = 'flex';
 
   // 연관 데이터 조회
-  Promise.all([
-    sbGet('programs', 'select=id&org_name=eq.' + encodeURIComponent(orgName)),
-    sbGet('students', 'select=id&org_name=eq.' + encodeURIComponent(orgName)),
-    sbGet('notices',  'select=id&org_name=eq.' + encodeURIComponent(orgName))
-  ])
+Promise.all([
+  sbGet('programs', 'select=id&org_name=eq.' + encodeURIComponent(orgName)),
+  fetch(SB_URL + '/functions/v1/get-students', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orgName: orgName })
+  }).then(function(r) { return r.json(); }).then(function(res) { return res.data || []; }),
+  sbGet('notices',  'select=id&org_name=eq.' + encodeURIComponent(orgName))
+])
   .then(function(results) {
     var progCount    = (results[0] || []).length;
     var studentCount = (results[1] || []).length;
