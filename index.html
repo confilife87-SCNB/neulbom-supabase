@@ -1336,10 +1336,18 @@
     <div class="portal-sub">학교밖 늘봄 · 지역사회 돌봄</div>
 
     <!-- 학부모 버튼 → 크고 강조 -->
-    <button class="btn-portal parent" onclick="openParentView()">
-      <span>👨‍👩‍👧 학부모 — 프로그램 찾기</span>
-      <span>›</span>
-    </button>
+<button class="btn-portal parent" onclick="openParentView()">
+  <span>👨‍👩‍👧 학부모 — 프로그램 찾기</span>
+  <span>›</span>
+</button>
+
+<!-- ✅ 즐겨찾기 버튼 추가 -->
+<button class="btn-portal" 
+        style="background:linear-gradient(135deg,#fdcb6e,#e17055);font-size:0.95rem;padding:14px 20px;opacity:0.9;"
+        onclick="showView('view-favorites');renderFavorites()">
+  <span>⭐ 즐겨찾기</span>
+  <span>›</span>
+</button>
 
     <!-- 기관/관리자 구분선 -->
     <div class="portal-staff-divider">
@@ -1443,6 +1451,18 @@
     </div>
   </div>
 
+  <!-- ⭐ 즐겨찾기 -->
+<div id="view-favorites" class="view">
+  <div class="view-content" style="padding:20px;">
+    <div class="nav-top">
+      <button class="btn-back" onclick="goPortal()">← 돌아가기</button>
+      <span style="font-weight:700;color:var(--yellow-deep);">⭐ 즐겨찾기</span>
+      <div style="width:60px;"></div>
+    </div>
+    <div id="favorites-content"></div>
+  </div>
+</div>
+  
   <!-- 📋 기관상세 -->
   <div id="view-org-detail" class="view">
     <div class="view-content" style="padding:20px;">
@@ -2211,6 +2231,63 @@ function restoreCombo(selectId, customId, hiddenId, value) {
   }
 }
 
+function renderFavorites() {
+  var area = document.getElementById('favorites-content');
+  if (!favorites.length) {
+    area.innerHTML =
+      '<div class="empty-state">' +
+      '<div class="empty-icon">🤍</div>' +
+      '<div style="font-weight:700;margin-bottom:8px;">즐겨찾기가 없습니다</div>' +
+      '<div style="font-size:0.85rem;color:var(--text-sub);">프로그램 카드의 🤍를 눌러<br>즐겨찾기에 추가해보세요.</div>' +
+      '</div>';
+    return;
+  }
+
+  var h = '<div style="font-size:0.82rem;color:var(--text-sub);margin-bottom:12px;">⭐ ' + favorites.length + '개의 즐겨찾기</div>';
+
+  favorites.forEach(function(orgName) {
+    var org = allOrgs.find(function(o) { return o.name === orgName; });
+    if (!org) return;
+
+    var orgProgs = allProgs.filter(function(p) { return p.orgName === orgName; });
+    var openCount = orgProgs.filter(function(p) { return p.status === '모집중'; }).length;
+    var icon = org.type === '학교밖 늘봄' ? '📚' : '🏠';
+    var bc = org.type === '학교밖 늘봄' ? 'var(--blue-deep)' : 'var(--green-deep)';
+
+    h += '<div style="background:var(--surface);border:1px solid var(--border);' +
+         'border-left:5px solid ' + bc + ';border-radius:var(--radius);' +
+         'padding:16px;margin-bottom:12px;box-shadow:var(--shadow);' +
+         'cursor:pointer;" onclick="detailBackTo=\'view-favorites\';openOrgDetail(\'' +
+         esc(orgName).replace(/'/g, "\\'") + '\')">';
+
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+    h += '<div style="font-weight:800;font-size:0.95rem;">' + icon + ' ' + esc(orgName) + '</div>';
+    h += '<button class="btn-favorite" data-org="' + esc(orgName) + '"' +
+         ' onclick="toggleFavorite(\'' + esc(orgName).replace(/'/g, "\\'") + '\',event)"' +
+         ' style="background:none;border:none;font-size:1.3rem;cursor:pointer;">❤️</button>';
+    h += '</div>';
+
+    h += '<div style="font-size:0.82rem;color:var(--text-sub);line-height:1.7;">';
+    h += org.address ? '📍 ' + esc(org.address) + '<br>' : '';
+    h += org.hours   ? '🕐 ' + esc(org.hours)   + '<br>' : '';
+    h += '</div>';
+
+    h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">';
+    h += '<span class="badge ' + (org.type === '학교밖 늘봄' ? 'badge-blue' : 'badge-green') + '">' +
+         (org.type || '미설정') + '</span>';
+    if (openCount > 0) {
+      h += '<span class="badge badge-green">🟢 모집중 ' + openCount + '개</span>';
+    }
+    if (org.transport === '있음') {
+      h += '<span class="badge badge-orange">🚌 통학버스</span>';
+    }
+    h += '</div>';
+    h += '</div>';
+  });
+
+  area.innerHTML = h;
+}
+  
 // ==========================================
 // ⚙️ Supabase API 설정
 // ==========================================
@@ -2291,7 +2368,50 @@ var kakaoMarkers = [];
 var mapFilter = '전체';
 var mapSearchQuery = '';
 var highlightProgName = '';
-var currentAdminTab = 'overview'; //
+var currentAdminTab = 'overview';
+var favorites = JSON.parse(localStorage.getItem('favorites') || '[]'); // ✅ 즐겨찾기
+
+
+// =====================================================
+// ⭐ 즐겨찾기 헬퍼
+// =====================================================
+function isFavorite(orgName) {
+  return favorites.indexOf(orgName) !== -1;
+}
+
+function toggleFavorite(orgName, e) {
+  if (e) e.stopPropagation();
+  var idx = favorites.indexOf(orgName);
+  if (idx !== -1) {
+    favorites.splice(idx, 1);
+    showToast('즐겨찾기에서 제거했습니다.');
+  } else {
+    favorites.push(orgName);
+    showToast('⭐ 즐겨찾기에 추가했습니다!');
+  }
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+
+  // 현재 화면 갱신
+  var currentView = document.querySelector('.view[style*="flex"]');
+  if (currentView) {
+    var id = currentView.id;
+    if (id === 'view-parent') {
+      buildCatGrid();
+      renderProgList();
+    } else if (id === 'view-org-detail') {
+      // 하트 아이콘만 갱신
+      var heartBtns = document.querySelectorAll('.btn-favorite');
+      heartBtns.forEach(function(btn) {
+        if (btn.getAttribute('data-org') === orgName) {
+          btn.innerText = isFavorite(orgName) ? '❤️' : '🤍';
+        }
+      });
+    } else if (id === 'view-favorites') {
+      renderFavorites();
+    }
+  }
+}
+  
   // ==========================================
 // 🔍 초성 검색 헬퍼
 // ==========================================
@@ -2624,16 +2744,66 @@ function renderProgList(){
     if (!grouped[key]) grouped[key] = { info: p, schedules: [], ck: catKey(p.category) };
     grouped[key].schedules.push({ day: p.day, start: p.startTime, end: p.endTime });
   });
-  var list=Object.values(grouped);
-  var openList=list.filter(function(g){return g.info.status!=='마감';});
-  var closedList=list.filter(function(g){return g.info.status==='마감';});
-  var h='';
-  if(openList.length>0)h+='<div class="open-summary">🟢 현재 신청 가능한 프로그램 <strong>'+openList.length+'개</strong></div><div class="prog-list">';
-  openList.forEach(function(g){h+=buildPCard(g);});
-  if(openList.length>0)h+='</div>';
-  if(closedList.length>0){h+='<div class="sec-header"><div class="sec-title">🔴 마감된 프로그램 ('+closedList.length+'개)</div><button class="sec-toggle" onclick="toggleClosed()">펼치기 ▼</button></div><div class="prog-list" id="closed-list" style="display:none;">';closedList.forEach(function(g){h+=buildPCard(g);});h+='</div>';}
-  if(!openList.length&&!closedList.length)h='<div class="empty-state"><div class="empty-icon">📋</div>등록된 프로그램이 없습니다.</div>';
-  area.innerHTML=h;
+var list = Object.values(grouped);
+
+// ✅ 수정8: 상태별 + updated_at 내림차순 정렬
+function getStatusOrder(status) {
+  if (status === '모집중')   return 0;
+  if (status === '대기접수') return 1;
+  if (status === '준비중')   return 2;
+  return 3;
+}
+
+var openList = list
+  .filter(function(g) { return g.info.status !== '마감'; })
+  .sort(function(a, b) {
+    // 1순위: 상태 순서
+    var statusDiff = getStatusOrder(a.info.status) - getStatusOrder(b.info.status);
+    if (statusDiff !== 0) return statusDiff;
+    // 2순위: 최신 업데이트 순
+    var aTime = new Date(a.info.updatedAt || 0).getTime();
+    var bTime = new Date(b.info.updatedAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+var closedList = list
+  .filter(function(g) { return g.info.status === '마감'; })
+  .sort(function(a, b) {
+    var aTime = new Date(a.info.updatedAt || 0).getTime();
+    var bTime = new Date(b.info.updatedAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+// 모집중/대기접수 개수 분리
+var recruitingCount = openList.filter(function(g) {
+  return g.info.status === '모집중';
+}).length;
+var waitingCount = openList.filter(function(g) {
+  return g.info.status === '대기접수';
+}).length;
+
+var h = '';
+if (openList.length > 0) {
+  var summaryText = '🟢 모집중 <strong>' + recruitingCount + '개</strong>';
+  if (waitingCount > 0) {
+    summaryText += ' · 🟡 대기접수 <strong>' + waitingCount + '개</strong>';
+  }
+  h += '<div class="open-summary">' + summaryText + '</div>';
+  h += '<div class="prog-list">';
+}
+openList.forEach(function(g) { h += buildPCard(g); });
+if (openList.length > 0) h += '</div>';
+if (closedList.length > 0) {
+  h += '<div class="sec-header"><div class="sec-title">🔴 마감된 프로그램 (' + closedList.length + '개)</div>' +
+       '<button class="sec-toggle" onclick="toggleClosed()">펼치기 ▼</button></div>' +
+       '<div class="prog-list" id="closed-list" style="display:none;">';
+  closedList.forEach(function(g) { h += buildPCard(g); });
+  h += '</div>';
+}
+if (!openList.length && !closedList.length) {
+  h = '<div class="empty-state"><div class="empty-icon">📋</div>등록된 프로그램이 없습니다.</div>';
+}
+area.innerHTML = h;
 }
 
 // 🆕 24시간 → 12시간제 변환 헬퍼
@@ -2725,8 +2895,15 @@ function buildPCard(g) {
 
   // 프로그램명 + 기관명
   h += '<div class="p-card-main">';
-  h += '<div class="p-card-name">' +
-       cat.icon + ' ' + esc(p.name) + '</div>';
+  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
+  h += '<div class="p-card-name">' + cat.icon + ' ' + esc(p.name) + '</div>';
+  // ✅ 즐겨찾기 하트 버튼
+  h += '<button class="btn-favorite" data-org="' + esc(p.orgName) + '"' +
+       ' onclick="toggleFavorite(\'' + esc(p.orgName).replace(/'/g, "\\'") + '\',event)"' +
+       ' style="background:none;border:none;font-size:1.2rem;cursor:pointer;' +
+       'padding:2px 4px;flex-shrink:0;">' +
+       (isFavorite(p.orgName) ? '❤️' : '🤍') + '</button>';
+  h += '</div>';
   h += '<div class="p-card-org">📍 ' + esc(p.orgName);
   if (orgType) {
     h += ' <span style="color:var(--border);margin:0 2px;">·</span> ' +
@@ -2880,7 +3057,14 @@ function renderOrgDetail(org, progs, notices) {
 
   // ① 기관명 + 뱃지
   h += '<div class="detail-org-header">';
-  h += '  <div class="detail-org-name">' + typeIcon + ' ' + esc(org.name) + '</div>';
+  h += '  <div style="display:flex;justify-content:space-between;align-items:center;">';
+  h += '    <div class="detail-org-name">' + typeIcon + ' ' + esc(org.name) + '</div>';
+  // ✅ 즐겨찾기 하트 버튼
+  h += '    <button class="btn-favorite" data-org="' + esc(org.name) + '"' +
+       ' onclick="toggleFavorite(\'' + esc(org.name).replace(/'/g, "\\'") + '\',event)"' +
+       ' style="background:none;border:none;font-size:1.6rem;cursor:pointer;padding:4px;">' +
+       (isFavorite(org.name) ? '❤️' : '🤍') + '</button>';
+  h += '  </div>';
   h += '  <div class="detail-org-badges">';
   h += '    <span class="badge ' + typeBadge + '">' + typeName + '</span>';
   if (org.jurisdiction) {
