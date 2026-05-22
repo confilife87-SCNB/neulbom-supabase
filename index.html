@@ -4258,13 +4258,28 @@ function saveOrgPwd() {
   if (!confirm('비밀번호를 변경하시겠습니까?\n다음 로그인부터 새 비밀번호를 사용합니다.')) return;
 
   showLoading(true);
-  sbUpdate('organizations', 'name=eq.' + encodeURIComponent(currentOrgName), { password: newPwd })
-    .then(function() {
-      showLoading(false);
+  fetch(SB_URL + '/functions/v1/change-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': 'Bearer ' + currentAccessToken
+    },
+    body: JSON.stringify({
+      type:        'org',
+      newPassword: newPwd
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    showLoading(false);
+    if (result.success) {
       document.getElementById('org-new-pwd').value = '';
       showToast('✅ 비밀번호가 변경되었습니다!');
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+    } else {
+      showToast('❌ ' + result.message);
+    }
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 
 function renderOrgInfoForm() {
@@ -5474,13 +5489,37 @@ function savePwd() {
   showLoading(true);
   closeModal('modal-pwd');
 
-  sbUpdate('organizations', 'name=eq.' + encodeURIComponent(editPwdOrg), { password: np })
-    .then(function() {
-      showLoading(false);
+  // 대상 기관의 org_id 찾기
+  var targetOrg = allOrgs.find(function(o) { return o.name === editPwdOrg; });
+  if (!targetOrg) {
+    showLoading(false);
+    showToast('❌ 기관 정보를 찾을 수 없습니다.');
+    return;
+  }
+
+  fetch(SB_URL + '/functions/v1/change-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': 'Bearer ' + currentAccessToken
+    },
+    body: JSON.stringify({
+      type:        'admin_org',
+      newPassword: np,
+      targetOrgId: targetOrg.orgId
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    showLoading(false);
+    if (result.success) {
       showToast('✅ 변경!');
       renderAdmPwd();
-    })
-    .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
+    } else {
+      showToast('❌ ' + result.message);
+    }
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
 // --- 보고서 ---
 function exportClipboard() { if (!adminData || !adminData.stats) return; var lines = []; lines.push('순창초 지역연계 저녁늘봄 현황'); lines.push('생성일: ' + new Date().toLocaleDateString('ko-KR')); lines.push(''); lines.push('기관명\t유형\t프로그램\t이용학생'); (adminData.stats.orgStats || []).forEach(function(s) { lines.push(s.name + '\t' + s.type + '\t' + s.progCount + '\t' + s.studentCount); }); var text = lines.join('\n'); if (navigator.clipboard) navigator.clipboard.writeText(text).then(function() { showToast('📋 복사!'); }); else { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('📋 복사!'); } }
@@ -5954,18 +5993,32 @@ function timeToMin(timeStr) {
 function saveAdminPwd() {
   var newPwd = document.getElementById('adm-new-pwd').value.trim();
   if (!newPwd) { showToast('새 비밀번호를 입력하세요.'); return; }
+  if (!confirm('관리자 비밀번호를 변경하시겠습니까?\n다음 로그인부터 새 비밀번호를 사용합니다.')) return;
 
-  alert(
-    '🔑 관리자 비밀번호 변경 방법\n\n' +
-    '1. Supabase 대시보드 접속\n' +
-    '2. Edge Functions → admin-login → Secrets\n' +
-    '3. ADMIN_PASSWORD 값을 새 비밀번호로 변경\n\n' +
-    '변경 즉시 새 비밀번호로 로그인 가능합니다.'
-  );
-
-  document.getElementById('adm-new-pwd').value = '';
+  showLoading(true);
+  fetch(SB_URL + '/functions/v1/change-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': 'Bearer ' + currentAccessToken
+    },
+    body: JSON.stringify({
+      type:        'admin',
+      newPassword: newPwd
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    showLoading(false);
+    if (result.success) {
+      document.getElementById('adm-new-pwd').value = '';
+      showToast('✅ 관리자 비밀번호가 변경되었습니다!');
+    } else {
+      showToast('❌ ' + result.message);
+    }
+  })
+  .catch(function(e) { showLoading(false); showToast('❌ ' + e.message); });
 }
-
 // ==========================================
 // 🏢 기관 유형/관할 편집 모달
 // ==========================================
