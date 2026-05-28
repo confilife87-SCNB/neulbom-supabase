@@ -1854,13 +1854,13 @@
   </div>
 </div>
 
-<!-- 모달: 학생 (🆕 전체 개선) -->
+<!-- 모달: 학생 -->
 <div id="modal-student" class="modal-overlay"
      onclick="if(event.target===this)closeModal('modal-student')">
   <div class="modal-content">
     <div class="modal-title" id="modal-student-title">학생 추가</div>
 
-    <!-- 🆕 학년/반 드롭박스 -->
+    <!-- 학년/반 드롭박스 (반은 선택사항으로 변경) -->
     <div class="form-row">
       <div class="form-group" id="fg-ms-grade">
         <label class="form-label">
@@ -1878,11 +1878,9 @@
         <div class="form-error-msg">학년을 선택해주세요.</div>
       </div>
       <div class="form-group" id="fg-ms-class">
-        <label class="form-label">
-          반 <span class="required">*</span>
-        </label>
+        <label class="form-label">반</label>
         <select id="ms-class">
-          <option value="">선택</option>
+          <option value="">선택 (선택사항)</option>
           <option value="1">1반</option>
           <option value="2">2반</option>
           <option value="3">3반</option>
@@ -1894,7 +1892,6 @@
           <option value="9">9반</option>
           <option value="10">10반</option>
         </select>
-        <div class="form-error-msg">반을 선택해주세요.</div>
       </div>
     </div>
 
@@ -1917,13 +1914,12 @@
       </select>
     </div>
 
-    <!-- 🆕 프로그램 선택 → 요일 자동채움 연동 -->
+    <!-- 프로그램 선택 → 요일 자동채움 연동 -->
     <div class="form-group">
       <label class="form-label">프로그램</label>
       <select id="ms-prog" onchange="onStudentProgChange()">
         <option value="">선택</option>
       </select>
-      <!-- 프로그램 선택 시 운영시간 참고 표시 -->
       <div id="ms-prog-info"
            style="display:none;margin-top:6px;font-size:0.8rem;
                   color:var(--teal-deep);font-weight:600;
@@ -1932,7 +1928,7 @@
       </div>
     </div>
 
-    <!-- 🆕 이용요일 — 버튼 토글 + 경고 -->
+    <!-- 이용요일 — 버튼 토글 + 경고 -->
     <div class="form-group" id="fg-ms-day">
       <label class="form-label">이용요일</label>
       <div class="toggle-btn-group" id="ms-day-btns">
@@ -1954,7 +1950,6 @@
       <div class="toggle-result" id="ms-day-result">
         요일을 선택하세요
       </div>
-      <!-- 🆕 등록 요일 불일치 경고 -->
       <div class="toggle-warn" id="ms-day-warn">
         ⚠️ 프로그램 운영 요일(<span id="ms-day-warn-days"></span>)과
         다른 요일이 포함되어 있습니다.
@@ -1962,9 +1957,11 @@
       <input type="hidden" id="ms-day">
     </div>
 
-    <!-- 🆕 보호자 연락처 — 자동 하이픈 -->
-    <div class="form-group">
-      <label class="form-label">보호자 연락처</label>
+    <!-- 보호자 연락처 — 필수로 변경 -->
+    <div class="form-group" id="fg-ms-contact">
+      <label class="form-label">
+        보호자 연락처 <span class="required">*</span>
+      </label>
       <input type="text" id="ms-contact"
              placeholder="01012345678"
              maxlength="13"
@@ -1972,12 +1969,15 @@
       <div style="font-size:0.75rem;color:var(--text-sub);margin-top:3px;">
         숫자만 입력하면 자동으로 하이픈이 추가됩니다.
       </div>
+      <div class="form-error-msg">보호자 연락처를 입력해주세요.</div>
     </div>
 
-    <!-- 등원/하원 방법 -->
+    <!-- 등원/하원 방법 — 필수로 변경 -->
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">등원방법</label>
+      <div class="form-group" id="fg-ms-arrival">
+        <label class="form-label">
+          등원방법 <span class="required">*</span>
+        </label>
         <select id="ms-arrival">
           <option value="">선택</option>
           <option>기관차량</option>
@@ -1986,9 +1986,12 @@
           <option>도보(자율)</option>
           <option>사설학원차량</option>
         </select>
+        <div class="form-error-msg">등원방법을 선택해주세요.</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">하원방법</label>
+      <div class="form-group" id="fg-ms-dismissal">
+        <label class="form-label">
+          하원방법 <span class="required">*</span>
+        </label>
         <select id="ms-dismissal">
           <option value="">선택</option>
           <option>기관차량</option>
@@ -1997,6 +2000,7 @@
           <option>도보(자율)</option>
           <option>사설학원차량</option>
         </select>
+        <div class="form-error-msg">하원방법을 선택해주세요.</div>
       </div>
     </div>
 
@@ -2018,6 +2022,7 @@
     </div>
   </div>
 </div>
+  
   <!-- 모달: 공지 -->
   <div id="modal-notice" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-notice')"><div class="modal-content"><div class="modal-title" id="modal-notice-title">공지사항 작성</div><div class="form-group"><label class="form-label">제목</label><input type="text" id="mn-title"></div><div class="form-group"><label class="form-label">내용</label><textarea id="mn-content" style="min-height:120px;"></textarea></div><div class="form-group"><label class="form-label">상태</label><select id="mn-status"><option>게시중</option><option>종료</option></select></div><div style="display:flex;gap:8px;"><button class="btn-action gray" style="flex:1;" onclick="closeModal('modal-notice')">취소</button><button class="btn-action teal" style="flex:2;" onclick="saveNotice()">저장</button></div></div></div>
 
@@ -4855,9 +4860,9 @@ function openStudentModal(ri) {
   document.getElementById('modal-student').style.display = 'flex';
 }
 function saveStudent() {
-  // 🆕 필수항목 검증
   var errors = [];
 
+  // 학년 — 필수
   var grade = document.getElementById('ms-grade').value;
   if (!grade) {
     setFormError('fg-ms-grade', true);
@@ -4866,20 +4871,43 @@ function saveStudent() {
     setFormError('fg-ms-grade', false);
   }
 
+  // 반 — 선택 (검증 제거)
   var classNum = document.getElementById('ms-class').value;
-  if (!classNum) {
-    setFormError('fg-ms-class', true);
-    errors.push('ms-class');
-  } else {
-    setFormError('fg-ms-class', false);
-  }
 
+  // 이름 — 필수
   var name = document.getElementById('ms-name').value.trim();
   if (!name) {
     setFormError('fg-ms-name', true);
     errors.push('ms-name');
   } else {
     setFormError('fg-ms-name', false);
+  }
+
+  // 보호자 연락처 — 필수로 변경
+  var contact = document.getElementById('ms-contact').value.trim();
+  if (!contact) {
+    setFormError('fg-ms-contact', true);
+    errors.push('ms-contact');
+  } else {
+    setFormError('fg-ms-contact', false);
+  }
+
+  // 등원방법 — 필수로 변경
+  var arrival = document.getElementById('ms-arrival').value;
+  if (!arrival) {
+    setFormError('fg-ms-arrival', true);
+    errors.push('ms-arrival');
+  } else {
+    setFormError('fg-ms-arrival', false);
+  }
+
+  // 하원방법 — 필수로 변경
+  var dismissal = document.getElementById('ms-dismissal').value;
+  if (!dismissal) {
+    setFormError('fg-ms-dismissal', true);
+    errors.push('ms-dismissal');
+  } else {
+    setFormError('fg-ms-dismissal', false);
   }
 
   if (errors.length > 0) {
@@ -4896,10 +4924,10 @@ function saveStudent() {
     classNum:  classNum,
     name:      name,
     progName:  document.getElementById('ms-prog').value,
-    day:       document.getElementById('ms-day').value, // 🆕 hidden input
-    contact:   document.getElementById('ms-contact').value,
-    arrival:   document.getElementById('ms-arrival').value,
-    dismissal: document.getElementById('ms-dismissal').value,
+    day:       document.getElementById('ms-day').value,
+    contact:   contact,
+    arrival:   arrival,
+    dismissal: dismissal,
     note:      document.getElementById('ms-note').value
   };
 
@@ -4928,8 +4956,8 @@ function saveStudent() {
   }
 
   var dbData = {
-    grade:     d.grade     ? parseInt(d.grade)    : null,
-    class_num: d.classNum  ? parseInt(d.classNum) : null,
+    grade:     d.grade    ? parseInt(d.grade)    : null,
+    class_num: d.classNum ? parseInt(d.classNum) : null,
     name:      d.name,
     org_name:  orgName,
     prog_name: d.progName,
